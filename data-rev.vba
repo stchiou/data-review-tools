@@ -1,7 +1,13 @@
+Attribute VB_Name = "Module2"
 Sub Data_Review()
     Dim LastRow As Integer
     Dim curRow As Integer
     Dim i As Integer
+    Dim temp(100)as string
+    Dim nb(100) As integer
+    Dim pg(100) As integer
+    Dim p1 as Integer
+    Dim p2 as Integer
     Sheets.Add after:=Sheets("QA Data")
     Sheets(Sheets.Count).Select
     Sheets(Sheets.Count).Name = "Data"
@@ -10,8 +16,7 @@ Sub Data_Review()
         Selection.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
     Worksheets("QA Data").Select
     LastRow = Cells(1, 1).End(xlDown).Row
-    Dim nb(LastRow) As String
-    Dim pg(LastRow) As String
+
     Worksheets("QA Data").Range(Cells(1, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Data").Range("A1")
     Worksheets("QA Data").Range(Cells(1, 12), Cells(LastRow, 12)).Copy _
@@ -20,8 +25,11 @@ Sub Data_Review()
     Worksheets("Data").Cells(1, 4).Value = "Page"
     For i = 2 To LastRow
         Cells(i, 7).Select
-        nb(i) = Mid(Cells(i, 7).Value, Find("Book ", Cells(i, 7).Value) + 5, 5)
-        pg(i) = Mid(Cells(i, 7).Value, Find("page ", Cells(i, 7).Value) + 5, 2)
+        temp(i)=Cells(i,7).Value
+        p1=Instr(temp(i),"Book ")
+        p2=Instr(temp(i),"page ")
+        nb(i) = Mid(Cells(i, 7).Value, p1 + 5, 5)
+        pg(i) = Mid(Cells(i, 7).Value, p2 + 5, 2)
         Worksheets("Data").Cells(i, 3).Value = nb(i)
         Worksheets("Data").Cells(i, 4).Value = pg(i)
     Next i
