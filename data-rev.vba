@@ -9,7 +9,7 @@ Sub Data_Review()
     Dim pg(100) As Integer
     Dim p1 As Integer
     Dim p2 As Integer
-    Dim reviewer(30, 5) As String
+    Dim reviewer() As Variant
     'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("supplement")
     Sheets(Sheets.Count).Select
@@ -21,11 +21,8 @@ Sub Data_Review()
     'Determine number of record in the sheet'
     Worksheets("QA Data").Select
     LastRow = Cells(1, 1).End(xlDown).Row
-    For i = 2 To 30
-      For j = 1 To 5
-        reviewer(i, j) = Worksheets("supplement").Range(Cells(i, j)).Value
-      Next j
-    Next i
+    'Read the names of Reviewers into array'
+    reviewer = Worksheets("supplement").Range("a2:e25").Value
     'Make a copy of Date and Method from the source sheet to the target sheet'
     Worksheets("QA Data").Range(Cells(1, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Data").Range("A1")
