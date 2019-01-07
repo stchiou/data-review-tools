@@ -11,7 +11,7 @@ Sub Data_Review()
     Dim p2 As Integer
     Dim reviewer(30, 5) As String
     'Create a new sheet for consolidated data'
-    Sheets.Add after:=Sheets("QA Data")
+    Sheets.Add after:=Sheets("supplement")
     Sheets(Sheets.Count).Select
     Sheets(Sheets.Count).Name = "Data"
     'Remove extra blank lines on the spreadsheet'
