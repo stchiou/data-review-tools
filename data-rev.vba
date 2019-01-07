@@ -9,7 +9,7 @@ Sub Data_Review()
     Dim pg(100) As Integer
     Dim p1 As Integer
     Dim p2 As Integer
-    Dim reviewer(30, 3) As String
+    Dim reviewer(30, 5) As String
     'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("QA Data")
     Sheets(Sheets.Count).Select
@@ -22,7 +22,7 @@ Sub Data_Review()
     Worksheets("QA Data").Select
     LastRow = Cells(1, 1).End(xlDown).Row
     For i = 2 To 30
-      For j = 1 To 3
+      For j = 1 To 5
         reviewer(i, j) = Worksheets("supplement").Range(Cells(i, j)).Value
       Next j
     Next i
