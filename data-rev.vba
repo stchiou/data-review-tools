@@ -18,7 +18,7 @@ Sub Data_Review()
     Dim rlpos(100) As Integer
     Dim rl(100) As String
     Dim tempstr As String
-    Dim dr_list(50) as String
+    Dim dr_list(50) As String
     'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("QA Data")
     Sheets(Sheets.Count).Select
@@ -38,9 +38,9 @@ Sub Data_Review()
     Worksheets("QA Data").Range(Cells(1, 12), Cells(LastRow, 12)).Copy _
     Destination:=Worksheets("Data").Range("B1")   'Column B; Method'
     'Make a copy of Lot Numbers to the target sheet'
-    Worksheets("QA Data").Range(Cells(1,3), Cells(LastRow, 3)).Copy _
+    Worksheets("QA Data").Range(Cells(1, 3), Cells(LastRow, 3)).Copy _
     Destination:=Worksheets("Data").Range("C1")   'Column C; Lot Number'
-    Worksheets("QA Data").Range(Cells(1,4), Cells(LastRow, 4)).Copy _
+    Worksheets("QA Data").Range(Cells(1, 4), Cells(LastRow, 4)).Copy _
     Destination:=Worksheets("Data").Range("D1")   'Column D; List Number'
     'Make a copy of Error type to the target sheet'
     Worksheets("QA Data").Range(Cells(1, 6), Cells(LastRow, 6)).Copy _
@@ -73,8 +73,8 @@ Sub Data_Review()
             drpunc(i) = InStr(tempstr, "     ") + drpos(i)
             dr(i) = mid(col_m(i), drpos(i), (drpunc(i) - drpos(i)))
         End If
-        If Instr(dr(i),"N/A")>0 Then
-          dr(i)=""
+        If InStr(dr(i), "N/A") > 0 Then
+          dr(i) = ""
         Else
         End If
         Worksheets("Data").Cells(i, 7).Value = dr(i)  'Column G; Data Reviewer'
@@ -82,9 +82,8 @@ Sub Data_Review()
         rl(i) = mid(col_m(i), rlpos(i), Len(col_m(i)))
         Worksheets("Data").Cells(i, 8).Value = rl(i)  'Column H; Released by'
     Next i
-    Worksheets("Data").Range(Cells(2,5),cells(LastRow,5)).Copy _
-    Destination:=Worksheets("Results").Range(Cells(2,1),Cells(LastRow,1))
-    Worksheets("Data").Range(Cells(2,6),Cells(LastRow,6)).Copy _
-    Destination:=Worksheets("Results").Range(Cells(LastRow+1,1),Cells(LastRow*2-1,1))
+    Worksheets("Data").Select
+    Range(Cells(1, 7), Cells(LastRow, 8)).Copy _
+    Destination:=Worksheets("Results").Range("A1")
 
 End Sub
