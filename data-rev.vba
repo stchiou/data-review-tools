@@ -14,33 +14,12 @@ Sub Data_Review()
     Dim p_rev as String
     Dim rev as String
     Dim rel as String
-    'Function for finding Data Reviewer name'
-    Function FindRole (comment)
-      Dim comment as string
-      Dim rev_start as Integer
-      Dim rel_start as Integer
-      Dim separator as Integer
-      separator=Instr(comment,"     ")
-      'Find Data Reviewer'
-      rev_start=Instr(comment,"Data reviewer ")
-      If rev_start=0 Then
-        comment=left(comment,separator+5,len(comment)-separator-5)
-      Else
-        If rev_start > separator Then
-          comment=left(comment,separator+5,len(comment)-separator-5)
-          separator=Instr(comment,"     ")
-        Else
-          comment=left(comment,separator+5,len(comment)-separator-5)
-        End If
-          rev=mid(comment,rev_start+14,10)
-      End If
-      'Find Releaser'
-      rel_start=Inst()
-    End Function
-    Function FindRel ()
-    End Function
-    Function FindPR()
-    End Function
+    Dim comment as String
+    Dim drpos as Integer
+    Dim drpunc as Integer
+    Dim dr as String
+    Dim rlpos as Integer
+    Dim tempstr as string
     'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("supplement")
     Sheets(Sheets.Count).Select
@@ -64,8 +43,10 @@ Sub Data_Review()
     'Create Headers for Notebook and Page Number columns'
     Worksheets("Data").Cells(1, 3).Value = "Note Book"
     Worksheets("Data").Cells(1, 4).Value = "Page"
+    Worksheets("Data").Cells(1, 5).Value = "Data Reviewer"
+    Worksheets("Data").Cells(1, 6).Value = "Released by"
     'Parse Notebook and Page Number from the source sheet to the target sheet'
-    For i = 2 To LastRow
+     For i = 2 To LastRow
         Cells(i, 7).Select
         col_g(i) = Cells(i, 7).Value
         p1 = InStr(col_g(i), "Book ")
@@ -75,13 +56,14 @@ Sub Data_Review()
         Worksheets("Data").Cells(i, 3).Value = nb(i)
         Worksheets("Data").Cells(i, 4).Value = pg(i)
         col_j(i) = cells(i, 10).Value
-
+        cells(i,4).value=comment
+        drpos=Instr(comment,"Data reviewer ")+14
+        tempstr=mid(comment,drpos,len(comment))
+        drpunc=Instr(tempstr,"     ")+drpos
+        dr=mid(comment,drpos,(drpunc-drpos))
+        Worksheets("Data").Cells(i,5).Value=dr
+        rlpos=Instr(comment,"Released by ")+12
+        rl=mid(comment,rlpos,len(comment))
+        Worksheets("Data").Cells(i,6).Value=rl
     Next i
-
-
-
-
-
-
-
 End Sub
