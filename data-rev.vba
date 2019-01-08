@@ -77,13 +77,21 @@ Sub Data_Review()
           dr(i) = ""
         Else
         End If
+        If InStr(dr(i), "?") > 0 Then
+            dr(i) = ""
+        Else
+        End If
         Worksheets("Data").Cells(i, 7).Value = dr(i)  'Column G; Data Reviewer'
         rlpos(i) = InStr(col_m(i), "Released by ") + 12
         rl(i) = mid(col_m(i), rlpos(i), Len(col_m(i)))
         Worksheets("Data").Cells(i, 8).Value = rl(i)  'Column H; Released by'
     Next i
     Worksheets("Data").Select
-    Range(Cells(1, 7), Cells(LastRow, 8)).Copy _
+    Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
     Destination:=Worksheets("Results").Range("A1")
-
+    tempstr = "A" & LastRow + 1
+    Range(Cells(2, 8), Cells(LastRow, 8)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
+    Worksheets("Results").Range(Cells(1, 1), Cells(LastRow * 2, 1)).RemoveDuplicates Columns:=1
+    
 End Sub
