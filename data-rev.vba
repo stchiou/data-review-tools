@@ -11,17 +11,15 @@ Sub Data_Review()
     Dim col_m(100) As String
     Dim p1 As Integer
     Dim p2 As Integer
-    Dim p_rev as String
-    Dim rev as String
-    Dim rel as String
-    Dim comment as String
-    Dim drpos as Integer
-    Dim drpunc as Integer
-    Dim dr as String
-    Dim rlpos as Integer
-    Dim tempstr as string
+    Dim p_rev(100) As String
+    Dim drpos(100) As Integer
+    Dim drpunc(100) As Integer
+    Dim dr(100) As String
+    Dim rlpos(100) As Integer
+    Dim rl(100) As String
+    Dim tempstr As String
     'Create a new sheet for consolidated data'
-    Sheets.Add after:=Sheets("supplement")
+    Sheets.Add after:=Sheets("QA Data")
     Sheets(Sheets.Count).Select
     Sheets(Sheets.Count).Name = "Data"
     'Remove extra blank lines on the spreadsheet'
@@ -51,19 +49,23 @@ Sub Data_Review()
         col_g(i) = Cells(i, 7).Value
         p1 = InStr(col_g(i), "Book ")
         p2 = InStr(col_g(i), "page ")
-        nb(i) = Mid(Cells(i, 7).Value, p1 + 5, 5)
-        pg(i) = Mid(Cells(i, 7).Value, p2 + 5, 2)
+        nb(i) = mid(Cells(i, 7).Value, p1 + 5, 5)
+        pg(i) = mid(Cells(i, 7).Value, p2 + 5, 2)
         Worksheets("Data").Cells(i, 3).Value = nb(i)
         Worksheets("Data").Cells(i, 4).Value = pg(i)
-        col_j(i) = cells(i, 10).Value
-        cells(i,4).value=comment
-        drpos=Instr(comment,"Data reviewer ")+14
-        tempstr=mid(comment,drpos,len(comment))
-        drpunc=Instr(tempstr,"     ")+drpos
-        dr=mid(comment,drpos,(drpunc-drpos))
-        Worksheets("Data").Cells(i,5).Value=dr
-        rlpos=Instr(comment,"Released by ")+12
-        rl=mid(comment,rlpos,len(comment))
-        Worksheets("Data").Cells(i,6).Value=rl
+        col_j(i) = Cells(i, 10).Value
+        col_m(i) = Cells(i, 13).Value
+        drpos(i) = InStr(col_m(i), "Data reviewer ") + 14
+        If drpos(i) = 14 Then
+            dr(i) = ""
+        Else
+            tempstr = mid(col_m(i), drpos(i), Len(col_m(i)))
+            drpunc(i) = InStr(tempstr, "     ") + drpos(i)
+            dr(i) = mid(col_m(i), drpos(i), (drpunc(i) - drpos(i)))
+        End If
+        Worksheets("Data").Cells(i, 5).Value = dr(i)
+        rlpos(i) = InStr(col_m(i), "Released by ") + 12
+        rl(i) = mid(col_m(i), rlpos(i), Len(col_m(i)))
+        Worksheets("Data").Cells(i, 6).Value = rl(i)
     Next i
 End Sub
