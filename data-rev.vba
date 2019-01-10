@@ -1,20 +1,22 @@
-Attribute VB_Name = "Module1"
+Attribute VB_Name = "DataReviewer"
     Public LastRow As Integer
     Public curRow As Integer
     Public col_g(1000) As String
-    Dim nb(1000) As Integer
-    Dim pg(1000) As Integer
-    Dim col_j(1000) As String
-    Dim col_m(1000) As String
-    Dim p1 As Integer
-    Dim p2 As Integer
-    Dim p_rev(1000) As String
-    Dim drpos(1000) As Integer
-    Dim drpunc(1000) As Integer
-    Dim dr(1000) As String
-    Dim rlpos(1000) As Integer
-    Dim rl(1000) As String
-    Dim tempstr As String
+    Public nb(1000) As Integer
+    Public pg(1000) As Integer
+    Public col_j(1000) As String
+    Public col_m(1000) As String
+    Public p1 As Integer
+    Public p2 As Integer
+    Public p_rev(1000) As String
+    Public drpos(1000) As Integer
+    Public drpunc(1000) As Integer
+    Public dr(1000) As String
+    Public rlpos(1000) As Integer
+    Public rl(1000) As String
+    Public tempstr As String
+    Public dr_names(100, 2) As String
+    Public cur_row As Integer
 Sub DR_GenData()
     Dim i As Integer
     'Create a new sheet for consolidated data'
@@ -84,24 +86,36 @@ Sub DR_GenData()
         rl(i) = mid(col_m(i), rlpos(i), Len(col_m(i)))
         Worksheets("Data").Cells(i, 8).value = rl(i)  'Column H; Released by'
     Next i
-End Sub
-Sub DR_Calculate()
-    Dim dr_record(1000) As String
-    Dim cur_row As Integer
+    Worksheets("Name").Activate
+    LastRow = Cells(1, 1).End(xlDown).Row
+    For cur_row = 2 To LastRow
+        dr_names(cur_row, 0) = Cells(cur_row, 1).value
+        dr_names(cur_row, 1) = Cells(cur_row, 2).value
+        dr_names(cur_row, 2) = Cells(cur_row, 3).value
+    Next cur_row
+    
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
     Destination:=Worksheets("Results").Range("A1")
     tempstr = "A" & LastRow + 1
     Range(Cells(2, 8), Cells(LastRow, 8)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
+    Range(Cells(1, 6), Cells(LastRow, 6)).Copy _
+    Destination:=Worksheets("Results").Range("B1")
+    tempstr = "B" & LastRow + 1
+    Range(Cells(2, 6), Cells(LastRow, 6)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
+    Range(Cells(1, 5), Cells(LastRow, 5)).Copy _
+    Destination:=Worksheets("Results").Range("C1")
+    tempstr = "C" & LastRow + 1
+    Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
     Worksheets("Results").Select
+    Range(Cells(For1, 1), Cells(LastRow * 2, 1)).Copy _
+    Destination:=Worksheets("Results").Range("E1")
+    Range(Cells(1, 5), Cells(LastRow * 2, 5)).RemoveDuplicates Columns:=1, Header:=xlYes
     On Error Resume Next
-      Range(1, 1).Select
-      Selection.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
-    Worksheets("Results").Cells(1, 1).Select
-    cur_row = 1
-    While activecell.value <> ""
-      cur_row = cur_row + 1
-      dr_record(i) = activecell.offset(1, 0).value
-    Wend
+        Range(1, 5).Select
+        Selection.SpecialCells(xlCellTypeBlanks).Delete Shift:=xlShiftUp
+    
 End Sub
