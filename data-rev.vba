@@ -15,7 +15,7 @@ Attribute VB_Name = "DataReviewer"
     Public rlpos(1000) As Integer
     Public rl(1000) As String
     Public tempstr As String
-    Public dr_names(100, 2) As String
+   
     Public cur_row As Integer
 Sub DR_GenData()
     Dim i As Integer
@@ -59,8 +59,8 @@ Sub DR_GenData()
         col_g(i) = Cells(i, 7).value
         p1 = InStr(col_g(i), "Book ")
         p2 = InStr(col_g(i), "page ")
-        nb(i) = mid(Cells(i, 7).value, p1 + 5, 5)
-        pg(i) = mid(Cells(i, 7).value, p2 + 5, 2)
+        nb(i) = Mid(Cells(i, 7).value, p1 + 5, 5)
+        pg(i) = Mid(Cells(i, 7).value, p2 + 5, 2)
         Worksheets("Data").Cells(i, 9).value = nb(i) 'Column I; Notebook'
         Worksheets("Data").Cells(i, 10).value = pg(i) 'Column J; page'
         col_j(i) = Cells(i, 10).value
@@ -69,9 +69,9 @@ Sub DR_GenData()
         If drpos(i) = 14 Then
             dr(i) = col_j(i)
         Else
-            tempstr = mid(col_m(i), drpos(i), Len(col_m(i)))
+            tempstr = Mid(col_m(i), drpos(i), Len(col_m(i)))
             drpunc(i) = InStr(tempstr, "     ") + drpos(i)
-            dr(i) = mid(col_m(i), drpos(i), (drpunc(i) - drpos(i)))
+            dr(i) = Mid(col_m(i), drpos(i), (drpunc(i) - drpos(i)))
         End If
         If InStr(dr(i), "N/A") > 0 Then
           dr(i) = ""
@@ -83,17 +83,11 @@ Sub DR_GenData()
         End If
         Worksheets("Data").Cells(i, 7).value = dr(i)  'Column G; Data Reviewer'
         rlpos(i) = InStr(col_m(i), "Released by ") + 12
-        rl(i) = mid(col_m(i), rlpos(i), Len(col_m(i)))
+        rl(i) = Mid(col_m(i), rlpos(i), Len(col_m(i)))
         Worksheets("Data").Cells(i, 8).value = rl(i)  'Column H; Released by'
     Next i
-    Worksheets("Name").Activate
-    LastRow = Cells(1, 1).End(xlDown).Row
-    For cur_row = 2 To LastRow
-        dr_names(cur_row, 0) = Cells(cur_row, 1).value
-        dr_names(cur_row, 1) = Cells(cur_row, 2).value
-        dr_names(cur_row, 2) = Cells(cur_row, 3).value
-    Next cur_row
-    
+
+    'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
     Destination:=Worksheets("Results").Range("A1")
@@ -111,11 +105,54 @@ Sub DR_GenData()
     Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
     Worksheets("Results").Select
-    Range(Cells(For1, 1), Cells(LastRow * 2, 1)).Copy _
+    Range(Cells(1, 1), Cells(LastRow * 2, 1)).Copy _
     Destination:=Worksheets("Results").Range("E1")
+    'Remove duplicates
     Range(Cells(1, 5), Cells(LastRow * 2, 5)).RemoveDuplicates Columns:=1, Header:=xlYes
+    'Remove blank cell on data review name column'
     On Error Resume Next
         Range(1, 5).Select
-        Selection.SpecialCells(xlCellTypeBlanks).Delete Shift:=xlShiftUp
+        Selection.SpecialCells(xlCellTypeBlanks).Delete Shift:=xlShiftUp7
+    Dim name_count As Integer
+    Dim res_name_count As Integer
+    Dim res_pos As Integer
+    Dim nam_pos As Integer
+    Dim dr_name_rs As String
+    Dim restr As String
+    'Detect row number'
+    res_name_count = Worksheets("Results").Cells(1, 5).End(xlDown).Row
+    name_count = Worksheets("Name").Cells(1, 1).End(xlDown).Row
+    For res_pos = 2 To res_name_count
+        dr_name_rs = Trim(Cells(res_pos, 5).value)
+        If InStr(dr_name_rs, ". ") <> 0 Then
+            restr = Trim(Mid(dr_name, InStr(dr_name_rs, ". ") + 1, Len(dr_name_rs)))
+            Else
+                If InStr(dr_name_rs, ".") <> 0 Then
+                    restr = Left(dr_name_rs, Len(dr_name_rs) - 3)
+                Else
+                    restr = dr_name_rs
+                End If
+                restr = Left(dr_name_rs, InStr(dr_name_rs, " ") - 1)
+            End If
+            For name_pos = 2 To name_count
+                If InStr(Cells(name_pos, 1).value, restr) <> 0 Then
+                    restr = Cells(name_pos, 1).value & " " & Cells(name_pos, 2).value
+                    Cells(res_pos, 5).value = restr
+                Else
+                    If InStr(Cells(name_pos, 2).value, restr) <> 0 Then
+                        restr = Cells(name_pos, 1).value & " " & Cells(name_pos, 2).value
+                        Cells(res_pos, 5).value = restr
+                    Else
+                        If InStr(Cells(name_pos, 3).value, restr) <> 0 Then
+                            restr = Cells(name_pos, 1).value & " " & Cells(name_pos, 2).value
+                            Cells(res_pos, 5).value = restr
+                        Else
+                        
+                        End If
+                    End If
+                    
+                End If
+            Next name_pos
+        Next res_pos
     
 End Sub
