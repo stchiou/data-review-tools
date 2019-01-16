@@ -1,73 +1,88 @@
 Attribute VB_Name = "DataReviewer"
-    Public LastRow As Integer
-    Public curRow As Integer
-    Public col_g(1000) As String
-    Public nb(1000) As Integer
-    Public pg(1000) As Integer
-    Public col_j(1000) As String
-    Public col_m(1000) As String
-    Public p1 As Integer
-    Public p2 As Integer
-    Public p_rev(1000) As String
-    Public drpos(1000) As Integer
-    Public drpunc(1000) As Integer
-    Public dr(1000) As String
-    Public rlpos(1000) As Integer
-    Public rl(1000) As String
-    Public tempstr As String
-   
-    Public cur_row As Integer
 Sub DR_GenData()
+'--------------------------------------------------------
+'Script for processing and summarize Data Reviewer Error
+'v1.0
+'Sean Chiou, Jan 7, 2019
+'--------------------------------------------------------
+    Dim LastRow As Integer               'Last row on the spreadsheet
+    Dim curRow As Integer                'Current row of the spreadsheet
+    Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
+    Dim nb(1000) As Integer              'Value of the Notebook number parsed from col_g()
+    Dim pg(1000) As Integer              'Value of the Page number parsed from col_g()
+    Dim col_j(1000) As String            'Value of Column J of the Sheet "QA Data" (Previous Reviewer)
+    Dim col_m(1000) As String            'Value of Column M of the Sheet "QA Data" (Comments)
+    Dim p1 As Integer                    'Temporary variable to store the position of the pattern "Book" while processing Column G of Sheet "QA Data"
+    Dim p2 As Integer                    'Temporary variable to store the position of the pattern "Page" while processing Column G of Sheet "QA Data"
+    Dim drpos(1000) As Integer           'Position of "Data Review" in Column M of the Sheet "QA Data"
+    Dim drpunc(1000) As Integer          'Position of "  " (two consecutive spaces) in Column M of the Sheet "QA Data"
+    Dim dr(1000) As String               'Value of names after "Data Reviewer", parsed from Column M of the Sheet "QA Data"
+    Dim rlpos(1000) As Integer           'Position of "Released by" in Column M of the Sheet "QA Data"
+    Dim rl(1000) As String               'Value of names after "Released by", parsed from Column M of the Sheet "QA Data"
+    Dim tempstr As String                'Temporary string holder while processing data
     Dim i As Integer
-    'Create a new sheet for consolidated data'
+'-----------------------------------------------------------------------------------------------------------------------------
+'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("QA Data")
     Sheets(Sheets.Count).Select
     Sheets(Sheets.Count).Name = "Data"
-    'Remove extra blank lines on the spreadsheet'
+'Remove extra blank lines on the spreadsheet'
     On Error Resume Next
         Range(1, 1).Select
         Selection.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
-    'Determine number of record in the sheet'
+'Determine number of record in the sheet'
     Worksheets("QA Data").Select
     LastRow = Cells(1, 1).End(xlDown).Row
-
-    'Make a copy of Date to the target sheet'
+'Make a copy of Column E(Date) from Sheet "QA Data" to Column A of Sheet "Data"
     Worksheets("QA Data").Range(Cells(1, 5), Cells(LastRow, 5)).Copy _
-    Destination:=Worksheets("Data").Range("A1")   'Column A; Date'
-    'Make a copy of Method to the target sheet'
+    Destination:=Worksheets("Data").Range("A1")
+'Make a copy of Column L (Method) from Sheet "QA Data" to Column B of Sheet "Data"
     Worksheets("QA Data").Range(Cells(1, 12), Cells(LastRow, 12)).Copy _
     Destination:=Worksheets("Data").Range("B1")   'Column B; Method'
-    'Make a copy of Lot Numbers to the target sheet'
+'Make a copy of Lot Numbers from Sheet "QA Data" to Sheet "Data"
     Worksheets("QA Data").Range(Cells(1, 3), Cells(LastRow, 3)).Copy _
     Destination:=Worksheets("Data").Range("C1")   'Column C; Lot Number'
     Worksheets("QA Data").Range(Cells(1, 4), Cells(LastRow, 4)).Copy _
     Destination:=Worksheets("Data").Range("D1")   'Column D; List Number'
-    'Make a copy of Error type to the target sheet'
+'Make a copy of Error type to the target sheet'
     Worksheets("QA Data").Range(Cells(1, 6), Cells(LastRow, 6)).Copy _
     Destination:=Worksheets("Data").Range("E1")   'Column E; Error Type'
-    'Make a copy of Error Class to the target sheet'
+'Make a copy of Error Class to the target sheet'
     Worksheets("QA Data").Range(Cells(1, 8), Cells(LastRow, 8)).Copy _
-    Destination:=Worksheets("Data").Range("F1")   'Column F; Error class'
+    Destination:=Worksheets("Data").Range("F1")                 'Column F: Error class'
     'Create Headers for Notebook and Page Number columns'
-    Worksheets("Data").Cells(1, 7).value = "Data Reviewer" 'Column G; Data Reviewer'
-    Worksheets("Data").Cells(1, 8).value = "Released by"   'Column H; Released by'
-    Worksheets("Data").Cells(1, 9).value = "Note Book"     'Column I; Notebook'
-    Worksheets("Data").Cells(1, 10).value = "Page"          'Column J; Page'
-    'Parse Notebook and Page Number from the source sheet to the target sheet'
-     For i = 2 To LastRow
+    Worksheets("Data").Cells(1, 7).value = "Previous Reviewer"  'Column G: Previous Reviewer
+    Worksheets("Data").Cells(1, 8).value = "Data Reviewer"      'Column H: Data Reviewer
+    Worksheets("Data").Cells(1, 9).value = "Released by"        'Column I: Released by
+    Worksheets("Data").Cells(1, 10).value = "Note Book"         'Column J: Notebook
+    Worksheets("Data").Cells(1, 11).value = "Page"              'Column K; Page
+    'processing data row by row
+    For i = 2 To LastRow
+        'Parse Notebook and Page Number from the source sheet to the target sheet'
         Cells(i, 7).Select
         col_g(i) = Cells(i, 7).value
         p1 = InStr(col_g(i), "Book ")
         p2 = InStr(col_g(i), "page ")
-        nb(i) = Mid(Cells(i, 7).value, p1 + 5, 5)
-        pg(i) = Mid(Cells(i, 7).value, p2 + 5, 2)
-        Worksheets("Data").Cells(i, 9).value = nb(i) 'Column I; Notebook'
-        Worksheets("Data").Cells(i, 10).value = pg(i) 'Column J; page'
-        col_j(i) = Cells(i, 10).value
-        col_m(i) = Cells(i, 13).value
-        drpos(i) = InStr(col_m(i), "Data review") + 14
-        If drpos(i) = 14 Then
-            dr(i) = col_j(i)
+        nb(i) = Mid(Cells(i, 7).value, p1 + 5, 5)               'fill array nb() with notebook number
+        pg(i) = Mid(Cells(i, 7).value, p2 + 5, 2)               'fill array pg() with page number
+        Worksheets("Data").Cells(i, 10).value = nb(i)           'fill notebook number into Column J of worksheet "Data"
+        Worksheets("Data").Cells(i, 11).value = pg(i)           'fill page number into Column K of worksheet "Data"
+        col_j(i) = Cells(i, 10).value                           'fill value of Previous Reviewer from column J of worksheet "QA Data" into array col_j()
+        col_m(i) = Cells(i, 13).value                           'fill value of Comment  from column M of worksheet "QA Data" into array col_m()
+        'Set the value of Column J of worksheet "QA Data" that contains "N/A" and "?" to blank
+        If InStr(col_j(i), "N/A") > 0 Then
+            col_j(i) = ""
+            Else
+            If InStr(col_j(i), "?") > 0 Then
+                col_j(i) = ""
+                Else
+            End If
+            col_j(i) = col_j(i)
+        End If
+        'Matches pattern "Data review" to "Comment" to see if the pattern exists
+        drpos(i) = InStr(col_m(i), "Data review")
+        If drpos(i) <> 0 Then
+            dr_rev = col_j(i)
         Else
             tempstr = Mid(col_m(i), drpos(i), Len(col_m(i)))
             drpunc(i) = InStr(tempstr, "     ") + drpos(i)
