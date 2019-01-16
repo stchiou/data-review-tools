@@ -22,7 +22,8 @@ Sub DR_GenData()
     Dim tempstr As String                'Temporary string holder while processing data
     Dim temppos As Integer              'Temporary position holder for "  " found in Column M
     Dim i As Integer
-    Dim splitted() As String
+    Dim j As Integer
+    Dim word_count As Integer
 '-------------------------------------------------------------------------------------------------------------------------------
 'Create a new sheet for consolidated data'
     Sheets.Add after:=Sheets("QA Data")
@@ -82,30 +83,32 @@ Sub DR_GenData()
             End If
             col_j(i) = col_j(i)
         End If
-    'Matches pattern "Data review" to "Comment" to see if the pattern exists
-        splitted = Split(col_m(i), "  ")
-        drpos(i) = WorksheetFunction.Max(InStr(col_m(i), "Data review"), InStr(col_m(i), "Data reviewer"))
-        If drpos(i) = 0 Then
-            dr(i) = ""
-        Else
-            tempstr = Mid(col_m(i), drpos(i), Len(col_m(i)))        'tempstr is a substring of Column M starting from drpos()
-            temppos = InStr(tempstr, "  ")
-            If temppos < drpos(i) Then
-                temppos = InStr(Mid(tempstr, tempos + 5, Len(tempstr)), "  ")
-                drpunc(i) = drpos(i) + temppos
+        word_count = UBound(Split(col_m(i), "  "), 1) + 1
+        Dim splited_col_m() As String
+        splited_col_m = Split(col_m(i), "  ")
+        For j = 0 To word_count
+            If InStr(Trim(splited_col_m(j)), "Data review") > 0 Then
+                If InStr(Trim(splited_col_m(j)), "Data reviewer") > 0 Then
+                    dr(i) = Mid(Trim(splited_col_m(j)), 14, Len(splited_col_m(j)))
+                Else
+                    dr(i) = Mid(Trim(splited_col_m(j)), 12, Len(splited_col_m(j)))
+                End If
+                Exit For
             Else
-                drpunc(i) = temppos + drpos(i)                      'position of two consecutive spaces in whole string of Column M
+                dr(i) = ""
+                If InStr(Trim(splited_col_m(j)), "Released by") > 0 Then
+                    rl(i) = Mid(Trim(splited_col_m(j)), 12, Len(splited_col_m(j)))
+                    Exit For
+                Else
+                    rl(i) = ""
+                End If
             End If
-            dr(i) = Mid(col_m(i), drpos(i) + 14, (drpunc(i) - drpos(i)) - 14)
-        End If
-       
+        Next j
+    'Matches pattern "Data review" to "Comment" to see if the pattern exists
         Worksheets("Data").Cells(i, 7).value = col_j(i)  'Column G: previous Reviewer
         Worksheets("Data").Cells(i, 8).value = dr(i)     'Column H: Data Reviewer
-        rlpos(i) = InStr(col_m(i), "Released by ") + 12
-        rl(i) = Mid(col_m(i), rlpos(i), Len(col_m(i)))
         Worksheets("Data").Cells(i, 9).value = rl(i)     'Column I: Released by
     Next i
-
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
