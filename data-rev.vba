@@ -144,9 +144,17 @@ Sub DR_GenData()
     Dim restr As String
     'Detect row number'
     res_name_count = Worksheets("Results").Cells(1, 2).End(xlDown).Row
-    name_count = Worksheets("Name").Cells(1, 1).End(xlDown).Row
-    Cells(2, 1).Select
-    For res_pos = 2 To res_name_count
-        
-    Next res_pos
+    Range("A2").Select
+    Application.CutCopyMode = False
+    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Add Key:=Range("A2"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("Results").Sort
+        .SetRange Range(Cells(2, 1), Cells(res_name_count, 3))
+        .Header = xlNo
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
 End Sub
