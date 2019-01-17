@@ -1,11 +1,13 @@
 Attribute VB_Name = "DataReviewer"
-Sub DR_GenData()
 '-------------------------------------------------------------------------------------------------------------------------------
 'VBA Script for processing and summarize Data Reviewer Error, v1.0
 'by Sean Chiou
 'Jan 7, 2019
 '-------------------------------------------------------------------------------------------------------------------------------
-    Dim LastRow As Integer               'Last row on the spreadsheet
+Public LastRow As Integer               'Last row on the spreadsheet
+Sub DR_GenData()
+
+    
     Dim curRow As Integer                'Current row of the spreadsheet
     Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
     Dim nb(1000) As Integer              'Value of the Notebook number parsed from col_g()
@@ -26,9 +28,12 @@ Sub DR_GenData()
     Dim word_count As Integer
 '-------------------------------------------------------------------------------------------------------------------------------
 'Create a new sheet for consolidated data'
-    Sheets.Add after:=Sheets("QA Data")
-    Sheets(Sheets.Count).Select
-    Sheets(Sheets.Count).Name = "Data"
+    sheets.Add after:=sheets("QA Data")
+    sheets(sheets.count).Select
+    sheets(sheets.count).Name = "Data"
+    sheets.Add after:=sheets("Data")
+    sheets(sheets.count).Select
+    sheets(sheets.count).Name = "Results"
 'Remove extra blank lines on the spreadsheet'
     'Worksheets("Data").Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
     On Error Resume Next
@@ -110,6 +115,8 @@ Sub DR_GenData()
         Worksheets("Data").Cells(i, 8).Value = dr(i)     'Column H: Data Reviewer
         Worksheets("Data").Cells(i, 9).Value = rl(i)     'Column I: Released by
     Next i
+End Sub
+Sub Clean_up()
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
@@ -149,4 +156,5 @@ Sub DR_GenData()
         .SortMethod = xlPinYin
         .Apply
     End With
+
 End Sub
