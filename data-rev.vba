@@ -20,7 +20,7 @@ Sub DR_GenData()
     Dim rlpos(1000) As Integer           'Position of "Released by" in Column M of the Sheet "QA Data"
     Dim rl(1000) As String               'Value of names after "Released by", parsed from Column M of the Sheet "QA Data"
     Dim tempstr As String                'Temporary string holder while processing data
-    Dim temppos As Integer              'Temporary position holder for "  " found in Column M
+    Dim temppos As Integer               'Temporary position holder for "  " found in Column M
     Dim i As Integer
     Dim j As Integer
     Dim word_count As Integer
@@ -126,12 +126,6 @@ Sub DR_GenData()
     tempstr = "C" & LastRow + 1
     Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
-    'Worksheets("Results").Select
-    'Range(Cells(1, 1), Cells(LastRow * 2, 1)).Copy _
-    'Destination:=Worksheets("Results").Range("E1")
-    'Remove duplicates
-    'Range(Cells(1, 5), Cells(LastRow * 2, 5)).RemoveDuplicates Columns:=1, Header:=xlYes
-    'Remove blank cell on data review name column'
     Worksheets("Results").Activate
     On Error Resume Next
         Range(1, 1).Select
@@ -144,6 +138,7 @@ Sub DR_GenData()
     Dim restr As String
     'Detect row number'
     res_name_count = Worksheets("Results").Cells(1, 2).End(xlDown).Row
+    'sort "Results" page according to name
     Range("A2").Select
     Application.CutCopyMode = False
     ActiveWorkbook.Worksheets("Results").Sort.SortFields.Clear
