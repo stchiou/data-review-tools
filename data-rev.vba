@@ -30,6 +30,7 @@ Sub DR_GenData()
     Sheets(Sheets.Count).Select
     Sheets(Sheets.Count).Name = "Data"
 'Remove extra blank lines on the spreadsheet'
+    'Worksheets("Data").Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
     On Error Resume Next
         Range(1, 1).Select
         Selection.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
@@ -135,12 +136,17 @@ Sub DR_GenData()
     tempstr = "C" & LastRow * 2 + 1
     Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
-    res_name_count = Worksheets("Results").Cells(1, 2).End(xlDown).Row
-    For i = 1 To res_name_count
-        Worksheets("Results").Cells(i, 1).Activate
-        If ActiveCell.Value = "" Then
-            ActiveCell.Rows.EntireRow.Delete
-        Else
-        End If
-    Next i
+    Worksheets("Results").Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+    res_name_count = Worksheets("Results").Cells(1, 3).End(xlDown).Row
+    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Add Key:=Range("A2"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("Results").Sort
+        .SetRange Range("A2:C796")
+        .Header = xlNo
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
 End Sub
