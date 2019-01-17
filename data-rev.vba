@@ -55,24 +55,24 @@ Sub DR_GenData()
     Worksheets("QA Data").Range(Cells(1, 8), Cells(LastRow, 8)).Copy _
     Destination:=Worksheets("Data").Range("F1")
 'Create Headers for Notebook and Page Number columns'
-    Worksheets("Data").Cells(1, 7).value = "Previous Reviewer"      'Column G: Previous Reviewer
-    Worksheets("Data").Cells(1, 8).value = "Data Reviewer"          'Column H: Data Reviewer
-    Worksheets("Data").Cells(1, 9).value = "Released by"            'Column I: Released by
-    Worksheets("Data").Cells(1, 10).value = "Note Book"             'Column J: Notebook
-    Worksheets("Data").Cells(1, 11).value = "Page"                  'Column K; Page
+    Worksheets("Data").Cells(1, 7).Value = "Previous Reviewer"      'Column G: Previous Reviewer
+    Worksheets("Data").Cells(1, 8).Value = "Data Reviewer"          'Column H: Data Reviewer
+    Worksheets("Data").Cells(1, 9).Value = "Released by"            'Column I: Released by
+    Worksheets("Data").Cells(1, 10).Value = "Note Book"             'Column J: Notebook
+    Worksheets("Data").Cells(1, 11).Value = "Page"                  'Column K; Page
 'processing data row by row
     For i = 2 To LastRow
     'Parse Notebook and Page Number from the source sheet to the target sheet'
         Cells(i, 7).Select
-        col_g(i) = Cells(i, 7).value
+        col_g(i) = Cells(i, 7).Value
         p1 = InStr(col_g(i), "Book ")
         p2 = InStr(col_g(i), "page ")
-        nb(i) = Mid(Cells(i, 7).value, p1 + 5, 5)               'fill array nb() with notebook number
-        pg(i) = Mid(Cells(i, 7).value, p2 + 5, 2)               'fill array pg() with page number
-        Worksheets("Data").Cells(i, 10).value = nb(i)           'fill notebook number into Column J of worksheet "Data"
-        Worksheets("Data").Cells(i, 11).value = pg(i)           'fill page number into Column K of worksheet "Data"
-        col_j(i) = Cells(i, 10).value                           'fill value of Previous Reviewer from column J of worksheet "QA Data" into array col_j()
-        col_m(i) = Cells(i, 13).value                           'fill value of Comment  from column M of worksheet "QA Data" into array col_m()
+        nb(i) = Mid(Cells(i, 7).Value, p1 + 5, 5)               'fill array nb() with notebook number
+        pg(i) = Mid(Cells(i, 7).Value, p2 + 5, 2)               'fill array pg() with page number
+        Worksheets("Data").Cells(i, 10).Value = nb(i)           'fill notebook number into Column J of worksheet "Data"
+        Worksheets("Data").Cells(i, 11).Value = pg(i)           'fill page number into Column K of worksheet "Data"
+        col_j(i) = Cells(i, 10).Value                           'fill value of Previous Reviewer from column J of worksheet "QA Data" into array col_j()
+        col_m(i) = Cells(i, 13).Value                           'fill value of Comment  from column M of worksheet "QA Data" into array col_m()
     'Set the value of Column J of worksheet "QA Data" that contains "N/A" and "?" to blank
         If InStr(col_j(i), "N/A") > 0 Then
             col_j(i) = ""
@@ -105,9 +105,9 @@ Sub DR_GenData()
             End If
         Next j
     'Matches pattern "Data review" to "Comment" to see if the pattern exists
-        Worksheets("Data").Cells(i, 7).value = col_j(i)  'Column G: previous Reviewer
-        Worksheets("Data").Cells(i, 8).value = dr(i)     'Column H: Data Reviewer
-        Worksheets("Data").Cells(i, 9).value = rl(i)     'Column I: Released by
+        Worksheets("Data").Cells(i, 7).Value = col_j(i)  'Column G: previous Reviewer
+        Worksheets("Data").Cells(i, 8).Value = dr(i)     'Column H: Data Reviewer
+        Worksheets("Data").Cells(i, 9).Value = rl(i)     'Column I: Released by
     Next i
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
@@ -116,9 +116,15 @@ Sub DR_GenData()
     tempstr = "A" & LastRow + 1
     Range(Cells(2, 8), Cells(LastRow, 8)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
+    tempstr = "A" & LastRow * 2 + 1
+    Range(Cells(2, 9), Cells(LastRow, 9)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
     Range(Cells(1, 6), Cells(LastRow, 6)).Copy _
     Destination:=Worksheets("Results").Range("B1")
     tempstr = "B" & LastRow + 1
+    Range(Cells(2, 6), Cells(LastRow, 6)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
+    tempstr = "B" & LastRow * 2 + 1
     Range(Cells(2, 6), Cells(LastRow, 6)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
     Range(Cells(1, 5), Cells(LastRow, 5)).Copy _
@@ -126,30 +132,15 @@ Sub DR_GenData()
     tempstr = "C" & LastRow + 1
     Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
     Destination:=Worksheets("Results").Range(tempstr)
-    Worksheets("Results").Activate
-    On Error Resume Next
-        Range(1, 1).Select
-        Selection.SpecialCells(xlCellTypeBlanks).EntireRow.Delete 'Shift:=xlShiftUp
-    Dim name_count As Integer
-    Dim res_name_count As Integer
-    Dim res_pos As Integer
-    Dim nam_pos As Integer
-    Dim dr_name_rs As String
-    Dim restr As String
-    'Detect row number'
+    tempstr = "C" & LastRow * 2 + 1
+    Range(Cells(2, 5), Cells(LastRow, 5)).Copy _
+    Destination:=Worksheets("Results").Range(tempstr)
     res_name_count = Worksheets("Results").Cells(1, 2).End(xlDown).Row
-    'sort "Results" page according to name
-    Range("A2").Select
-    Application.CutCopyMode = False
-    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Clear
-    ActiveWorkbook.Worksheets("Results").Sort.SortFields.Add Key:=Range("A2"), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-    With ActiveWorkbook.Worksheets("Results").Sort
-        .SetRange Range(Cells(2, 1), Cells(res_name_count, 3))
-        .Header = xlNo
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
+    For i = 1 To res_name_count
+        Worksheets("Results").Cells(i, 1).Activate
+        If ActiveCell.Value = "" Then
+            ActiveCell.Rows.EntireRow.Delete
+        Else
+        End If
+    Next i
 End Sub
