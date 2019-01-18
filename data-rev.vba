@@ -115,8 +115,14 @@ Sub DR_GenData()
         Worksheets("Data").Cells(i, 8).Value = dr(i)     'Column H: Data Reviewer
         Worksheets("Data").Cells(i, 9).Value = rl(i)     'Column I: Released by
     Next i
+    Worksheets("Data").Activate
+    ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
+    ActiveSheet.Shapes.Range(Array("Button 1")).Select
+    Selection.Characters.Text = "Summary"
+    Selection.OnAction = "Clean_up"
 End Sub
 Sub Clean_up()
+    Dim dr_name() As String
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
