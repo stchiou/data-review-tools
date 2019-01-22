@@ -5,6 +5,8 @@ Attribute VB_Name = "DataReviewer"
 'Jan 7, 2019
 '-------------------------------------------------------------------------------------------------------------------------------
 Public LastRow As Integer               'Last row on the spreadsheet
+Public dr_name() As String
+Public dr_num As Integer
 Sub DR_GenData()
 
     
@@ -110,6 +112,7 @@ Sub DR_GenData()
                 End If
             End If
         Next j
+       
     'Matches pattern "Data review" to "Comment" to see if the pattern exists
         Worksheets("Data").Cells(i, 7).Value = col_j(i)  'Column G: previous Reviewer
         Worksheets("Data").Cells(i, 8).Value = dr(i)     'Column H: Data Reviewer
@@ -119,10 +122,14 @@ Sub DR_GenData()
     ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
     ActiveSheet.Shapes.Range(Array("Button 1")).Select
     Selection.Characters.Text = "Summary"
-    Selection.OnAction = "Clean_up"
+    Selection.OnAction = "tabulate"
+    MsgBox "Click on Summary Button (L1) to summarize data after finish editing."
+    Cells(5, 12).Activate
 End Sub
-Sub Clean_up()
-    Dim dr_name() As String
+Sub tabulate()
+    Dim i As Integer
+    Dim j As Integer
+    Dim to_be_matched As String
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
@@ -151,16 +158,43 @@ Sub Clean_up()
     Destination:=Worksheets("Results").Range(tempstr)
     Worksheets("Results").Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
     res_name_count = Worksheets("Results").Cells(1, 3).End(xlDown).Row
+    tempstr = "C" & res_name_count
     ActiveWorkbook.Worksheets("Results").Sort.SortFields.Clear
     ActiveWorkbook.Worksheets("Results").Sort.SortFields.Add Key:=Range("A2"), _
         SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
     With ActiveWorkbook.Worksheets("Results").Sort
-        .SetRange Range("A2:C796")
+        .SetRange Range("A2:" & tempstr)
         .Header = xlNo
         .MatchCase = False
         .Orientation = xlTopToBottom
         .SortMethod = xlPinYin
         .Apply
     End With
+    Worksheets("Results").Range("A1").Value = "Name"
+    dr_num = Worksheets("names").Cells(1, 1).End(xlDown).Row
+    ReDim dr_name(dr_num) As String
+    For i = 1 To dr_num
+        dr_name(i) = Trim(Worksheets("names").Cells(i, 1).Value)
+    Next i
+    For j = 2 To res_name_count
+        to_be_matched = Trim(Worksheets("Results").Cells(j, 1).Value)
+        For i = 1 To dr_num
+            If InStr(dr_name(i), to_be_matched) > 0 Then
+                Worksheets("Results").Cells(j, 1).Value = Worksheets("names").Cells(i, 4).Value
+            Else
+                
+            End If
+        Next i
+    Next j
+    Worksheets("Results").Activate
+    ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
+    ActiveSheet.Shapes.Range(Array("Button 1")).Select
+    Selection.Characters.Text = "Continue"
+    Selection.OnAction = "Summarize"
+    MsgBox "Click on Continue Button (L1) to continue summarize data after finish editing."
+    Cells(5, 12).Activate
+End Sub
+Sub summarize()
 
 End Sub
+
