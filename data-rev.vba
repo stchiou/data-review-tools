@@ -195,9 +195,11 @@ End Sub
 Sub summarize()
     Dim i As Integer
     Dim j As Integer
+    Dim k As Integer
     Dim unique_name_num As Integer
     Dim unique_type_num As Integer
     Dim unique_name() As String
+    Dim unique_type() As String
     Dim err_type() As String
     Dim types() As String
     Dim class_count() As Integer
@@ -216,11 +218,17 @@ Sub summarize()
     Worksheets("Results").Range("J1").PasteSpecial Transpose:=True
     Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Value = ""
     ReDim unique_name(unique_name_num)
-    For i = 2 To unique_value
+    ReDim unique_type(unique_type_num)
+    ReDim type_count(unique_name_num, 3)
+    ReDim err_type(unique_name_num, unique_type_num)
+    For i = 2 To unique_name_num
         unique_name(i) = Cells(i, 6).Value
     Next i
-    For j = 2 To res_name_count
+    For i = 1 To unique_type_num - 1
+        unique_type(i) = Cells(1, 9 + i)
+    Next i
+    For i = 2 To res_name_num
         
-    Next j
+    Next i
 End Sub
 
