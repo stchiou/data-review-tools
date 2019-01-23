@@ -185,19 +185,42 @@ Sub tabulate()
         Next i
     Next j
     Worksheets("Results").Activate
-    ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
+    ActiveSheet.Buttons.Add Range("D1").Left, Range("D1").Top, Range("D1").Width, Range("D1").Height
     ActiveSheet.Shapes.Range(Array("Button 1")).Select
     Selection.Characters.Text = "Continue"
     Selection.OnAction = "Summarize"
-    MsgBox "Click on Continue Button (L1) to continue summarize data after finish editing."
+    MsgBox "Click on Continue Button (D1) to continue summarize data after finish editing."
     Cells(5, 12).Activate
 End Sub
 Sub summarize()
     Dim i As Integer
     Dim j As Integer
+    Dim unique_name_num As Integer
+    Dim unique_type_num As Integer
     Dim unique_name() As String
+    Dim err_type() As String
+    Dim types() As String
     Dim class_count() As Integer
     Dim type_count() As Integer
-    Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("F2"), unique:=True
+    Dim temp_class As Integer
+    Dim temp_type As Integer
+    Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("F1"), unique:=True
+    Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("J1"), unique:=True
+    Worksheets("Results").Cells(1, 6).Value = "Name"
+    Worksheets("Results").Cells(1, 7).Value = "Critical"
+    Worksheets("Results").Cells(1, 8).Value = "Major"
+    Worksheets("Results").Cells(1, 9).Value = "Minor"
+    unique_type_num = Worksheets("Results").Cells(1, 10).End(xlDown).Row
+    unique_name_num = Worksheets("Results").Cells(1, 6).End(xlDown).Row
+    Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Copy
+    Worksheets("Results").Range("J1").PasteSpecial Transpose:=True
+    Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Value = ""
+    ReDim unique_name(unique_name_num)
+    For i = 2 To unique_value
+        unique_name(i) = Cells(i, 6).Value
+    Next i
+    For j = 2 To res_name_count
+        
+    Next j
 End Sub
 
