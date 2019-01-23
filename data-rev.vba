@@ -7,9 +7,8 @@ Attribute VB_Name = "DataReviewer"
 Public LastRow As Integer               'Last row on the spreadsheet
 Public dr_name() As String
 Public dr_num As Integer
+Public res_name_count As Integer
 Sub DR_GenData()
-
-    
     Dim curRow As Integer                'Current row of the spreadsheet
     Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
     Dim nb(1000) As Integer              'Value of the Notebook number parsed from col_g()
@@ -115,8 +114,8 @@ Sub DR_GenData()
        
     'Matches pattern "Data review" to "Comment" to see if the pattern exists
         Worksheets("Data").Cells(i, 7).Value = col_j(i)  'Column G: previous Reviewer
-        Worksheets("Data").Cells(i, 8).Value = dr(i)     'Column H: Data Reviewer
-        Worksheets("Data").Cells(i, 9).Value = rl(i)     'Column I: Released by
+        Worksheets("Data").Cells(i, 8).Value = Trim(dr(i))     'Column H: Data Reviewer
+        Worksheets("Data").Cells(i, 9).Value = Trim(rl(i))     'Column I: Released by
     Next i
     Worksheets("Data").Activate
     ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
@@ -174,15 +173,14 @@ Sub tabulate()
     dr_num = Worksheets("names").Cells(1, 1).End(xlDown).Row
     ReDim dr_name(dr_num) As String
     For i = 1 To dr_num
-        dr_name(i) = Trim(Worksheets("names").Cells(i, 1).Value)
+        dr_name(i) = Worksheets("names").Cells(i, 1).Value
     Next i
     For j = 2 To res_name_count
-        to_be_matched = Trim(Worksheets("Results").Cells(j, 1).Value)
+        to_be_matched = Worksheets("Results").Cells(j, 1).Value
         For i = 1 To dr_num
             If InStr(dr_name(i), to_be_matched) > 0 Then
                 Worksheets("Results").Cells(j, 1).Value = Worksheets("names").Cells(i, 4).Value
             Else
-                
             End If
         Next i
     Next j
@@ -195,6 +193,11 @@ Sub tabulate()
     Cells(5, 12).Activate
 End Sub
 Sub summarize()
-
+    Dim i As Integer
+    Dim j As Integer
+    Dim unique_name() As String
+    Dim class_count() As Integer
+    Dim type_count() As Integer
+    Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("F2"), unique:=True
 End Sub
 
