@@ -200,12 +200,7 @@ Sub summarize()
     Dim unique_type_num As Integer
     Dim unique_name() As String
     Dim unique_type() As String
-    Dim err_type() As String
-    Dim types() As String
-    Dim class_count() As Integer
-    Dim type_count() As Integer
-    Dim temp_class As Integer
-    Dim temp_type As Integer
+    Dim temp() As Integer
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("F1"), unique:=True
     Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("J1"), unique:=True
     Worksheets("Results").Cells(1, 6).Value = "Name"
@@ -217,18 +212,22 @@ Sub summarize()
     Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Copy
     Worksheets("Results").Range("J1").PasteSpecial Transpose:=True
     Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Value = ""
-    ReDim unique_name(unique_name_num)
-    ReDim unique_type(unique_type_num)
-    ReDim type_count(unique_name_num, 3)
-    ReDim err_type(unique_name_num, unique_type_num)
+    Dim col_count As Integer
+    col_count = sheets("Results").Cells(1, 6).End(xlToLeft).Column
+    ReDim temp(unique_name_num, unique_type_num + 3) As Integer
     For i = 2 To unique_name_num
         unique_name(i) = Cells(i, 6).Value
     Next i
     For i = 1 To unique_type_num - 1
         unique_type(i) = Cells(1, 9 + i)
     Next i
-    For i = 2 To res_name_num
-        
+    Worksheets("Results").Activate
+    For i = 2 To unique_name_num
+        For j = 7 To col_count
+            For k = 2 To res_name_count
+                
+            Next k
+        Next j
     Next i
 End Sub
 
