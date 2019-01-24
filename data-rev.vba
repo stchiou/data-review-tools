@@ -202,6 +202,7 @@ Sub summarize()
     Dim unique_name() As String
     Dim unique_type() As String
     Dim temp() As Integer
+    Dim errors() As String
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
     Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("I1"), unique:=True
     Worksheets("Results").Cells(1, 4).Value = "Continue"
@@ -215,10 +216,14 @@ Sub summarize()
     Worksheets("Results").Range("I1").PasteSpecial Transpose:=True
     Worksheets("Results").Range(Cells(2, 9), Cells(unique_type_num, 9)).Value = ""
     Dim col_count As Integer
-    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column - 4
+    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column
+    ReDim errors(col_count) As String
     ReDim unique_name(unique_name_num) As String
     ReDim unique_type(unique_type_num) As String
     ReDim temp(unique_name_num, unique_type_num + 3) As Integer
+    For i = 6 To col_count
+        errors(i) = Cells(1, i).Value
+    Next i
     For i = 2 To unique_name_num
         unique_name(i) = Cells(i, 5).Value
     Next i
