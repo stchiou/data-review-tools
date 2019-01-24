@@ -232,14 +232,31 @@ Sub summarize()
     Next i
     Worksheets("Results").Activate
     For cur_name = 2 To unique_name_num
-        For col_cur = 6 To col_count
+        For col_cur = 6 To 8
             temp(cur_name, col_cur) = 0
             For row_cur = 2 To res_name_count
-                If InStr(unique_name(cur_name), Cells(row_cur, 1)) > 0 Then
+                If InStr(unique_name(cur_name), Cells(row_cur, 1)) = 1 Then
                     If InStr(errors(col_cur), Cells(row_cur, 2)) > 0 Then
                         temp(cur_name, col_cur) = temp(cur_name, col_cur) + 1
                     Else
-                        temp(cur_name, cole_cur) = temp(cur_name, col_cur)
+                        temp(cur_name, col_cur) = temp(cur_name, col_cur)
+                    End If
+                    temp(cur_name, col_cur) = temp(cur_name, col_cur)
+                Else
+                    temp(cur_name, col_cur) = temp(cur_name, col_cur)
+                End If
+                
+                   Cells(cur_name, col_cur).Value = temp(cur_name, col_cur)
+            Next row_cur
+        Next col_cur
+        For col_cur = 8 To col_count
+            temp(cur_name, col_cur) = 0
+            For row_cur = 2 To res_name_count
+                If InStr(unique_name(cur_name), Cells(row_cur, 1)) = 1 Then
+                    If InStr(errors(col_cur), Cells(row_cur, 3)) > 0 Then
+                        temp(cur_name, col_cur) = temp(cur_name, col_cur) + 1
+                    Else
+                        temp(cur_name, col_cur) = temp(cur_name, col_cur)
                     End If
                     temp(cur_name, col_cur) = temp(cur_name, col_cur)
                 Else
