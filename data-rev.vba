@@ -231,15 +231,19 @@ Sub summarize()
         unique_type(i) = Cells(1, 9 + i)
     Next i
     Worksheets("Results").Activate
-    For cur_row = 2 To res_name_count
         For cur_name = 2 To unique_name_num
             For cur_col = 6 To col_count
-                temp(cur_name, cur_col) = _
-                Application.WorksheetFunction.CountIf(sheets("Results").Range("A" & cur_row), "=" & unique_name(cur_name)) _
-                + CountIf(sheets("Results").Range("B" & cur_row), "=" & errors(cur_col))
+            temp(cur_name, cur_col) = 0
+             For cur_row = 2 To res_name_count
+                temp(cur_name, cur_col) = temp(cur_name, cur_col) + _
+                Application.WorksheetFunction.CountIf(Worksheets("Results").Range("A" & cur_row), "=" & unique_name(cur_name)) _
+                + Application.WorksheetFunction.CountIf(Worksheets("Results").Range("B" & cur_row), "=" & errors(cur_col)) _
+                + Application.WorksheetFunction.CountIf(Worksheets("Results").Range("C" & cur_row), "=" & errors(cur_col))
+                Next cur_row
+                Cells(cur_name, cur_col).Value = temp(cur_name, cur_col)
             Next cur_col
         Next cur_name
-    Next cur_row
+    
     'For cur_name = 2 To unique_name_num
     '   For col_cur = 6 To 8
     '       temp(cur_name, col_cur) = 0
