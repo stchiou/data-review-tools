@@ -235,14 +235,20 @@ Sub summarize()
         For col_cur = 6 To col_count
             temp(cur_name, col_cur) = 0
             For row_cur = 2 To res_name_count
-                If Cells(row_cur, 1).Value = unique_name(i) And Cells(row_cur, 2) = errors(col_cur) Then
-                    temp(cur_name, col_cur) = temp(cur_name, col_cur) + 1
-                    Cells(cur_name, col_cur).Value = temp(cur_name, col_cur)
+                If InStr(unique_name(cur_name), Cells(row_cur, 1)) > 0 Then
+                    If InStr(errors(col_cur), Cells(row_cur, 2)) > 0 Then
+                        temp(cur_name, col_cur) = temp(cur_name, col_cur) + 1
+                    Else
+                        temp(cur_name, cole_cur) = temp(cur_name, col_cur)
+                    End If
+                    temp(cur_name, col_cur) = temp(cur_name, col_cur)
                 Else
+                    temp(cur_name, col_cur) = temp(cur_name, col_cur)
                 End If
                 
+                   Cells(cur_name, col_cur).Value = temp(cur_name, col_cur)
             Next row_cur
         Next col_cur
-    Next u_name
+    Next cur_name
 End Sub
 
