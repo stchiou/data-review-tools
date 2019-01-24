@@ -201,22 +201,25 @@ Sub summarize()
     Dim unique_name() As String
     Dim unique_type() As String
     Dim temp() As Integer
-    Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("F1"), unique:=True
-    Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("J1"), unique:=True
-    Worksheets("Results").Cells(1, 6).Value = "Name"
-    Worksheets("Results").Cells(1, 7).Value = "Critical"
-    Worksheets("Results").Cells(1, 8).Value = "Major"
-    Worksheets("Results").Cells(1, 9).Value = "Minor"
-    unique_type_num = Worksheets("Results").Cells(1, 10).End(xlDown).Row
-    unique_name_num = Worksheets("Results").Cells(1, 6).End(xlDown).Row
-    Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Copy
-    Worksheets("Results").Range("J1").PasteSpecial Transpose:=True
-    Worksheets("Results").Range(Cells(2, 10), Cells(unique_type_num, 10)).Value = ""
+    Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
+    Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("I1"), unique:=True
+    Worksheets("Results").Cells(1, 4).Value = "Continue"
+    Worksheets("Results").Cells(1, 5).Value = "Name"
+    Worksheets("Results").Cells(1, 6).Value = "Critical"
+    Worksheets("Results").Cells(1, 7).Value = "Major"
+    Worksheets("Results").Cells(1, 8).Value = "Minor"
+    unique_type_num = Worksheets("Results").Cells(1, 9).End(xlDown).Row
+    unique_name_num = Worksheets("Results").Cells(1, 5).End(xlDown).Row
+    Worksheets("Results").Range(Cells(2, 9), Cells(unique_type_num, 9)).Copy
+    Worksheets("Results").Range("I1").PasteSpecial Transpose:=True
+    Worksheets("Results").Range(Cells(2, 9), Cells(unique_type_num, 9)).Value = ""
     Dim col_count As Integer
-    col_count = sheets("Results").Cells(1, 6).End(xlToLeft).Column
+    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column
+    ReDim unique_name(unique_name_num) As String
+    ReDim unique_type(unique_type_num) As String
     ReDim temp(unique_name_num, unique_type_num + 3) As Integer
     For i = 2 To unique_name_num
-        unique_name(i) = Cells(i, 6).Value
+        unique_name(i) = Cells(i, 5).Value
     Next i
     For i = 1 To unique_type_num - 1
         unique_type(i) = Cells(1, 9 + i)
@@ -224,9 +227,14 @@ Sub summarize()
     Worksheets("Results").Activate
     For i = 2 To unique_name_num
         For j = 7 To col_count
+            temp(i, j) = 0
             For k = 2 To res_name_count
-                
+                If Cells(k, 1).Value = unique_name(i) And Cells(k, 2) = "Critical" Then
+                    temp(i, j) = temp(i, j) + 1
+                Else
+                End If
             Next k
+            Cells(i, j).Value = temp(i, j)
         Next j
     Next i
 End Sub
