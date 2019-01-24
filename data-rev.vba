@@ -220,7 +220,7 @@ Sub summarize()
     ReDim errors(col_count) As String
     ReDim unique_name(unique_name_num) As String
     ReDim unique_type(unique_type_num) As String
-    ReDim temp(unique_name_num, unique_type_num + 3) As Integer
+    ReDim temp(unique_name_num, col_count) As Integer
     For i = 6 To col_count
         errors(i) = Cells(1, i).Value
     Next i
