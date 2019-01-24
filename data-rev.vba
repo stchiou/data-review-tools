@@ -194,8 +194,9 @@ Sub tabulate()
 End Sub
 Sub summarize()
     Dim i As Integer
-    Dim j As Integer
-    Dim k As Integer
+    Dim u_name As Integer
+    Dim col_cur As Integer
+    Dim row_cur As Integer
     Dim unique_name_num As Integer
     Dim unique_type_num As Integer
     Dim unique_name() As String
@@ -214,7 +215,7 @@ Sub summarize()
     Worksheets("Results").Range("I1").PasteSpecial Transpose:=True
     Worksheets("Results").Range(Cells(2, 9), Cells(unique_type_num, 9)).Value = ""
     Dim col_count As Integer
-    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column
+    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column - 4
     ReDim unique_name(unique_name_num) As String
     ReDim unique_type(unique_type_num) As String
     ReDim temp(unique_name_num, unique_type_num + 3) As Integer
@@ -225,17 +226,19 @@ Sub summarize()
         unique_type(i) = Cells(1, 9 + i)
     Next i
     Worksheets("Results").Activate
-    For i = 2 To unique_name_num
-        For j = 7 To col_count
-            temp(i, j) = 0
-            For k = 2 To res_name_count
-                If Cells(k, 1).Value = unique_name(i) And Cells(k, 2) = "Critical" Then
-                    temp(i, j) = temp(i, j) + 1
+    For u_name = 2 To unique_name_num
+        For col_cur = 6 To col_count
+            temp(u_name, col_cur) = 0
+            For row_cur = 2 To res_name_count
+                If Cells(row_cur, 1).Value = unique_name(i) And Cells(row_cur, 2) = "Critical" Then
+                    temp(u_name, col_cur) = temp(u_name, col_cur) + 1
+                    Cells(u_name, col_cur).Value = temp(u_name, col_cur)
                 Else
+                    Cells(u_name, col_cur).Value = temp(u_name, col_cur)
                 End If
-            Next k
-            Cells(i, j).Value = temp(i, j)
-        Next j
-    Next i
+                
+            Next row_cur
+        Next col_cur
+    Next u_name
 End Sub
 
