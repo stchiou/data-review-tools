@@ -194,7 +194,7 @@ Sub tabulate()
 End Sub
 Sub summarize()
     Dim i As Integer
-    Dim u_name As Integer
+    Dim cur_name As Integer
     Dim col_cur As Integer
     Dim row_cur As Integer
     Dim unique_name_num As Integer
@@ -231,15 +231,14 @@ Sub summarize()
         unique_type(i) = Cells(1, 9 + i)
     Next i
     Worksheets("Results").Activate
-    For u_name = 2 To unique_name_num
+    For cur_name = 2 To unique_name_num
         For col_cur = 6 To col_count
-            temp(u_name, col_cur) = 0
+            temp(cur_name, col_cur) = 0
             For row_cur = 2 To res_name_count
-                If Cells(row_cur, 1).Value = unique_name(i) And Cells(row_cur, 2) = "Critical" Then
-                    temp(u_name, col_cur) = temp(u_name, col_cur) + 1
-                    Cells(u_name, col_cur).Value = temp(u_name, col_cur)
+                If Cells(row_cur, 1).Value = unique_name(i) And Cells(row_cur, 2) = errors(col_cur) Then
+                    temp(cur_name, col_cur) = temp(cur_name, col_cur) + 1
+                    Cells(cur_name, col_cur).Value = temp(cur_name, col_cur)
                 Else
-                    Cells(u_name, col_cur).Value = temp(u_name, col_cur)
                 End If
                 
             Next row_cur
