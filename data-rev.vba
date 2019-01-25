@@ -244,9 +244,10 @@ Sub summarize()
                 Next cur_row
                 Cells(cur_name, cur_col).Value = temp(cur_name, cur_col)
                 Cells(cur_name, col_count + 1).Value = Application.WorksheetFunction.Sum(Worksheets("Results").Range(Cells(cur_name, 9), Cells(cur_name, col_count)))
+                Cells(cur_name + 1, cur_col).Value = Application.WorksheetFunction.Sum(Worksheets("Results").Range(Cells(2, cur_col), Cells(unique_name_num, cur_col)))
             Next cur_col
         Next cur_name
-        Cells(1, col_count + 1).Value = "Sum"
-    
-    
+        Cells(unique_name_num + 1, col_count + 1).Value = Application.WorksheetFunction.Sum(Worksheets("Results").Range(Cells(2, col_count + 1), Cells(unique_name_num, col_count + 1)))
+        Cells(1, col_count + 1).Value = "Personal Total"
+        Cells(unique_name_num + 1, 5).Value = "Categorical Total"
 End Sub
