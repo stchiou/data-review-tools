@@ -8,6 +8,9 @@ Public LastRow As Integer               'Last row on the spreadsheet
 Public dr_name() As String
 Public dr_num As Integer
 Public res_name_count As Integer
+Public errors() As String
+Public unique_name() As String
+Public unique_type() As String
 Sub DR_GenData()
     Dim curRow As Integer                'Current row of the spreadsheet
     Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
@@ -199,10 +202,8 @@ Sub summarize()
     Dim cur_row As Integer
     Dim unique_name_num As Integer
     Dim unique_type_num As Integer
-    Dim unique_name() As String
-    Dim unique_type() As String
+    
     Dim temp() As Integer
-    Dim errors() As String
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
     Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("I1"), unique:=True
     Worksheets("Results").Cells(1, 4).Value = "Continue"
@@ -250,4 +251,21 @@ Sub summarize()
         Cells(unique_name_num + 1, col_count + 1).Value = Application.WorksheetFunction.Sum(Worksheets("Results").Range(Cells(2, col_count + 1), Cells(unique_name_num, col_count + 1)))
         Cells(1, col_count + 1).Value = "Personal Total"
         Cells(unique_name_num + 1, 5).Value = "Categorical Total"
+        Worksheets("Results").Activate
+    ActiveSheet.Buttons.Add Range("D3").Left, Range("D3").Top, Range("D3").Width, Range("D3").Height
+    ActiveSheet.Shapes.Range(Array("Button 2")).Select
+    Selection.Characters.Text = "Chart"
+    Selection.OnAction = "Plotting_Data"
+    MsgBox "Click on the Graph Button (D3) to create charts from data."
+    Cells(5, 12).Activate
+End Sub
+Sub Plotting_Data()
+    Dim x_rng As Range
+    Dim y_rng As Range
+    Dim cht As Object
+    'Plotting Error Classes of Group
+    
+    'Plotting Error Types of Group
+    'Plotting Error Classes of Individual
+    'Plotting Error Types of Individual
 End Sub
