@@ -11,6 +11,8 @@ Public res_name_count As Integer
 Public errors() As String
 Public unique_name() As String
 Public unique_type() As String
+Public unique_name_num As Integer
+Public unique_type_num As Integer
 Sub DR_GenData()
     Dim curRow As Integer                'Current row of the spreadsheet
     Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
@@ -200,8 +202,7 @@ Sub summarize()
     Dim cur_name As Integer
     Dim cur_col As Integer
     Dim cur_row As Integer
-    Dim unique_name_num As Integer
-    Dim unique_type_num As Integer
+    
     
     Dim temp() As Integer
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
@@ -260,12 +261,32 @@ Sub summarize()
     Cells(5, 12).Activate
 End Sub
 Sub Plotting_Data()
-    Dim x_rng As Range
-    Dim y_rng As Range
-    Dim cht As Object
+    'Dim x_rng As Range
+    'Dim y_rng As Range
+    'Dim cht As Object
     'Plotting Error Classes of Group
-    
+    Worksheets("Results").Activate
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlColumnClustered
+    ActiveChart.SetSourceData Source:=Range("F1:H1")
+    ActiveChart.SetSourceData Source:=Range("F1:H1,F" & unique_name_num + 1 & ":H" & unique_name_num + 1)
+    ActiveChart.SeriesCollection(1).Name = "=""Group Error Class"""
+    ActiveChart.Location where:=xlLocationAsNewSheet, Name:="group_err_class"
     'Plotting Error Types of Group
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlColumnClustered
+    ActiveChart.SetSourceData Source:=Range("I1:N1")
+    ActiveChart.SetSourceData Source:=Range("I1:N1,I" & unique_name_num + 1 & ":N" & unique_name_num + 1)
+    ActiveChart.SeriesCollection(1).Name = "=""Group Error Type"""
+    ActiveChart.Location where:=xlocationasnewsheet, Name:="group_err_type"
+    'Plotting Total Error of Individual
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlColumnClustered
+    ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num)
+    ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num & ", O2:O" & unique_name_num)
+    ActiveChart.SeriesCollection(1).Name = "=""Total Error, Individual"""
+    ActiveChart.Location where:=xlLocationAsNewSheet, Name:="Total_error_ind"
     'Plotting Error Classes of Individual
+    
     'Plotting Error Types of Individual
 End Sub
