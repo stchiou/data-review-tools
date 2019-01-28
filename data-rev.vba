@@ -264,7 +264,14 @@ Sub Plotting_Data()
     Dim y_rng As Range
     Dim cht As Object
     'Plotting Error Classes of Group
-    
+    Worksheets("Results").Activate
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlColumnClustered
+    ActiveSheet.ChartObjects("Chart 1").Activate
+    ActiveChart.SeriesCollection.NewSeries
+    ActiveChart.SeriesCollection(1).Name = "=""Group Error Class"""
+    ActiveChart.SeriesCollection(1).Values = "=Results!$F$57:$H$57"
+    ActiveChart.SeriesCollection(1).XValues = "=Results!$F$1:$H$1"
     'Plotting Error Types of Group
     'Plotting Error Classes of Individual
     'Plotting Error Types of Individual
