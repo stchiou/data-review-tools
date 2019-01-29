@@ -293,11 +293,14 @@ Sub Plotting_Data()
     ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num & ", O2:O" & unique_name_num)
     ActiveChart.SeriesCollection(1).Name = "=""Total Error, Individual"""
     'Plotting Error Types of Individual
+    Dim chart_name As String
     For i = 2 To dat_name
        ActiveSheet.Shapes.AddChart.Select
        ActiveChart.ChartType = xlColumnClustered
        ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type))
        ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type) & "," & type_col(1) & i & ":" & type_col(err_type) & i)
        ActiveChart.SeriesCollection(1).Name = Range("E" & i)
+       ActiveChart.Location Where:=xlLocationAsNewSheet
+       Worksheets("Results").Activate
     Next i
 End Sub
