@@ -116,7 +116,6 @@ Sub DR_GenData()
                 End If
             End If
         Next j
-       
     'Matches pattern "Data review" to "Comment" to see if the pattern exists
         Worksheets("Data").Cells(i, 7).Value = col_j(i)  'Column G: previous Reviewer
         Worksheets("Data").Cells(i, 8).Value = Trim(dr(i))     'Column H: Data Reviewer
@@ -202,8 +201,6 @@ Sub summarize()
     Dim cur_name As Integer
     Dim cur_col As Integer
     Dim cur_row As Integer
-    
-    
     Dim temp() As Integer
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
     Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("I1"), unique:=True
@@ -261,9 +258,21 @@ Sub summarize()
     Cells(5, 12).Activate
 End Sub
 Sub Plotting_Data()
-    'Dim x_rng As Range
-    'Dim y_rng As Range
-    'Dim cht As Object
+    Dim i As Integer
+    Dim type_addr() As String
+    Dim name_addr() As String
+    Dim type_col() As String
+    Dim err_type As Integer
+    Dim dat_name As Integer
+    dat_name = unique_name_num - 1
+    err_type = unique_type_num - 1
+    ReDim type_addr(err_type)
+    ReDim type_col(err_type)
+    For i = 1 To err_type
+        type_addr(i) = Worksheets("Results").Cells(1, i + 8).Address()
+        type_col(i) = Mid(type_addr(i), 2, 1)
+    Next i
+    
     'Plotting Error Classes of Group
     Worksheets("Results").Activate
     ActiveSheet.Shapes.AddChart.Select
@@ -271,22 +280,24 @@ Sub Plotting_Data()
     ActiveChart.SetSourceData Source:=Range("F1:H1")
     ActiveChart.SetSourceData Source:=Range("F1:H1,F" & unique_name_num + 1 & ":H" & unique_name_num + 1)
     ActiveChart.SeriesCollection(1).Name = "=""Group Error Class"""
-    ActiveChart.Location where:=xlLocationAsNewSheet, Name:="group_err_class"
     'Plotting Error Types of Group
     ActiveSheet.Shapes.AddChart.Select
     ActiveChart.ChartType = xlColumnClustered
-    ActiveChart.SetSourceData Source:=Range("I1:N1")
-    ActiveChart.SetSourceData Source:=Range("I1:N1,I" & unique_name_num + 1 & ":N" & unique_name_num + 1)
+    ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type))
+    ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type) & "," & type_col(1) & unique_name_num + 1 & ":" & type_col(err_type) & unique_name_num + 1)
     ActiveChart.SeriesCollection(1).Name = "=""Group Error Type"""
-    ActiveChart.Location where:=xlocationasnewsheet, Name:="group_err_type"
     'Plotting Total Error of Individual
     ActiveSheet.Shapes.AddChart.Select
     ActiveChart.ChartType = xlColumnClustered
     ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num)
     ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num & ", O2:O" & unique_name_num)
     ActiveChart.SeriesCollection(1).Name = "=""Total Error, Individual"""
-    ActiveChart.Location where:=xlLocationAsNewSheet, Name:="Total_error_ind"
-    'Plotting Error Classes of Individual
-    
     'Plotting Error Types of Individual
+    For i = 2 To dat_name
+       ActiveSheet.Shapes.AddChart.Select
+       ActiveChart.ChartType = xlColumnClustered
+       ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type))
+       ActiveChart.SetSourceData Source:=Range(type_addr(1) & ":" & type_addr(err_type) & "," & type_col(1) & i & ":" & type_col(err_type) & i)
+       ActiveChart.SeriesCollection(1).Name = Range("E" & i)
+    Next i
 End Sub
