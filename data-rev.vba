@@ -210,11 +210,15 @@ Sub summarize()
 'This section summarize data and retabulate them into a matrix format. Subtotals for each person and each categories are also
 'calculated.
 
-    Dim i As Integer
-    Dim cur_name As Integer
-    Dim cur_col As Integer
-    Dim cur_row As Integer
-    Dim temp() As Integer
+    Dim i As Integer                                            'A variable to store FOR loop index
+    Dim cur_name As Integer                                     'the name of Data Reviewer that data is being processed
+    Dim cur_col As Integer                                      'the column that data is being processed
+    Dim cur_row As Integer                                      'the row that data is being processed
+    Dim temp() As Integer                                       'an array variable
+    '-----------------------------------------------------------------------------------------------------------------------------
+    '1. Copy unique values of Data Reviewer's names from Column A to Column E.
+    '2. Copy unique values of Error Type from Column C to Column I
+    '3. Added values of the first row in order to generate a header row for the final matrix.
     Worksheets("Results").Range("A2:A" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("E1"), unique:=True
     Worksheets("Results").Range("C2:C" & res_name_count).AdvancedFilter Action:=xlFilterCopy, copytorange:=Range("I1"), unique:=True
     Worksheets("Results").Cells(1, 4).Value = "Continue"
@@ -222,6 +226,9 @@ Sub summarize()
     Worksheets("Results").Cells(1, 6).Value = "Critical"
     Worksheets("Results").Cells(1, 7).Value = "Major"
     Worksheets("Results").Cells(1, 8).Value = "Minor"
+    '-------------------------------------------------------------------------------------------------------------------------------
+    '1. Calculates row numbers for Columns A-D
+    '2. Calculates row numbers for Column E
     unique_type_num = Worksheets("Results").Cells(1, 9).End(xlDown).Row
     unique_name_num = Worksheets("Results").Cells(1, 5).End(xlDown).Row
     Worksheets("Results").Range(Cells(2, 9), Cells(unique_type_num, 9)).Copy
