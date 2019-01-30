@@ -35,11 +35,11 @@ Sub DR_GenData()
 '-------------------------------------------------------------------------------------------------------------------------------
 'Create a new sheet for consolidated data'
     sheets.Add after:=sheets("QA Data")
-    sheets(sheets.count).Select
-    sheets(sheets.count).Name = "Data"
+    sheets(sheets.Count).Select
+    sheets(sheets.Count).Name = "Data"
     sheets.Add after:=sheets("Data")
-    sheets(sheets.count).Select
-    sheets(sheets.count).Name = "Results"
+    sheets(sheets.Count).Select
+    sheets(sheets.Count).Name = "Results"
 'Remove extra blank lines on the spreadsheet'
     'Worksheets("Data").Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
     On Error Resume Next
@@ -130,8 +130,11 @@ Sub DR_GenData()
     Cells(5, 12).Activate
 End Sub
 Sub tabulate()
-    Dim i As Integer
-    Dim j As Integer
+'This section tabulate the results parsed from the comment and other fields of the original data into columns format that can be further
+'processed into matrix.
+
+    Dim i As Integer                                            'variable to store a FOR loop index
+    Dim j As Integer                                            'variable to store a FOR loop index
     Dim to_be_matched As String
     'copy reviewer's name, error class, and error type to result sheet'
     Worksheets("Data").Select
@@ -176,9 +179,14 @@ Sub tabulate()
     Worksheets("Results").Range("A1").Value = "Name"
     dr_num = Worksheets("names").Cells(1, 1).End(xlDown).Row
     ReDim dr_name(dr_num) As String
+    
+    'Loop for reading Data Reviewer's names in the Name Sheet into an array
     For i = 1 To dr_num
         dr_name(i) = Worksheets("names").Cells(i, 1).Value
     Next i
+    
+    'Loop for compare the names on the Results sheet to the names in the Name Sheet and replace the
+    'matched name with full name according to the Name Sheet.
     For j = 2 To res_name_count
         to_be_matched = Worksheets("Results").Cells(j, 1).Value
         For i = 1 To dr_num
@@ -188,6 +196,8 @@ Sub tabulate()
             End If
         Next i
     Next j
+    
+    'Add button on the spreadsheet for redirect the code to the next section.
     Worksheets("Results").Activate
     ActiveSheet.Buttons.Add Range("D1").Left, Range("D1").Top, Range("D1").Width, Range("D1").Height
     ActiveSheet.Shapes.Range(Array("Button 1")).Select
@@ -197,6 +207,9 @@ Sub tabulate()
     Cells(5, 12).Activate
 End Sub
 Sub summarize()
+'This section summarize data and retabulate them into a matrix format. Subtotals for each person and each categories are also
+'calculated.
+
     Dim i As Integer
     Dim cur_name As Integer
     Dim cur_col As Integer
@@ -258,6 +271,13 @@ Sub summarize()
     Cells(5, 12).Activate
 End Sub
 Sub Plotting_Data()
+'This section plots error types for individual data reviewer. The plots will then be moved as separated sheets
+    Dim col_count As Integer
+    Dim last_col_addr As String
+    Dim last_col As String
+    col_count = Worksheets("Results").Cells(1, 1).End(xlToRight).Column
+    last_col_addr = Cells(1, col_count).Address()
+    last_col = Mid(last_col_addr, 2, 1)
     Dim i As Integer
     Dim type_addr() As String
     Dim name_addr() As String
@@ -290,10 +310,9 @@ Sub Plotting_Data()
     ActiveSheet.Shapes.AddChart.Select
     ActiveChart.ChartType = xlColumnClustered
     ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num)
-    ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num & ", O2:O" & unique_name_num)
+    ActiveChart.SetSourceData Source:=Range("E2:E" & unique_name_num & "," & last_col & "2:" & last_col & unique_name_num)
     ActiveChart.SeriesCollection(1).Name = "=""Total Error, Individual"""
     'Plotting Error Types of Individual
-    Dim chart_name As String
     For i = 2 To dat_name
        ActiveSheet.Shapes.AddChart.Select
        ActiveChart.ChartType = xlColumnClustered
