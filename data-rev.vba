@@ -2,7 +2,7 @@ Attribute VB_Name = "DataReviewer"
 '-------------------------------------------------------------------------------------------------------------------------------
 'VBA Script for processing and summarize Data Reviewer Error, v1.0
 'by Sean Chiou
-'Jan 7, 2019
+'Jan 7, 2019; version 1.0
 '-------------------------------------------------------------------------------------------------------------------------------
 Public LastRow As Integer               'Last row on the spreadsheet
 Public dr_name() As String
@@ -14,6 +14,8 @@ Public unique_type() As String
 Public unique_name_num As Integer
 Public unique_type_num As Integer
 Sub DR_GenData()
+'--------------------------------------------------------------------------------------------------------
+'This section parses values from the "Comment" and E
     Dim curRow As Integer                'Current row of the spreadsheet
     Dim col_g(1000) As String            'Value of Column G of the Sheet "QA Data" (Error Description)
     Dim nb(1000) As Integer              'Value of the Notebook number parsed from col_g()
@@ -116,11 +118,16 @@ Sub DR_GenData()
                 End If
             End If
         Next j
+    '-----------------------------------------------------------------------
     'Matches pattern "Data review" to "Comment" to see if the pattern exists
+    '-----------------------------------------------------------------------
         Worksheets("Data").Cells(i, 7).Value = col_j(i)  'Column G: previous Reviewer
         Worksheets("Data").Cells(i, 8).Value = Trim(dr(i))     'Column H: Data Reviewer
         Worksheets("Data").Cells(i, 9).Value = Trim(rl(i))     'Column I: Released by
     Next i
+    '---------------------------------------------------------------------------------------------------------------------
+    'Add button to redirect code to the next section.
+    '---------------------------------------------------------------------------------------------------------------------
     Worksheets("Data").Activate
     ActiveSheet.Buttons.Add Range("L1").Left, Range("L1").Top, Range("L1").Width, Range("L1").Height
     ActiveSheet.Shapes.Range(Array("Button 1")).Select
@@ -130,13 +137,16 @@ Sub DR_GenData()
     Cells(5, 12).Activate
 End Sub
 Sub tabulate()
+'--------------------------------------------------------------------------------------------------------------------------------------
 'This section tabulate the results parsed from the comment and other fields of the original data into columns format that can be further
 'processed into matrix.
-
+'---------------------------------------------------------------------------------------------------------------------------------------
     Dim i As Integer                                            'variable to store a FOR loop index
     Dim j As Integer                                            'variable to store a FOR loop index
     Dim to_be_matched As String
+    '---------------------------------------------------------------------
     'copy reviewer's name, error class, and error type to result sheet'
+    '---------------------------------------------------------------------
     Worksheets("Data").Select
     Range(Cells(1, 7), Cells(LastRow, 7)).Copy _
     Destination:=Worksheets("Results").Range("A1")
