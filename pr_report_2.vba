@@ -12,15 +12,13 @@ Sub PR_Report()
 '5. committed to close this week
 '6. aged that will close
 '------------------------------------------------------------------------------------------------------------------
-    Dim OpenType_LIR() As Integer
-    Dim OpenType_RAAC() As Integer
-    Dim OpenType_ER() As Integer
-    Dim OpenType_QAR() As Integer
-    Dim OpenType_INC() As Integer
+    Dim OpenCount() As Integer
     Dim OpenAge() As Integer
+    Dim OpenStage() As Integer
     Dim OpenIRow As Integer
     Dim OpenICol As Integer
-    Dim RecordType As Integer
+    Dim RecType() As Integer
+    Dim temp As String
     Dim ClosedType_QAR() As Integer
     Dim ClosedType_LIR() As Integer
     Dim ClosedType_RAAC() As Integer
@@ -63,6 +61,8 @@ Sub PR_Report()
   '----------------------------------------
   Cells(1, OpenICol).Value = "Age"
   ReDim OpenAge(OpenIRow) As Integer
+  ReDim OpenStage(OpenIRow) As Integer
+  ReDim RecType(OpenIRow) As Integer
   For i = 2 To OpenIRow
     OpenAge(i) = Date - Cells(i, 4)
     Cells(i, OpenICol).Value = OpenAge(i)
@@ -72,38 +72,78 @@ Sub PR_Report()
   '----------------------------------------
   'create category
   '----------------------------------------
-  Cells(1, OpenICol).Value = "Age Category"
+  Cells(1, OpenICol).Value = "Stage"
+  Cells(1, OpenICol + 1).Value = "Type"
+  
   For i = 2 To OpenIRow
-    age = Cells(i, OpenICol - 1).Value
-    stage = Application.WorksheetFunction.Floor(age / 30, 1)
-    Select Case stage
+    OpenStage(i) = Application.WorksheetFunction.Floor(OpenAge(i) / 30, 1)
+    Select Case OpenStage(i)
         Case Is > 5
-            Cells(i, OpenICol).Value = 6
+            OpenStage(i) = 7
         Case Is > 4
-            Cells(i, OpenICol).Value = 5
+            OpenStage(i) = 6
         Case Is > 3
-            Cells(i, OpenICol).Value = 4
+            OpenStage(i) = 5
         Case Is > 2
-            Cells(i, OpenICol).Value = 3
+            OpenStage(i) = 4
         Case Is > 1
-            Cells(i, OpenICol).Value = 2
+            OpenStage(i) = 3
         Case Is > 0
-            Cells(i, OpenICol).Value = 1
     End Select
-    If age < 30 Then
-        If age >= 23 Then
-            Cells(i, OpenICol).Value = 0.5
+    If OpenAge(i) < 30 Then
+        If OpenAge(i) >= 23 Then
+            OpenStage(i) = 1
         Else
-            Cells(i, OpenICol).Value = 0
+            OpenStage(i) = 0
         End If
     Else
     End If
+    temp = Cells(i, 9).Value
+    Select Case temp
+        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+            RecType(i) = 1
+        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+            RecType(i) = 2
+        Case "Manufacturing Investigations / Event Report"
+            RecType(i) = 3
+        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+            RecType(i) = 4
+        Case "Manufacturing Investigations / Incident"
+            RecType(i) = 5
+    End Select
+    Cells(i, OpenICol).Value = OpenStage(i)
+    Cells(i, OpenICol + 1).Value = RecType(i)
   Next i
-  
-  '------------------------------------------
+  OpenICol = OpenICol + 2
+  '--------------------------------------------------------------------------------
   'Calculating Open Records by Age and Type
+  '--------------------------------------------------------------------------------
+  'Text for Record types:
+  'LIR:     "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+  'RAAC:    "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+  'ER:      "Manufacturing Investigations / Event Report"
+  'QAR:     "Manufacturing Investigations / Quality Assurance Report (QAR)"
+  'INC:     "Manufacturing Investigations / Incident"
+  '------------------------------
+  'Array subscripts:
+  '-----------------------------------
+  'First Dimension | Second Dimension
+  '-----------------------------------
+  '1: LIR          | 0: < 30
+  '2: RAAC         | 1: 23-30
+  '3: ER           | 2: 31-60
+  '4: QAR          | 3: 61-90
+  '5: INC          | 4: 91-120
+  '                | 5: 121-150
+  '                | 6: 151-180
+  '                | 7: >180
+  '---------------------------------------------------------------------------------
+  ReDim OpenCount(5, 7) As Integer
+  For i = 2 To OpenIRow
+    
+  Next i
   '------------------------------------------
-  '------------------------------------------
+  'Codes from V 1.0
   '<23
   '------------------------------------------
 '  OpenType_LIR_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
