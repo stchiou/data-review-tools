@@ -19,6 +19,7 @@ Sub PR_Report()
     Dim OpenICol As Integer
     Dim RecType() As Integer
     Dim temp As String
+    Dim tempval As Integer
     Dim ClosedType_QAR() As Integer
     Dim ClosedType_LIR() As Integer
     Dim ClosedType_RAAC() As Integer
@@ -38,19 +39,26 @@ Sub PR_Report()
     'Removing approved record
     '------------------------------------------
     For i = 2 To OpenIRow
-        If Cells(i, 6).Value > 0 Then
-            Rows(i).EntireRow.Delete
-            i = i - 1
-            OpenIRow = OpenIRow - 1
+        temp = Cells(i, 9).Value
+        If InStr("Awaiting SQL Approval", temp) > 0 Then
         Else
-        End If
-    Next i
-    For i = 2 To OpenIRow
-        If Cells(i, 7).Value > 0 Then
-            Rows(i).EntireRow.Delete
-            i = i - 1
-            OpenIRow = OpenIRow - 1
-        Else
+            If InStr("OPUQL", temp) > 0 Then
+            Else
+                tempval = Cells(i, 6)
+                If tempval > 0 Then
+                    Row(i).EntireRow.Delete
+                    i = i - 1
+                    OpenIRow = OpenIRow - 1
+                Else
+                    tempval = Cells(i, 7)
+                    If tempval > 0 Then
+                        Row(i).EntireRow.Delete
+                        i = i - 1
+                        OpenIRow = OpenIRow - 1
+                    Else
+                    End If
+                End If
+            End If
         End If
     Next i
     Columns(6).EntireColumn.Delete
