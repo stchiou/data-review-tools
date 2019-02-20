@@ -12,6 +12,10 @@ Sub PR_Report()
 '5. committed to close this week
 '6. aged that will close
 '------------------------------------------------------------------------------------------------------------------
+    Dim File_1 As String
+    Dim File_2 As String
+    Dim week_num As Integer
+    Dim Sheet_Name As String
     Dim OpenCount() As Integer
     Dim OpenAge() As Integer
     Dim OpenStage() As Integer
@@ -19,7 +23,7 @@ Sub PR_Report()
     Dim OpenICol As Integer
     Dim RecType() As Integer
     Dim temp As String
-    Dim tempval As Integer
+    Dim tempval As Long
     Dim ClosedType_QAR() As Integer
     Dim ClosedType_LIR() As Integer
     Dim ClosedType_RAAC() As Integer
@@ -32,7 +36,19 @@ Sub PR_Report()
     Dim j As Integer
     Dim age As Integer
     Dim stage As Integer
-    Worksheets("open").Activate
+   '---------------------------------------------------------------------------------
+    File_1 = InputBox("Input filename and file extension of the data file to be processed")
+    File_2 = InputBox("Input filename and file extension that contains short descriptions of the records")
+    week_num = InputBox("Input week number of the year")
+    Sheet_Name = Left(File_1, InStr(File_1, ".") - 1)
+    Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_1, local:=True
+    Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_2, local:=True
+    Columns("E:E").Select
+    Selection.Copy
+    Windows(File_1).Activate
+    Columns("C:C").Select
+    Selection.Insert Shift:=xlToRight
+    Worksheets(Sheet_Name).Activate
     OpenIRow = Cells(1, 1).End(xlDown).Row
     OpenICol = Cells(1, 1).End(xlToRight).Column
     '------------------------------------------
@@ -40,19 +56,19 @@ Sub PR_Report()
     '------------------------------------------
     For i = 2 To OpenIRow
         temp = Cells(i, 9).Value
-        If InStr("Awaiting SQL Approval", temp) > 0 Then
+        If InStr(temp, "Awaiting SQL Approval") > 0 Then
         Else
-            If InStr("OPUQL", temp) > 0 Then
+            If InStr(temp, "OPUQL") > 0 Then
             Else
                 tempval = Cells(i, 6)
                 If tempval > 0 Then
-                    Row(i).EntireRow.Delete
+                    Rows(i).EntireRow.Delete
                     i = i - 1
                     OpenIRow = OpenIRow - 1
                 Else
                     tempval = Cells(i, 7)
                     If tempval > 0 Then
-                        Row(i).EntireRow.Delete
+                        Rows(i).EntireRow.Delete
                         i = i - 1
                         OpenIRow = OpenIRow - 1
                     Else
@@ -61,9 +77,6 @@ Sub PR_Report()
             End If
         End If
     Next i
-    Columns(6).EntireColumn.Delete
-    Columns(6).EntireColumn.Delete
-    OpenICol = OpenICol - 2
   '----------------------------------------
   'Calculate Age
   '----------------------------------------
@@ -106,7 +119,7 @@ Sub PR_Report()
         End If
     Else
     End If
-    temp = Cells(i, 9).Value
+    temp = Cells(i, 11).Value
     Select Case temp
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             RecType(i) = 1
@@ -147,10 +160,143 @@ Sub PR_Report()
   '                | 7: >180
   '---------------------------------------------------------------------------------
   ReDim OpenCount(5, 7) As Integer
-  For i = 2 To OpenIRow
-    
+  For i = 0 To 5
+    For j = 0 To 7
+        OpenCount(i, j) = 0
+    Next j
   Next i
-  '------------------------------------------
+  For i = 2 To OpenIRow
+    Select Case RecType(i)
+        Case Is = 1
+            Select Case OpenStage(i)
+                Case Is = 0
+                    OpenCount(1, 0) = OpenCount(1, 0) + 1
+                Case Is = 1
+                    OpenCount(1, 1) = OpenCount(1, 1) + 1
+                Case Is = 2
+                    OpenCount(1, 2) = OpenCount(1, 2) + 1
+                Case Is = 3
+                    OpenCount(1, 3) = OpenCount(1, 3) + 1
+                Case Is = 4
+                    OpenCount(1, 4) = OpenCount(1, 4) + 1
+                Case Is = 5
+                    OpenCount(1, 5) = OpenCount(1, 5) + 1
+                Case Is = 6
+                    OpenCount(1, 6) = OpenCount(1, 6) + 1
+                Case Is = 7
+                    OpenCount(1, 7) = OpenCount(1, 7) + 1
+            End Select
+        Case Is = 2
+            Select Case OpenStage(i)
+                Case Is = 0
+                    OpenCount(2, 0) = OpenCount(2, 0) + 1
+                Case Is = 1
+                    OpenCount(2, 1) = OpenCount(2, 1) + 1
+                Case Is = 2
+                    OpenCount(2, 2) = OpenCount(2, 2) + 1
+                Case Is = 3
+                    OpenCount(2, 3) = OpenCount(2, 3) + 1
+                Case Is = 4
+                    OpenCount(2, 4) = OpenCount(2, 4) + 1
+                Case Is = 5
+                    OpenCount(2, 5) = OpenCount(2, 5) + 1
+                Case Is = 6
+                    OpenCount(2, 6) = OpenCount(2, 6) + 1
+                Case Is = 7
+                    OpenCount(2, 7) = OpenCount(2, 7) + 1
+            End Select
+        Case Is = 3
+            Select Case OpenStage(i)
+                Case Is = 0
+                    OpenCount(3, 0) = OpenCount(3, 0) + 1
+                Case Is = 1
+                    OpenCount(3, 1) = OpenCount(3, 1) + 1
+                Case Is = 2
+                    OpenCount(3, 2) = OpenCount(3, 2) + 1
+                Case Is = 3
+                    OpenCount(3, 3) = OpenCount(3, 3) + 1
+                Case Is = 4
+                    OpenCount(3, 4) = OpenCount(3, 4) + 1
+                Case Is = 5
+                    OpenCount(3, 5) = OpenCount(3, 5) + 1
+                Case Is = 6
+                    OpenCount(3, 6) = OpenCount(3, 6) + 1
+                Case Is = 7
+                    OpenCount(3, 7) = OpenCount(3, 7) + 1
+            End Select
+        Case Is = 4
+            Select Case OpenStage(i)
+                Case Is = 0
+                    OpenCount(4, 0) = OpenCount(4, 0) + 1
+                Case Is = 1
+                    OpenCount(4, 1) = OpenCount(4, 1) + 1
+                Case Is = 2
+                    OpenCount(4, 2) = OpenCount(4, 2) + 1
+                Case Is = 3
+                    OpenCount(4, 3) = OpenCount(4, 3) + 1
+                Case Is = 4
+                    OpenCount(4, 4) = OpenCount(4, 4) + 1
+                Case Is = 5
+                    OpenCount(4, 5) = OpenCount(4, 5) + 1
+                Case Is = 6
+                    OpenCount(4, 6) = OpenCount(4, 6) + 1
+                Case Is = 7
+                    OpenCount(4, 7) = OpenCount(4, 7) + 1
+            End Select
+        Case Is = 5
+            Select Case OpenStage(i)
+                Case Is = 0
+                    OpenCount(5, 0) = OpenCount(5, 0) + 1
+                Case Is = 1
+                    OpenCount(5, 1) = OpenCount(5, 1) + 1
+                Case Is = 2
+                    OpenCount(5, 2) = OpenCount(5, 2) + 1
+                Case Is = 3
+                    OpenCount(5, 3) = OpenCount(5, 3) + 1
+                Case Is = 4
+                    OpenCount(5, 4) = OpenCount(5, 4) + 1
+                Case Is = 5
+                    OpenCount(5, 5) = OpenCount(5, 5) + 1
+                Case Is = 6
+                    OpenCount(5, 6) = OpenCount(5, 6) + 1
+                Case Is = 7
+                    OpenCount(5, 7) = OpenCount(5, 7) + 1
+            End Select
+    End Select
+  Next i
+  Sheets.Add after:=Sheets(Sheet_Name)
+  Sheets(Sheets.Count).Select
+  Sheets(Sheets.Count).Name = "Results"
+  Worksheets("Results").Cells(1, 1).Value = "Record Type"
+  Worksheets("Results").Cells(1, 2).Value = "<23 Days"
+  Worksheets("Results").Cells(1, 3).Value = "24-30 Days"
+  Worksheets("Results").Cells(1, 4).Value = "31-60 Days"
+  Worksheets("Results").Cells(1, 5).Value = "61-90 Days"
+  Worksheets("Results").Cells(1, 6).Value = "91-120 Days"
+  Worksheets("Results").Cells(1, 7).Value = "121-150 Days"
+  Worksheets("Results").Cells(1, 8).Value = "151-180 Days"
+  Worksheets("Results").Cells(1, 9).Value = ">181 Days"
+  Worksheets("Results").Cells(1, 10).Value = "Aged"
+  Worksheets("Results").Cells(1, 11).Value = "Total"
+  Worksheets("Results").Cells(2, 1).Value = "LIR"
+  Worksheets("Results").Cells(3, 1).Value = "RAAC"
+  Worksheets("Results").Cells(4, 1).Value = "ER"
+  Worksheets("Results").Cells(5, 1).Value = "QAR"
+  Worksheets("Results").Cells(6, 1).Value = "INC"
+  For i = 1 To 5
+    For j = 0 To 7
+        Cells(i + 1, j + 2).Value = OpenCount(i, j)
+        Cells(i + 1, 10).Value = OpenCount(i, 2) + _
+        OpenCount(i, 3) + OpenCount(i, 4) + OpenCount(i, 5) _
+        + OpenCount(i, 6) + OpenCount(i, 7)
+        Cells(i + 1, 11).Value = OpenCount(i, 0) + _
+        OpenCount(i, 1) + OpenCount(i, 2) + OpenCount(i, 3) _
+        + OpenCount(i, 4) + OpenCount(i, 5) + OpenCount(i, 6) _
+        + OpenCount(i, 7)
+    Next j
+  Next i
+  
+  '------------------------------------------7
   'Codes from V 1.0
   '<23
   '------------------------------------------
