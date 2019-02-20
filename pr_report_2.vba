@@ -24,6 +24,9 @@ Sub PR_Report()
     Dim RecType() As Integer
     Dim temp As String
     Dim tempval As Long
+    Dim address1 As String
+    Dim address2 As String
+    Dim OpenRec() As String
     Dim ClosedType_QAR() As Integer
     Dim ClosedType_LIR() As Integer
     Dim ClosedType_RAAC() As Integer
@@ -146,7 +149,18 @@ Sub PR_Report()
   'QAR:     "Manufacturing Investigations / Quality Assurance Report (QAR)"
   'INC:     "Manufacturing Investigations / Incident"
   '------------------------------
-  'Array subscripts:
+  'Array subfix
+  '------------------------------
+  'Array Name: OpenRec
+  '----------------------------------
+  'First Dimension | Second Dimension
+  '----------------------------------
+  '2-OpenICol:     | 0: Record Number
+  '                | 1: Short Description
+  'Row on          | 2: Record Stage
+  'spreadsheet     | 3: Record Type
+  '----------------------------------
+  'Array Name: OpenCount
   '-----------------------------------
   'First Dimension | Second Dimension
   '-----------------------------------
@@ -159,6 +173,7 @@ Sub PR_Report()
   '                | 6: 151-180
   '                | 7: >180
   '---------------------------------------------------------------------------------
+  ReDim OpenRec(OpenIRow, 3) As String
   ReDim OpenCount(5, 7) As Integer
   For i = 0 To 5
     For j = 0 To 7
@@ -263,6 +278,10 @@ Sub PR_Report()
                     OpenCount(5, 7) = OpenCount(5, 7) + 1
             End Select
     End Select
+    OpenRec(i, 0) = Worksheets(Sheet_Name).Cells(i, 1).Value
+    OpenRec(i, 1) = Worksheets(Sheet_Name).Cells(i, 3).Value
+    OpenRec(i, 2) = OpenStage(i)
+    OpenRec(i, 3) = RecType(i)
   Next i
   Sheets.Add after:=Sheets(Sheet_Name)
   Sheets(Sheets.Count).Select
@@ -295,239 +314,12 @@ Sub PR_Report()
         + OpenCount(i, 7)
     Next j
   Next i
-  
-  '------------------------------------------7
-  'Codes from V 1.0
-  '<23
-  '------------------------------------------
-'  OpenType_LIR_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 0)
-'  OpenType_RAAC_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 0)
-'  OpenType_ER_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 0)
-'  OpenType_INC_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 0)
-'  OpenType_QAR_0 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 0)
-'  '------------------------------------------
-'  'Aging
-'  '------------------------------------------
-'  OpenType_LIR_0_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 0.5)
-'  OpenType_RAAC_0_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 0.5)
-'  OpenType_ER_0_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 0.5)
-'  OpenType_INC_0_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 0.5)
-'  OpenType_QAR_0_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 0.5)
-'  '-----------------------------------
-'  '31-60
-'  '-----------------------------------
-'  OpenType_LIR_1 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 1)
-'  OpenType_RAAC_1 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 1)
-'  OpenType_ER_1 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 1)
-'  OpenType_INC_1 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 1)
-'  OpenType_QAR_1 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 1)
-'  '-------------------------------------
-'  '61-90
-'  '-------------------------------------
-'  OpenType_LIR_2 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 2)
-'  OpenType_RAAC_2 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 2)
-'  OpenType_ER_2 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 2)
-'  OpenType_INC_2 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 2)
-'  OpenType_QAR_2 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 2)
-'  '-------------------------------------
-'  '91-120
-'  '-------------------------------------
-'  OpenType_LIR_3 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 3)
-'  OpenType_RAAC_3 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 3)
-'  OpenType_ER_3 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 3)
-'  OpenType_INC_3 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 3)
-'  OpenType_QAR_3 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 3)
-'  '--------------------------------------
-'  '121-150
-'  '--------------------------------------
-'  OpenType_LIR_4 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 4)
-'  OpenType_RAAC_4 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 4)
-'  OpenType_ER_4 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 4)
-'  OpenType_INC_4 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 4)
-'  OpenType_QAR_4 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 4)
-'  '--------------------------------------
-'  '151-180
-'  '--------------------------------------
-'  OpenType_LIR_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 5)
-'  OpenType_RAAC_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 5)
-'  OpenType_ER_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 5)
-'  OpenType_INC_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 5)
-'  OpenType_QAR_5 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 5)
-'  '--------------------------------------
-'  '>181
-'  '--------------------------------------
-'  OpenType_LIR_6 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Laboratory Investigation Report (LIR)", Range("$P$2:$P" & OpenIRow), 6)
-'  OpenType_RAAC_6 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)", Range("$P$2:$P" & OpenIRow), 6)
-'  OpenType_ER_6 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Event Report", Range("$P$2:$P" & OpenIRow), 6)
-'  OpenType_INC_6 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Incident", Range("$P$2:$P" & OpenIRow), 6)
-'  OpenType_QAR_6 = Application.WorksheetFunction.CountIfs(Range("$I$2:$I" & OpenIRow), _
-'  "Manufacturing Investigations / Quality Assurance Report (QAR)", Range("$P$2:$P" & OpenIRow), 6)
-'  '------------------------------------------------
-'  'Write Counts to Spreadsheet
-'  '------------------------------------------------
-'
-'
-'  Cells(1, OpenICol + 1).Value = "LIR"
-'  Cells(1, OpenICol + 2).Value = "<23"
-'  Cells(1, OpenICol + 3).Value = OpenType_LIR_0
-'  Cells(2, OpenICol + 1).Value = "LIR"
-'  Cells(2, OpenICol + 2).Value = "Aging"
-'  Cells(2, OpenICol + 3).Value = OpenType_LIR_0_5
-'  Cells(3, OpenICol + 1).Value = "LIR"
-'  Cells(3, OpenICol + 2).Value = "31-60 days"
-'  Cells(3, OpenICol + 3).Value = OpenType_LIR_1
-'  Cells(4, OpenICol + 1).Value = "LIR"
-'  Cells(4, OpenICol + 2).Value = "61-90 days"
-'  Cells(4, OpenICol + 3).Value = OpenType_LIR_2
-'  Cells(5, OpenICol + 1).Value = "LIR"
-'  Cells(5, OpenICol + 2).Value = "91-120 days"
-'  Cells(5, OpenICol + 3).Value = OpenType_LIR_3
-'  Cells(6, OpenICol + 1).Value = "LIR"
-'  Cells(6, OpenICol + 2).Value = "21-150 days"
-'  Cells(6, OpenICol + 3).Value = OpenType_LIR_4
-'  Cells(7, OpenICol + 1).Value = "LIR"
-'  Cells(7, OpenICol + 2).Value = "151-180 days"
-'  Cells(7, OpenICol + 3).Value = OpenType_LIR_5
-'  Cells(8, OpenICol + 1).Value = "LIR"
-'  Cells(8, OpenICol + 2).Value = ">180 days"
-'  Cells(8, OpenICol + 3).Value = OpenType_LIR_6
-'  'RAAC
-'  Cells(9, OpenICol + 1).Value = "RAAC"
-'  Cells(9, OpenICol + 2).Value = "<23"
-'  Cells(9, OpenICol + 3).Value = OpenType_RAAC_0
-'  Cells(10, OpenICol + 1).Value = "RAAC"
-'  Cells(10, OpenICol + 2).Value = "Aging"
-'  Cells(10, OpenICol + 3).Value = OpenType_RAAC_0_5
-'  Cells(11, OpenICol + 1).Value = "RAAC"
-'  Cells(11, OpenICol + 2).Value = "31-60 days"
-'  Cells(11, OpenICol + 3).Value = OpenType_RAAC_1
-'  Cells(12, OpenICol + 1).Value = "RAAC"
-'  Cells(12, OpenICol + 2).Value = "61-90 days"
-'  Cells(12, OpenICol + 3).Value = OpenType_RAAC_2
-'  Cells(13, OpenICol + 1).Value = "RAAC"
-'  Cells(13, OpenICol + 2).Value = "91-120 days"
-'  Cells(13, OpenICol + 3).Value = OpenType_RAAC_3
-'  Cells(14, OpenICol + 1).Value = "RAAC"
-'  Cells(14, OpenICol + 2).Value = "121-150 days"
-'  Cells(14, OpenICol + 3).Value = OpenType_RAAC_4
-'  Cells(15, OpenICol + 1).Value = "RAAC"
-'  Cells(15, OpenICol + 2).Value = "151-180 days"
-'  Cells(15, OpenICol + 3).Value = OpenType_RAAC_5
-'  Cells(16, OpenICol + 1).Value = "RAAC"
-'  Cells(16, OpenICol + 2).Value = ">180 days"
-'  Cells(16, OpenICol + 3).Value = OpenType_RAAC_6
-'  'ER
-'  Cells(17, OpenICol + 1).Value = "ER"
-'  Cells(17, OpenICol + 2).Value = "<23"
-'  Cells(17, OpenICol + 3).Value = OpenType_ER_0
-'  Cells(18, OpenICol + 1).Value = "ER"
-'  Cells(18, OpenICol + 2).Value = "Aging"
-'  Cells(18, OpenICol + 3).Value = OpenType_ER_0_5
-'  Cells(19, OpenICol + 1).Value = "ER"
-'  Cells(19, OpenICol + 2).Value = "31-60 days"
-'  Cells(19, OpenICol + 3).Value = OpenType_ER_1
-'  Cells(20, OpenICol + 1).Value = "ER"
-'  Cells(20, OpenICol + 2).Value = "61-90 days"
-'  Cells(20, OpenICol + 3).Value = OpenType_ER_2
-'  Cells(21, OpenICol + 1).Value = "ER"
-'  Cells(21, OpenICol + 2).Value = "91-120 days"
-'  Cells(21, OpenICol + 3).Value = OpenType_ER_3
-'  Cells(22, OpenICol + 1).Value = "ER"
-'  Cells(22, OpenICol + 2).Value = "121-150 days"
-'  Cells(22, OpenICol + 3).Value = OpenType_ER_4
-'  Cells(23, OpenICol + 1).Value = "ER"
-'  Cells(23, OpenICol + 2).Value = "151-180 days"
-'  Cells(23, OpenICol + 3).Value = OpenType_ER_5
-'  Cells(24, OpenICol + 1).Value = "ER"
-'  Cells(24, OpenICol + 2).Value = ">180 days"
-'  Cells(24, OpenICol + 3).Value = OpenType_ER_6
-'  'QAR
-'  Cells(25, OpenICol + 1).Value = "QAR"
-'  Cells(25, OpenICol + 2).Value = "<23"
-'  Cells(25, OpenICol + 3).Value = OpenType_QAR_0
-'  Cells(26, OpenICol + 1).Value = "QAR"
-'  Cells(26, OpenICol + 2).Value = "Aging"
-'  Cells(26, OpenICol + 3).Value = OpenType_QAR_0_5
-'  Cells(27, OpenICol + 1).Value = "QAR"
-'  Cells(27, OpenICol + 2).Value = "31-60 days"
-'  Cells(27, OpenICol + 3).Value = OpenType_QAR_1
-'  Cells(28, OpenICol + 1).Value = "QAR"
-'  Cells(28, OpenICol + 2).Value = "61-90 days"
-'  Cells(28, OpenICol + 3).Value = OpenType_QAR_2
-'  Cells(29, OpenICol + 1).Value = "QAR"
-'  Cells(29, OpenICol + 2).Value = "91-120 days"
-'  Cells(29, OpenICol + 3).Value = OpenType_QAR_3
-'  Cells(30, OpenICol + 1).Value = "QAR"
-'  Cells(30, OpenICol + 2).Value = "121-150 days"
-'  Cells(30, OpenICol + 3).Value = OpenType_QAR_4
-'  Cells(31, OpenICol + 1).Value = "QAR"
-'  Cells(31, OpenICol + 2).Value = "151-180 days"
-'  Cells(31, OpenICol + 3).Value = OpenType_QAR_5
-'  Cells(32, OpenICol + 1).Value = "QAR"
-'  Cells(32, OpenICol + 2).Value = "> 180 days"
-'  Cells(32, OpenICol + 3).Value = OpenType_QAR_6
-'  'INC
-'  Cells(33, OpenICol + 1).Value = "INC"
-'  Cells(33, OpenICol + 2).Value = "<23"
-'  Cells(33, OpenICol + 3).Value = OpenType_INC_0
-'  Cells(34, OpenICol + 1).Value = "INC"
-'  Cells(34, OpenICol + 2).Value = "Aging"
-'  Cells(34, OpenICol + 3).Value = OpenType_INC_0_5
-'  Cells(35, OpenICol + 1).Value = "INC"
-'  Cells(35, OpenICol + 2).Value = "31-60 days"
-'  Cells(35, OpenICol + 3).Value = OpenType_INC_1
-'  Cells(36, OpenICol + 1).Value = "INC"
-'  Cells(36, OpenICol + 2).Value = "61-90 days"
-'  Cells(36, OpenICol + 3).Value = OpenType_INC_2
-'  Cells(37, OpenICol + 1).Value = "INC"
-'  Cells(37, OpenICol + 2).Value = "91-120 days"
-'  Cells(37, OpenICol + 3).Value = OpenType_INC_3
-'  Cells(38, OpenICol + 1).Value = "INC"
-'  Cells(38, OpenICol + 2).Value = "121-150 days"
-'  Cells(38, OpenICol + 3).Value = OpenType_INC_4
-'  Cells(39, OpenICol + 1).Value = "INC"
-'  Cells(39, OpenICol + 2).Value = "151-180 days"
-'  Cells(39, OpenICol + 3).Value = OpenType_INC_5
-'  Cells(40, OpenICol + 1).Value = "INC"
-'  Cells(40, OpenICol + 2).Value = ">180 days"
-'  Cells(40, OpenICol + 3).Value = OpenType_INC_6
+  OpenICol = Cells(1, 1).End(xlToRight).Column
+  Cells(1, 1).Activate
+  ActiveCell.EntireRow.Insert
+  address1 = Cells(1, 1).Address(rowabsolute:=False, columnabsolute:=False)
+  address2 = Cells(1, OpenICol).Address(rowabsolute:=False, columnabsolute:=False)
+  Range(address1 & ":" & address2).Select
+  Selection.Merge
+  Cells(1, 1).Value = "Record Counts"
 End Sub
