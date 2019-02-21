@@ -23,7 +23,7 @@ Sub PR_Report()
     Dim OpenIRow As Integer
     Dim OpenICol As Integer
     Dim RecType() As Integer
-    Dim CurRec() As Range
+    Dim CurRec() As Integer
     Dim temp As String
     Dim tempval As Long
     Dim address1 As String
@@ -180,7 +180,7 @@ Sub PR_Report()
   '                | 8: Aged record Total
   '                | 9: Type Total
   '---------------------------------------------------------------------------------
-  ReDim CurRec(5) As Range
+  ReDim CurRec(1, 5) As Integer
   ReDim OpenRec(OpenRecNum, 3) As String
   ReDim OpenCount(6, 9) As Integer
   For i = 0 To 5
@@ -301,24 +301,24 @@ Sub PR_Report()
   
   Sheets.Add after:=Sheets(Sheet_Name)
   Sheets(Sheets.Count).Select
-  Sheets(Sheets.Count).Name = "Results"
-  Worksheets("Results").Cells(1, 1).Value = "Record Type"
-  Worksheets("Results").Cells(1, 2).Value = "<23 Days"
-  Worksheets("Results").Cells(1, 3).Value = "24-30 Days"
-  Worksheets("Results").Cells(1, 4).Value = "31-60 Days"
-  Worksheets("Results").Cells(1, 5).Value = "61-90 Days"
-  Worksheets("Results").Cells(1, 6).Value = "91-120 Days"
-  Worksheets("Results").Cells(1, 7).Value = "121-150 Days"
-  Worksheets("Results").Cells(1, 8).Value = "151-180 Days"
-  Worksheets("Results").Cells(1, 9).Value = ">181 Days"
-  Worksheets("Results").Cells(1, 10).Value = "Aged"
-  Worksheets("Results").Cells(1, 11).Value = "Total"
-  Worksheets("Results").Cells(2, 1).Value = "LIR"
-  Worksheets("Results").Cells(3, 1).Value = "RAAC"
-  Worksheets("Results").Cells(4, 1).Value = "ER"
-  Worksheets("Results").Cells(5, 1).Value = "QAR"
-  Worksheets("Results").Cells(6, 1).Value = "INC"
-  Worksheets("Results").Cells(7, 1).Value = "Total"
+  Sheets(Sheets.Count).Name = "Week_" & week_num
+  Worksheets("Week_" & week_num).Cells(1, 1).Value = "Record Type"
+  Worksheets("Week_" & week_num).Cells(1, 2).Value = "<23 Days"
+  Worksheets("Week_" & week_num).Cells(1, 3).Value = "24-30 Days"
+  Worksheets("Week_" & week_num).Cells(1, 4).Value = "31-60 Days"
+  Worksheets("Week_" & week_num).Cells(1, 5).Value = "61-90 Days"
+  Worksheets("Week_" & week_num).Cells(1, 6).Value = "91-120 Days"
+  Worksheets("Week_" & week_num).Cells(1, 7).Value = "121-150 Days"
+  Worksheets("Week_" & week_num & "_open").Cells(1, 8).Value = "151-180 Days"
+  Worksheets("Week_" & week_num & "_open").Cells(1, 9).Value = ">181 Days"
+  Worksheets("Week_" & week_num & "_open").Cells(1, 10).Value = "Aged"
+  Worksheets("Week_" & week_num & "_open").Cells(1, 11).Value = "Total"
+  Worksheets("Week_" & week_num & "_open").Cells(2, 1).Value = "LIR"
+  Worksheets("Week_" & week_num & "_open").Cells(3, 1).Value = "RAAC"
+  Worksheets("Week_" & week_num & "_open").Cells(4, 1).Value = "ER"
+  Worksheets("Week_" & week_num & "_open").Cells(5, 1).Value = "QAR"
+  Worksheets("Week_" & week_num & "_open").Cells(6, 1).Value = "INC"
+  Worksheets("Week_" & week_num & "_open").Cells(7, 1).Value = "Total"
   For i = 1 To 6
     For j = 0 To 9
         Cells(i + 1, j + 2).Value = OpenCount(i, j)
@@ -326,45 +326,68 @@ Sub PR_Report()
   Next i
   OpenICol = Cells(1, 1).End(xlToRight).Column
   For i = 0 To 4
-    Worksheets("Results").Cells(1, OpenICol + 4 * i + 1).Value = "Record ID"
-    Worksheets("Results").Cells(1, OpenICol + 4 * i + 2).Value = "Short Description"
-    Worksheets("Results").Cells(1, OpenICol + 4 * i + 3).Value = "Record Stage"
-    Worksheets("Results").Cells(1, OpenICol + 4 * i + 4).Value = "Record Type"
+    Worksheets("Week_" & week_num & "_open").Cells(1, OpenICol + 4 * i + 1).Value = "Record ID"
+    Worksheets("Week_" & week_num & "_open").Cells(1, OpenICol + 4 * i + 2).Value = "Short Description"
+    Worksheets("Week_" & week_num & "_open").Cells(1, OpenICol + 4 * i + 3).Value = "Record Stage"
+    Worksheets("Week_" & week_num & "_open").Cells(1, OpenICol + 4 * i + 4).Value = "Record Type"
   Next i
-  CurRec(1) = Cells(2, OpenICol)
-  CurRec(2) = CurRec(1).Offset(0, 4)
-  CurRec(3) = CurRec(1).Offset(0, 8)
-  CurRec(4) = CurRec(1).Offset(0, 12)
-  CurRec(5) = CurRec(1).Offset(0, 16)
+  CurRec(0, 1) = 2
+  CurRec(1, 1) = OpenICol + 1
+  CurRec(0, 2) = 2
+  CurRec(1, 2) = OpenICol + 5
+  CurRec(0, 3) = 2
+  CurRec(1, 3) = OpenICol + 9
+  CurRec(0, 4) = 2
+  CurRec(1, 4) = OpenICol + 13
+  CurRec(0, 5) = 2
+  CurRec(1, 5) = OpenICol + 17
   For i = 2 To OpenRecNum
     If OpenRec(i, 3) = 1 Then
-        CurRec(1).Value = OpenRec(i, 0)
-        CurRec(1).Offset(0, 1).Value = OpenRec(i, 1)
-        CurRec(1).Offset(0, 2).Value = OpenRec(i, 2)
-        CurRec(1).Offset(0, 3).Value = OpenRec(i, 3)
-        CurRec(1) = CurRec(1).Offset(1, 0)
+        Cells(CurRec(0, 1), CurRec(1, 1)).Activate
+        ActiveCell.Value = OpenRec(i, 0)
+        ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+        ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+        ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+        CurRec(0, 1) = CurRec(0, 1) + 1
+        CurRec(1, 1) = CurRec(1, 1)
     Else
         If OpenRec(i, 3) = 2 Then
-            CurRec(2).Value = OpenRec(i, 0)
-            CurRec(2).Offset(0, 1).Value = OpenRec(i, 1)
-            CurRec(2).Offset(0, 2).Value = OpenRec(i, 2)
-            CurRec(2).Offset(0, 3).Value = OpenRec(i, 3)
-            CurRec(2) = CurRec(2).Offset(1, 0)
+            Cells(CurRec(0, 2), CurRec(1, 2)).Activate
+            ActiveCell.Value = OpenRec(i, 0)
+            ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+            ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+            ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+            CurRec(0, 2) = CurRec(0, 2) + 1
+            CurRec(1, 2) = CurRec(1, 2)
         Else
             If OpenRec(i, 3) = 3 Then
-                CurRec(3).Value = OpenRec(i, 0)
-                CurRec(3).Offset(0, 1).Value = OpenRec(i, 1)
-                CurRec(3).Offset(0, 2).Value = OpenRec(i, 2)
-                CurRec(3).Offset(0, 3).Value = OpenRec(i, 3)
-                CurRec(3) = CurRec(3).Offset(1, 0)
+                Cells(CurRec(0, 3), CurRec(1, 3)).Activate
+                ActiveCell.Value = OpenRec(i, 0)
+                ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+                ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+                ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+                CurRec(0, 3) = CurRec(0, 3) + 1
+                CurRec(1, 3) = CurRec(1, 3)
             Else
                 If OpenRec(i, 3) = 4 Then
-                    CurRec(4).Value = OpenRec(i, 0)
-                    CurRec(4).Offset(0, 1).Value = OpenRec(i, 1)
-                    CurRec(4).Offset(0, 2).Value = OpenRec(i, 2)
-                    CurRec(4).Offset(0, 3).Value = OpenRec(i, 3)
-                    CurRec(4) = CurRec(4).Offset(1, 0)
+                    Cells(CurRec(0, 4), CurRec(1, 4)).Activate
+                    ActiveCell.Value = OpenRec(i, 0)
+                    ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+                    ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+                    ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+                    CurRec(0, 4) = CurRec(0, 4) + 1
+                    CurRec(1, 4) = CurRec(1, 4)
                 Else
+                    If OpenRec(i, 3) = 5 Then
+                        Cells(CurRec(0, 5), CurRec(1, 5)).Activate
+                        ActiveCell.Value = OpenRec(i, 0)
+                        ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+                        ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+                        ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+                        CurRec(0, 5) = CurRec(0, 5) + 1
+                        CurRec(1, 5) = CurRec(1, 5)
+                    Else
+                    End If
                 End If
             End If
         End If
