@@ -15,6 +15,7 @@ Sub PR_Report()
     Dim File_1 As String
     Dim File_2 As String
     Dim week_num As Integer
+    Dim OpenRecNum As Long
     Dim Sheet_Name As String
     Dim OpenCount() As Integer
     Dim OpenAge() As Integer
@@ -22,6 +23,7 @@ Sub PR_Report()
     Dim OpenIRow As Integer
     Dim OpenICol As Integer
     Dim RecType() As Integer
+    Dim CurRec() As Range
     Dim temp As String
     Dim tempval As Long
     Dim address1 As String
@@ -83,6 +85,9 @@ Sub PR_Report()
   '----------------------------------------
   'Calculate Age
   '----------------------------------------
+  OpenRecNum = OpenIRow
+  'OpenRecNum is the line number of the last line that contain open record;
+  'Total Record Number = OpenRecNum -1
   Cells(1, OpenICol).Value = "Age"
   ReDim OpenAge(OpenIRow) As Integer
   ReDim OpenStage(OpenIRow) As Integer
@@ -99,7 +104,7 @@ Sub PR_Report()
   Cells(1, OpenICol).Value = "Stage"
   Cells(1, OpenICol + 1).Value = "Type"
   
-  For i = 2 To OpenIRow
+  For i = 2 To OpenRecNum
     OpenStage(i) = Application.WorksheetFunction.Floor(OpenAge(i) / 30, 1)
     Select Case OpenStage(i)
         Case Is > 5
@@ -149,13 +154,13 @@ Sub PR_Report()
   'QAR:     "Manufacturing Investigations / Quality Assurance Report (QAR)"
   'INC:     "Manufacturing Investigations / Incident"
   '------------------------------
-  'Array subfix
+  'Array subscripts
   '------------------------------
   'Array Name: OpenRec
   '----------------------------------
   'First Dimension | Second Dimension
   '----------------------------------
-  '2-OpenICol:     | 0: Record Number
+  '2-OpenRecNum:   | 0: Record Number
   '                | 1: Short Description
   'Row on          | 2: Record Stage
   'spreadsheet     | 3: Record Type
@@ -164,19 +169,22 @@ Sub PR_Report()
   '-----------------------------------
   'First Dimension | Second Dimension
   '-----------------------------------
-  '1: LIR          | 0: < 30
-  '2: RAAC         | 1: 23-30
-  '3: ER           | 2: 31-60
-  '4: QAR          | 3: 61-90
-  '5: INC          | 4: 91-120
-  '                | 5: 121-150
-  '                | 6: 151-180
+  '                | 0: < 30
+  '1: LIR          | 1: 23-30
+  '2: RAAC         | 2: 31-60
+  '3: ER           | 3: 61-90
+  '4: QAR          | 4: 91-120
+  '5: INC          | 5: 121-150
+  '6: stage total  | 6: 151-180
   '                | 7: >180
+  '                | 8: Aged record Total
+  '                | 9: Type Total
   '---------------------------------------------------------------------------------
-  ReDim OpenRec(OpenIRow, 3) As String
-  ReDim OpenCount(5, 7) As Integer
+  ReDim CurRec(5) As Range
+  ReDim OpenRec(OpenRecNum, 3) As String
+  ReDim OpenCount(6, 9) As Integer
   For i = 0 To 5
-    For j = 0 To 7
+    For j = 0 To 9
         OpenCount(i, j) = 0
     Next j
   Next i
@@ -283,6 +291,14 @@ Sub PR_Report()
     OpenRec(i, 2) = OpenStage(i)
     OpenRec(i, 3) = RecType(i)
   Next i
+  For i = 1 To 5
+        OpenCount(i, 8) = OpenCount(i, 2) + OpenCount(i, 3) + OpenCount(i, 4) + OpenCount(i, 5) + OpenCount(i, 6) + OpenCount(i, 7)
+        OpenCount(i, 9) = OpenCount(i, 0) + OpenCount(i, 1) + OpenCount(i, 8)
+  Next i
+  For i = 0 To 9
+    OpenCount(6, i) = OpenCount(1, i) + OpenCount(2, i) + OpenCount(3, i) + OpenCount(4, i) + OpenCount(5, i)
+  Next i
+  
   Sheets.Add after:=Sheets(Sheet_Name)
   Sheets(Sheets.Count).Select
   Sheets(Sheets.Count).Name = "Results"
@@ -302,24 +318,62 @@ Sub PR_Report()
   Worksheets("Results").Cells(4, 1).Value = "ER"
   Worksheets("Results").Cells(5, 1).Value = "QAR"
   Worksheets("Results").Cells(6, 1).Value = "INC"
-  For i = 1 To 5
-    For j = 0 To 7
+  Worksheets("Results").Cells(7, 1).Value = "Total"
+  For i = 1 To 6
+    For j = 0 To 9
         Cells(i + 1, j + 2).Value = OpenCount(i, j)
-        Cells(i + 1, 10).Value = OpenCount(i, 2) + _
-        OpenCount(i, 3) + OpenCount(i, 4) + OpenCount(i, 5) _
-        + OpenCount(i, 6) + OpenCount(i, 7)
-        Cells(i + 1, 11).Value = OpenCount(i, 0) + _
-        OpenCount(i, 1) + OpenCount(i, 2) + OpenCount(i, 3) _
-        + OpenCount(i, 4) + OpenCount(i, 5) + OpenCount(i, 6) _
-        + OpenCount(i, 7)
     Next j
   Next i
   OpenICol = Cells(1, 1).End(xlToRight).Column
-  Cells(1, 1).Activate
-  ActiveCell.EntireRow.Insert
-  address1 = Cells(1, 1).Address(rowabsolute:=False, columnabsolute:=False)
-  address2 = Cells(1, OpenICol).Address(rowabsolute:=False, columnabsolute:=False)
-  Range(address1 & ":" & address2).Select
-  Selection.Merge
-  Cells(1, 1).Value = "Record Counts"
+  For i = 0 To 4
+    Worksheets("Results").Cells(1, OpenICol + 4 * i + 1).Value = "Record ID"
+    Worksheets("Results").Cells(1, OpenICol + 4 * i + 2).Value = "Short Description"
+    Worksheets("Results").Cells(1, OpenICol + 4 * i + 3).Value = "Record Stage"
+    Worksheets("Results").Cells(1, OpenICol + 4 * i + 4).Value = "Record Type"
+  Next i
+  CurRec(1) = Cells(2, OpenICol)
+  CurRec(2) = CurRec(1).Offset(0, 4)
+  CurRec(3) = CurRec(1).Offset(0, 8)
+  CurRec(4) = CurRec(1).Offset(0, 12)
+  CurRec(5) = CurRec(1).Offset(0, 16)
+  For i = 2 To OpenRecNum
+    If OpenRec(i, 3) = 1 Then
+        CurRec(1).Value = OpenRec(i, 0)
+        CurRec(1).Offset(0, 1).Value = OpenRec(i, 1)
+        CurRec(1).Offset(0, 2).Value = OpenRec(i, 2)
+        CurRec(1).Offset(0, 3).Value = OpenRec(i, 3)
+        CurRec(1) = CurRec(1).Offset(1, 0)
+    Else
+        If OpenRec(i, 3) = 2 Then
+            CurRec(2).Value = OpenRec(i, 0)
+            CurRec(2).Offset(0, 1).Value = OpenRec(i, 1)
+            CurRec(2).Offset(0, 2).Value = OpenRec(i, 2)
+            CurRec(2).Offset(0, 3).Value = OpenRec(i, 3)
+            CurRec(2) = CurRec(2).Offset(1, 0)
+        Else
+            If OpenRec(i, 3) = 3 Then
+                CurRec(3).Value = OpenRec(i, 0)
+                CurRec(3).Offset(0, 1).Value = OpenRec(i, 1)
+                CurRec(3).Offset(0, 2).Value = OpenRec(i, 2)
+                CurRec(3).Offset(0, 3).Value = OpenRec(i, 3)
+                CurRec(3) = CurRec(3).Offset(1, 0)
+            Else
+                If OpenRec(i, 3) = 4 Then
+                    CurRec(4).Value = OpenRec(i, 0)
+                    CurRec(4).Offset(0, 1).Value = OpenRec(i, 1)
+                    CurRec(4).Offset(0, 2).Value = OpenRec(i, 2)
+                    CurRec(4).Offset(0, 3).Value = OpenRec(i, 3)
+                    CurRec(4) = CurRec(4).Offset(1, 0)
+                Else
+                End If
+            End If
+        End If
+    End If
+  Next i
+'Cells(1, 1).Activate
+'  ActiveCell.EntireRow.Insert
+'  address1 = Cells(1, 1).Address(rowabsolute:=False, columnabsolute:=False)
+'  address2 = Cells(1, OpenICol).Address(rowabsolute:=False, columnabsolute:=False)
+'  Range(address1 & ":" & address2).Select
+'  Selection.Merge
 End Sub
