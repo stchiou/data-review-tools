@@ -329,23 +329,23 @@ Sub PR_Report()
         Cells(i + 1, j + 2).Value = OpenCount(i, j)
     Next j
   Next i
-  OpenlCol = Cells(1, 1).End(xlToRight).Column
+  ReplCol = Cells(1, 1).End(xlToRight).Column
   For i = 0 To 4
-    Worksheets("Week_" & week_num).Cells(1, OpenlCol + 4 * i + 1).Value = "Record ID"
-    Worksheets("Week_" & week_num).Cells(1, OpenlCol + 4 * i + 2).Value = "Short Description"
-    Worksheets("Week_" & week_num).Cells(1, OpenlCol + 4 * i + 3).Value = "Record Stage"
-    Worksheets("Week_" & week_num).Cells(1, OpenlCol + 4 * i + 4).Value = "Record Type"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
   Next i
   OpenCurRec(0, 1) = 2
-  OpenCurRec(1, 1) = OpenlCol + 1
+  OpenCurRec(1, 1) = ReplCol + 1
   OpenCurRec(0, 2) = 2
-  OpenCurRec(1, 2) = OpenlCol + 5
+  OpenCurRec(1, 2) = ReplCol + 5
   OpenCurRec(0, 3) = 2
-  OpenCurRec(1, 3) = OpenlCol + 9
+  OpenCurRec(1, 3) = ReplCol + 9
   OpenCurRec(0, 4) = 2
-  OpenCurRec(1, 4) = OpenlCol + 13
+  OpenCurRec(1, 4) = ReplCol + 13
   OpenCurRec(0, 5) = 2
-  OpenCurRec(1, 5) = OpenlCol + 17
+  OpenCurRec(1, 5) = ReplCol + 17
   For i = 2 To OpenRecNum
     If OpenRec(i, 3) = 1 Then
         Cells(OpenCurRec(0, 1), OpenCurRec(1, 1)).Activate
@@ -533,7 +533,7 @@ Sub PR_Report()
         ActiveCell.Offset(i, j + 1).Offset.Value = CloseCount(i, j)
     Next
   Next i
-  RepICol = Cells(1, 1).End(xlToRight).Column
+  ReplCol = Cells(1, 1).End(xlToRight).Column
   For i = 0 To 4
     Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
     Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
@@ -541,6 +541,6 @@ Sub PR_Report()
     Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
   Next i
   For i = 2 To CloseRecNum
-  
+    
   Next i
 End Sub
