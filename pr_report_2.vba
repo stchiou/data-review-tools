@@ -528,9 +528,19 @@ Sub PR_Report()
   ActiveCell.Offset(4, 0).Value = "QAR"
   ActiveCell.Offset(5, 0).Value = "INC"
   ActiveCell.Offset(6, 0).Value = "Total"
-  For i = 1 To 5
+  For i = 1 To 6
     For j = 0 To 2
-        ActiveCell.Offset(i + 1, j + 1).Offset.Value = CloseCount(i, j)
+        ActiveCell.Offset(i, j + 1).Offset.Value = CloseCount(i, j)
     Next
+  Next i
+  RepICol = Cells(1, 1).End(xlToRight).Column
+  For i = 0 To 4
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
+  Next i
+  For i = 2 To CloseRecNum
+  
   Next i
 End Sub
