@@ -533,14 +533,73 @@ Sub PR_Report()
         ActiveCell.Offset(i, j + 1).Offset.Value = CloseCount(i, j)
     Next
   Next i
-  ReplCol = Cells(1, 1).End(xlToRight).Column
+  ReplCol = Cells(1, 1).End(xlToRight).Column + 1
   For i = 0 To 4
-    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
-    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
-    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
-    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i).Value = "Record ID"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Short Description"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Record Stage"
+    Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Type"
   Next i
+  CloseCurRec(0, 1) = 2
+  CloseCurRec(1, 1) = ReplCol
+  CloseCurRec(0, 2) = 2
+  CloseCurRec(1, 2) = CloseCurRec(1, 1) + 4
+  CloseCurRec(0, 3) = 2
+  CloseCurRec(1, 3) = CloseCurRec(1, 2) + 4
+  CloseCurRec(0, 4) = 2
+  CloseCurRec(1, 4) = CloseCurRec(1, 3) + 4
+  CloseCurRec(0, 5) = 2
+  CloseCurRec(1, 5) = CloseCurRec(1, 4) + 4
   For i = 2 To CloseRecNum
-    
+    If CloseRec(i, 3) = 1 Then
+        Cells(CloseCurRec(0, 1), CloseCurRec(1, 1)).Activate
+        ActiveCell.Value = CloseRec(i, 0)
+        ActiveCell.Offset(0, 1).Value = CloseRec(i, 1)
+        ActiveCell.Offset(0, 2).Value = CloseRec(i, 2)
+        ActiveCell.Offset(0, 3).Value = CloseRec(i, 3)
+        CloseCurRec(0, 1) = CloseCurRec(0, 1) + 1
+        CloseCurRec(1, 1) = CloseCurRec(1, 1)
+    Else
+        If CloseRec(i, 3) = 2 Then
+            Cells(CloseCurRec(0, 2), CloseCurRec(1, 2)).Activate
+            ActiveCell.Value = CloseRec(i, 0)
+            ActiveCell.Offset(0, 1).Value = CloseRec(i, 1)
+            ActiveCell.Offset(0, 2).Value = CloseRec(i, 2)
+            ActiveCell.Offset(0, 3).Value = CloseRec(i, 3)
+            CloseCurRec(0, 2) = CloseCurRec(0, 2) + 1
+            CloseCurRec(1, 2) = CloseCurRec(1, 2)
+        Else
+            If CloseRec(i, 3) = 3 Then
+                Cells(CloseCurRec(0, 3), CloseCurRec(1, 3)).Activate
+                ActiveCell.Value = CloseRec(i, 0)
+                ActiveCell.Offset(0, 1).Value = CloseRec(i, 1)
+                ActiveCell.Offset(0, 2).Value = CloseRec(i, 2)
+                ActiveCell.Offset(0, 3).Value = CloseRec(i, 3)
+                CloseCurRec(0, 3) = CloseCurRec(0, 3) + 1
+                CloseCurRec(1, 3) = CloseCurRec(1, 3)
+            Else
+                If CloseRec(i, 3) = 4 Then
+                    Cells(CloseCurRec(0, 4), CloseCurRec(1, 4)).Activate
+                    ActiveCell.Value = CloseRec(i, 0)
+                    ActiveCell.Offset(0, 1).Value = CloseRec(i, 1)
+                    ActiveCell.Offset(0, 2).Value = CloseRec(i, 2)
+                    ActiveCell.Offset(0, 3).Value = CloseRec(i, 3)
+                    CloseCurRec(0, 4) = CloseCurRec(0, 4) + 1
+                    CloseCurRec(1, 4) = CloseCurRec(1, 4)
+                Else
+                    If CloseRec(i, 3) = 5 Then
+                        Cells(CloseCurRec(0, 5), CloseCurRec(1, 5)).Activate
+                        ActiveCell.Value = CloseRec(i, 0)
+                        ActiveCell.Offset(0, 1).Value = CloseRec(i, 1)
+                        ActiveCell.Offset(0, 2).Value = CloseRec(i, 2)
+                        ActiveCell.Offset(0, 3).Value = CloseRec(i, 3)
+                        CloseCurRec(0, 5) = CloseCurRec(0, 5) + 1
+                        CloseCurRec(1, 5) = CloseCurRec(1, 5)
+                    Else
+                    End If
+                End If
+            End If
+        End If
+    End If
   Next i
 End Sub
