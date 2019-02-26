@@ -51,6 +51,8 @@ Dim i As Integer
 Dim j As Integer
 Dim age As Integer
 Dim stage As Integer
+Dim address_1 As String
+Dim address_2 As String
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
@@ -652,4 +654,31 @@ For i = 2 To CloseRecNum
       End If
   End If
 Next i
+Worksheets("Week_" & week_num).Cells(1, 1).Activate
+ActiveCell.EntireRow.Insert
+Cells(1, 1).Value = "Open Records"
+Cells(1, 12).Value = "Open LIR"
+Cells(1, 16).Value = "Open RAAC"
+Cells(1, 20).Value = "Open ER"
+Cells(1, 24).Value = "Open QAR"
+Cells(1, 28).Value = "Open INC"
+Cells(1, 32).Value = "Closed Records"
+Cells(1, 36).Value = "Closed LIR"
+Cells(1, 40).Value = "Closed RAAC"
+Cells(1, 44).Value = "Closed ER"
+Cells(1, 48).Value = "Closed QAR"
+Cells(1, 52).Value = "Closed INC"
+address_1 = Cells(1, 1).Address(rowabsolute:=False, columnabsolute:=False)
+address_2 = Cells(1, 11).Address(rowabsolute:=False, columnabsolute:=False)
+Range(address_1 & ":" & address_2).Select
+Selection.Merge
+For i = 3 To 13
+    address_1 = Cells(1, 4 * i).Address(rowabsolute:=False, columnabsolute:=False)
+    address_2 = Cells(1, 4 * i + 3).Address(rowabsolute:=False, columnabsolute:=False)
+    Range(address_1 & ":" & address_2).Select
+    Selection.Merge
+Next i
+Sheets("Week_" & week_num).Move
+Worksheets("Week_" & week_num).Activate
+ActiveWorkbook.SaveAs Filename:="Week_" & week_num & "_summary"
 End Sub
