@@ -200,112 +200,119 @@ OpenlCol = OpenlCol + 2
 ReDim OpenCurRec(1, 5) As Integer
 ReDim OpenRec(OpenRecNum, 3) As String
 ReDim OpenCount(6, 9) As Integer
+'--------------------------------------------------
+'Reset the Array that Store Open Record Counts
+'--------------------------------------------------
 For i = 0 To 5
   For j = 0 To 9
       OpenCount(i, j) = 0
   Next j
 Next i
+'---------------------------------------------------------------------------------------------
+'Assigning Record Type, Counting Numbers of Each Record Type,
+'and Storing Results in an Array
+'---------------------------------------------------------------------------------------------
 For i = 2 To OpenlRow
   Select Case OpenRecType(i)
-      Case Is = 1
-          Select Case OpenStage(i)
-              Case Is = 0
-                  OpenCount(1, 0) = OpenCount(1, 0) + 1
-              Case Is = 1
-                  OpenCount(1, 1) = OpenCount(1, 1) + 1
-              Case Is = 2
-                  OpenCount(1, 2) = OpenCount(1, 2) + 1
-              Case Is = 3
-                  OpenCount(1, 3) = OpenCount(1, 3) + 1
-              Case Is = 4
-                  OpenCount(1, 4) = OpenCount(1, 4) + 1
-              Case Is = 5
-                  OpenCount(1, 5) = OpenCount(1, 5) + 1
-              Case Is = 6
-                  OpenCount(1, 6) = OpenCount(1, 6) + 1
-              Case Is = 7
-                  OpenCount(1, 7) = OpenCount(1, 7) + 1
-          End Select
-      Case Is = 2
-          Select Case OpenStage(i)
-              Case Is = 0
-                  OpenCount(2, 0) = OpenCount(2, 0) + 1
-              Case Is = 1
-                  OpenCount(2, 1) = OpenCount(2, 1) + 1
-              Case Is = 2
-                  OpenCount(2, 2) = OpenCount(2, 2) + 1
-              Case Is = 3
-                  OpenCount(2, 3) = OpenCount(2, 3) + 1
-              Case Is = 4
-                  OpenCount(2, 4) = OpenCount(2, 4) + 1
-              Case Is = 5
-                  OpenCount(2, 5) = OpenCount(2, 5) + 1
-              Case Is = 6
-                  OpenCount(2, 6) = OpenCount(2, 6) + 1
-              Case Is = 7
-                  OpenCount(2, 7) = OpenCount(2, 7) + 1
-          End Select
-      Case Is = 3
-          Select Case OpenStage(i)
-              Case Is = 0
-                  OpenCount(3, 0) = OpenCount(3, 0) + 1
-              Case Is = 1
-                  OpenCount(3, 1) = OpenCount(3, 1) + 1
-              Case Is = 2
-                  OpenCount(3, 2) = OpenCount(3, 2) + 1
-              Case Is = 3
-                  OpenCount(3, 3) = OpenCount(3, 3) + 1
-              Case Is = 4
-                  OpenCount(3, 4) = OpenCount(3, 4) + 1
-              Case Is = 5
-                  OpenCount(3, 5) = OpenCount(3, 5) + 1
-              Case Is = 6
-                  OpenCount(3, 6) = OpenCount(3, 6) + 1
-              Case Is = 7
-                  OpenCount(3, 7) = OpenCount(3, 7) + 1
-          End Select
-      Case Is = 4
-          Select Case OpenStage(i)
-              Case Is = 0
-                  OpenCount(4, 0) = OpenCount(4, 0) + 1
-              Case Is = 1
-                  OpenCount(4, 1) = OpenCount(4, 1) + 1
-              Case Is = 2
-                  OpenCount(4, 2) = OpenCount(4, 2) + 1
-              Case Is = 3
-                  OpenCount(4, 3) = OpenCount(4, 3) + 1
-              Case Is = 4
-                  OpenCount(4, 4) = OpenCount(4, 4) + 1
-              Case Is = 5
-                  OpenCount(4, 5) = OpenCount(4, 5) + 1
-              Case Is = 6
-                  OpenCount(4, 6) = OpenCount(4, 6) + 1
-              Case Is = 7
-                  OpenCount(4, 7) = OpenCount(4, 7) + 1
-          End Select
-      Case Is = 5
-          Select Case OpenStage(i)
-              Case Is = 0
-                  OpenCount(5, 0) = OpenCount(5, 0) + 1
-              Case Is = 1
-                  OpenCount(5, 1) = OpenCount(5, 1) + 1
-              Case Is = 2
-                  OpenCount(5, 2) = OpenCount(5, 2) + 1
-              Case Is = 3
-                  OpenCount(5, 3) = OpenCount(5, 3) + 1
-              Case Is = 4
-                  OpenCount(5, 4) = OpenCount(5, 4) + 1
-              Case Is = 5
-                  OpenCount(5, 5) = OpenCount(5, 5) + 1
-              Case Is = 6
-                  OpenCount(5, 6) = OpenCount(5, 6) + 1
-              Case Is = 7
-                  OpenCount(5, 7) = OpenCount(5, 7) + 1
-          End Select
+    Case Is = 1
+    Select Case OpenStage(i)
+        Case Is = 0
+            OpenCount(1, 0) = OpenCount(1, 0) + 1
+        Case Is = 1
+            OpenCount(1, 1) = OpenCount(1, 1) + 1
+        Case Is = 2
+            OpenCount(1, 2) = OpenCount(1, 2) + 1
+        Case Is = 3
+            OpenCount(1, 3) = OpenCount(1, 3) + 1
+        Case Is = 4
+            OpenCount(1, 4) = OpenCount(1, 4) + 1
+        Case Is = 5
+            OpenCount(1, 5) = OpenCount(1, 5) + 1
+        Case Is = 6
+            OpenCount(1, 6) = OpenCount(1, 6) + 1
+        Case Is = 7
+            OpenCount(1, 7) = OpenCount(1, 7) + 1
+    End Select
+    Case Is = 2
+    Select Case OpenStage(i)
+        Case Is = 0
+            OpenCount(2, 0) = OpenCount(2, 0) + 1
+        Case Is = 1
+            OpenCount(2, 1) = OpenCount(2, 1) + 1
+        Case Is = 2
+            OpenCount(2, 2) = OpenCount(2, 2) + 1
+        Case Is = 3
+            OpenCount(2, 3) = OpenCount(2, 3) + 1
+        Case Is = 4
+            OpenCount(2, 4) = OpenCount(2, 4) + 1
+        Case Is = 5
+            OpenCount(2, 5) = OpenCount(2, 5) + 1
+        Case Is = 6
+            OpenCount(2, 6) = OpenCount(2, 6) + 1
+        Case Is = 7
+            OpenCount(2, 7) = OpenCount(2, 7) + 1
+    End Select
+    Case Is = 3
+    Select Case OpenStage(i)
+        Case Is = 0
+            OpenCount(3, 0) = OpenCount(3, 0) + 1
+        Case Is = 1
+            OpenCount(3, 1) = OpenCount(3, 1) + 1
+        Case Is = 2
+            OpenCount(3, 2) = OpenCount(3, 2) + 1
+        Case Is = 3
+            OpenCount(3, 3) = OpenCount(3, 3) + 1
+        Case Is = 4
+            OpenCount(3, 4) = OpenCount(3, 4) + 1
+        Case Is = 5
+            OpenCount(3, 5) = OpenCount(3, 5) + 1
+        Case Is = 6
+            OpenCount(3, 6) = OpenCount(3, 6) + 1
+        Case Is = 7
+            OpenCount(3, 7) = OpenCount(3, 7) + 1
+    End Select
+    Case Is = 4
+    Select Case OpenStage(i)
+        Case Is = 0
+            OpenCount(4, 0) = OpenCount(4, 0) + 1
+        Case Is = 1
+            OpenCount(4, 1) = OpenCount(4, 1) + 1
+        Case Is = 2
+            OpenCount(4, 2) = OpenCount(4, 2) + 1
+        Case Is = 3
+            OpenCount(4, 3) = OpenCount(4, 3) + 1
+        Case Is = 4
+            OpenCount(4, 4) = OpenCount(4, 4) + 1
+        Case Is = 5
+            OpenCount(4, 5) = OpenCount(4, 5) + 1
+        Case Is = 6
+            OpenCount(4, 6) = OpenCount(4, 6) + 1
+        Case Is = 7
+            OpenCount(4, 7) = OpenCount(4, 7) + 1
+    End Select
+    Case Is = 5
+    Select Case OpenStage(i)
+        Case Is = 0
+            OpenCount(5, 0) = OpenCount(5, 0) + 1
+        Case Is = 1
+            OpenCount(5, 1) = OpenCount(5, 1) + 1
+        Case Is = 2
+            OpenCount(5, 2) = OpenCount(5, 2) + 1
+        Case Is = 3
+            OpenCount(5, 3) = OpenCount(5, 3) + 1
+        Case Is = 4
+            OpenCount(5, 4) = OpenCount(5, 4) + 1
+        Case Is = 5
+            OpenCount(5, 5) = OpenCount(5, 5) + 1
+        Case Is = 6
+            OpenCount(5, 6) = OpenCount(5, 6) + 1
+        Case Is = 7
+            OpenCount(5, 7) = OpenCount(5, 7) + 1
+    End Select
   End Select
-'-------------------------------------------------------------
-'Capture Open Records Information into Array
-'-------------------------------------------------------------
+    '-------------------------------------------------------------
+    'Capture Open Records Information into Array
+    '-------------------------------------------------------------
   OpenRec(i, 0) = Worksheets(OpenSheet_Name).Cells(i, 1).Value
   OpenRec(i, 1) = Worksheets(OpenSheet_Name).Cells(i, 3).Value
   OpenRec(i, 2) = OpenStage(i)
@@ -387,57 +394,61 @@ OpenCurRec(1, 5) = ReplCol + 17
 '----------------------------------------------------------------------------------
 For i = 2 To OpenRecNum
   If OpenRec(i, 3) = 1 Then
-      Cells(OpenCurRec(0, 1), OpenCurRec(1, 1)).Activate
-      ActiveCell.Value = OpenRec(i, 0)
-      ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
-      ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
-      ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
-      OpenCurRec(0, 1) = OpenCurRec(0, 1) + 1
-      OpenCurRec(1, 1) = OpenCurRec(1, 1)
+    Cells(OpenCurRec(0, 1), OpenCurRec(1, 1)).Activate
+    ActiveCell.Value = OpenRec(i, 0)
+    ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+    ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+    ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+    OpenCurRec(0, 1) = OpenCurRec(0, 1) + 1
+    OpenCurRec(1, 1) = OpenCurRec(1, 1)
   Else
-      If OpenRec(i, 3) = 2 Then
-          Cells(OpenCurRec(0, 2), OpenCurRec(1, 2)).Activate
-          ActiveCell.Value = OpenRec(i, 0)
-          ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
-          ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
-          ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
-          OpenCurRec(0, 2) = OpenCurRec(0, 2) + 1
-          OpenCurRec(1, 2) = OpenCurRec(1, 2)
-      Else
-          If OpenRec(i, 3) = 3 Then
-              Cells(OpenCurRec(0, 3), OpenCurRec(1, 3)).Activate
-              ActiveCell.Value = OpenRec(i, 0)
-              ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
-              ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
-              ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
-              OpenCurRec(0, 3) = OpenCurRec(0, 3) + 1
-              OpenCurRec(1, 3) = OpenCurRec(1, 3)
-          Else
-              If OpenRec(i, 3) = 4 Then
-                  Cells(OpenCurRec(0, 4), OpenCurRec(1, 4)).Activate
-                  ActiveCell.Value = OpenRec(i, 0)
-                  ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
-                  ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
-                  ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
-                  OpenCurRec(0, 4) = OpenCurRec(0, 4) + 1
-                  OpenCurRec(1, 4) = OpenCurRec(1, 4)
-              Else
-                  If OpenRec(i, 3) = 5 Then
-                      Cells(OpenCurRec(0, 5), OpenCurRec(1, 5)).Activate
-                      ActiveCell.Value = OpenRec(i, 0)
-                      ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
-                      ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
-                      ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
-                      OpenCurRec(0, 5) = OpenCurRec(0, 5) + 1
-                      OpenCurRec(1, 5) = OpenCurRec(1, 5)
-                  Else
-                  End If
-              End If
-          End If
-      End If
+    If OpenRec(i, 3) = 2 Then
+        Cells(OpenCurRec(0, 2), OpenCurRec(1, 2)).Activate
+        ActiveCell.Value = OpenRec(i, 0)
+        ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+        ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+        ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+        OpenCurRec(0, 2) = OpenCurRec(0, 2) + 1
+        OpenCurRec(1, 2) = OpenCurRec(1, 2)
+    Else
+        If OpenRec(i, 3) = 3 Then
+            Cells(OpenCurRec(0, 3), OpenCurRec(1, 3)).Activate
+            ActiveCell.Value = OpenRec(i, 0)
+            ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+            ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+            ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+            OpenCurRec(0, 3) = OpenCurRec(0, 3) + 1
+            OpenCurRec(1, 3) = OpenCurRec(1, 3)
+        Else
+            If OpenRec(i, 3) = 4 Then
+                Cells(OpenCurRec(0, 4), OpenCurRec(1, 4)).Activate
+                ActiveCell.Value = OpenRec(i, 0)
+                ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+                ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+                ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+                OpenCurRec(0, 4) = OpenCurRec(0, 4) + 1
+                OpenCurRec(1, 4) = OpenCurRec(1, 4)
+            Else
+                If OpenRec(i, 3) = 5 Then
+                    Cells(OpenCurRec(0, 5), OpenCurRec(1, 5)).Activate
+                    ActiveCell.Value = OpenRec(i, 0)
+                    ActiveCell.Offset(0, 1).Value = OpenRec(i, 1)
+                    ActiveCell.Offset(0, 2).Value = OpenRec(i, 2)
+                    ActiveCell.Offset(0, 3).Value = OpenRec(i, 3)
+                    OpenCurRec(0, 5) = OpenCurRec(0, 5) + 1
+                    OpenCurRec(1, 5) = OpenCurRec(1, 5)
+                Else
+                End If
+            End If
+        End If
+    End If
   End If
 Next i
 ReplCol = Worksheets("Week_" & week_num).Cells(1, 1).End(xlToRight).Column
+'--------------------------------------------------------------------------
+'Open Files Contains Closed Records and Short Description of Closed Records
+'Insert Short Descriptions to the Sheet that Contains Closed Records
+'--------------------------------------------------------------------------
 CloseSheet_Name = Left(File_3, InStr(File_3, ".") - 1)
 Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_3, local:=True
 Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_4, local:=True
@@ -450,7 +461,7 @@ Worksheets(CloseSheet_Name).Activate
 CloselRow = Cells(1, 1).End(xlDown).Row
 CloselCol = Cells(1, 1).End(xlToRight).Column
 '----------------------------------------
-'Calculate Age
+'Calculate Age of the Closed Records
 '----------------------------------------
 CloseRecNum = CloselRow
 'CloseRecNum is the line number of the last line that contain close record;
