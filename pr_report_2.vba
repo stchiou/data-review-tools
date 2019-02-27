@@ -678,7 +678,17 @@ For i = 3 To 13
     Range(address_1 & ":" & address_2).Select
     Selection.Merge
 Next i
+
+'---------------------------------------------------------------
+'Saving Weekly Report
+'---------------------------------------------------------------
 Sheets("Week_" & week_num).Move
 Worksheets("Week_" & week_num).Activate
 ActiveWorkbook.SaveAs Filename:="Week_" & week_num & "_summary"
+
+
+'-----------------------------------------------------------------
+'Output Weekly Results
+'-----------------------------------------------------------------
+
 End Sub
