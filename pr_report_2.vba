@@ -23,6 +23,7 @@ Dim File_2 As String
 Dim File_3 As String
 Dim File_4 As String
 Dim week_num As Integer
+Dim cutoff As String
 Dim OpenRecNum As Long
 Dim OpenSheet_Name As String
 Dim OpenCount() As Integer
@@ -57,6 +58,7 @@ Dim address_2 As String
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
+cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
 File_1 = InputBox("Input filename and file extension of the Open Records data file of week " & week_num & " to be processed", "OPEN RECORDS")
 File_2 = InputBox("Input filename and file extension of the file contains short descriptions of the Open Records of week " & week_num, "OPEN RECORDS SHORT DESCRIPTION")
 File_3 = InputBox("Input filename and file extension of the Closed Records data file of week " & week_num & " to be processed", "CLOSED RECORDS")
@@ -112,7 +114,7 @@ ReDim OpenAge(OpenlRow) As Integer
 ReDim OpenStage(OpenlRow) As Integer
 ReDim OpenRecType(OpenlRow) As Integer
 For i = 2 To OpenlRow
-  OpenAge(i) = Date - Cells(i, 4)
+  OpenAge(i) = DateValue(cutoff) - Cells(i, 4)
   Cells(i, OpenlCol).Value = OpenAge(i)
 Next i
 Range(Cells(2, OpenlCol), Cells(OpenlRow, OpenlCol)).NumberFormat = "0"
