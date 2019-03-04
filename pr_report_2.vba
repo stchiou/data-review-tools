@@ -687,8 +687,12 @@ Next i
 Sheets("Week_" & week_num).Move
 Worksheets("Week_" & week_num).Activate
 ActiveWorkbook.SaveAs Filename:="Week_" & week_num & "_summary"
-
-
+Windows(File_1).Activate
+ActiveWorkbook.SaveAs Filename:=OpenSheet_Name & "_o.xlsx" _
+, FileFormat:=xlOpenXMLWorkbook
+Windows(File_3).Activate
+ActiveWorkbook.SaveAs Filename:=CloseSheet_Name & "_c.xlsx" _
+, FileFormat:=xlOpenXMLWorkbook
 '-----------------------------------------------------------------
 'Output Weekly Results
 '-----------------------------------------------------------------
