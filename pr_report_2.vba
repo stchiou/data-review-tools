@@ -473,7 +473,6 @@ ReplCol = Worksheets("Week_" & week_num).Cells(1, 1).End(xlToRight).Column
 'Open Files Contains Closed Records and Short Description of Closed Records
 'Insert Short Descriptions to the Sheet that Contains Closed Records
 '--------------------------------------------------------------------------
-CloseSheet_Name = Left(File_3, InStr(File_3, ".") - 1)
 Workbooks.OpenText Filename:=File_3, local:=True
 Workbooks.OpenText Filename:=File_4, local:=True
 Columns("E:E").Select
