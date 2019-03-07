@@ -22,6 +22,7 @@ Dim File_1 As String
 Dim File_2 As String
 Dim File_3 As String
 Dim File_4 As String
+Dim msgValue As String
 Dim Window_1 As String
 Dim Window_2 As String
 Dim week_num As Integer
@@ -61,22 +62,45 @@ Dim address_2 As String
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
-File_1 = Application.GetOpenFilename _
-(Title:="Please choose a file that contains open records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
-File_2 = Application.GetOpenFilename _
-(Title:="Please choose a file that contains short descriptions of the open records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
-File_3 = Application.GetOpenFilename _
-(Title:="Please choose a file that conatins closed records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
-File_4 = Application.GetOpenFilename _
-(Title:="Please choose a file that contains short descriptions of the closed records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
-MsgBox File_1
-MsgBox File_2
-MsgBox File_3
-MsgBox File_4
+Input1:
+    File_1 = Application.GetOpenFilename _
+    (Title:="Please choose a file that contains open records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+    If MsgBox("File contains open records is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input1:
+    Else
+    End If
+Input2:
+    File_2 = Application.GetOpenFilename _
+    (Title:="Please choose a file that contains short descriptions of the open records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+     If MsgBox("File contains short description of the open records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input2:
+    Else
+    End If
+Input3:
+    File_3 = Application.GetOpenFilename _
+    (Title:="Please choose a file that conatins closed records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+    If MsgBox("File contains closed records is " & File_3 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input3:
+    Else
+    End If
+Input4:
+    File_4 = Application.GetOpenFilename _
+    (Title:="Please choose a file that contains short descriptions of the closed records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+    If MsgBox("File contains open records is " & File_4 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input4:
+    Else
+    End If
+If MsgBox("These are data files that you select:" _
+    & vbCr & File_1 _
+    & vbCr & File_2 _
+    & vbCr & File_3 _
+    & vbCr & File_4 _
+    & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
+    GoTo Input1:
+Else
+End If
 OpenSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
 CloseSheet_Name = Mid(File_3, InStrRev(File_3, "\") + 1, (Len(File_3) - InStrRev(File_3, "\") - 4))
-MsgBox OpenSheet_Name
-MsgBox CloseSheet_Name
 Window_1 = OpenSheet_Name & ".csv"
 Window_2 = CloseSheet_Name & ".csv"
 '--------------------------------------------------------------------------------
