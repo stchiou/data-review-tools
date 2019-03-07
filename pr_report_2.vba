@@ -61,11 +61,6 @@ Dim address_2 As String
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
-'File_1 = InputBox("Input filename and file extension of the Open Records data file of week " & week_num & " to be processed", "OPEN RECORDS")
-'File_2 = InputBox("Input filename and file extension of the file contains short descriptions of the Open Records of week " & week_num, "OPEN RECORDS SHORT DESCRIPTION")
-'File_3 = InputBox("Input filename and file extension of the Closed Records data file of week " & week_num & " to be processed", "CLOSED RECORDS")
-'File_4 = InputBox("Input filename and file extension of the file contains short descriptions of the Closed Record of week " & week_num, "CLOSED RECORDS SHORT DESCRIPTION")
-'OpenSheet_Name = Left(File_1, InStr(File_1, ".") - 1)
 File_1 = Application.GetOpenFilename _
 (Title:="Please choose a file that contains open records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
 File_2 = Application.GetOpenFilename _
