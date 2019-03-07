@@ -57,6 +57,9 @@ Dim age As Integer
 Dim stage As Integer
 Dim address_1 As String
 Dim address_2 As String
+Dim SumSheet_Name As String
+Dim ChartSheet_Name As String
+
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
@@ -64,28 +67,32 @@ week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
 Input1:
     File_1 = Application.GetOpenFilename _
-    (Title:="Please choose a file that contains open records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+        (Title:="Please choose a file that contains open records", _
+        filefilter:="CSV (Comma delimited) (*.csv),*.csv")
     If MsgBox("File contains open records is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input1:
     Else
     End If
 Input2:
     File_2 = Application.GetOpenFilename _
-    (Title:="Please choose a file that contains short descriptions of the open records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+        (Title:="Please choose a file that contains short descriptions of the open records", _
+        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
      If MsgBox("File contains short description of the open records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input2:
     Else
     End If
 Input3:
     File_3 = Application.GetOpenFilename _
-    (Title:="Please choose a file that conatins closed records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+        (Title:="Please choose a file that conatins closed records", _
+        filefilter:="CSV (Comma delimited) (*.csv),*.csv")
     If MsgBox("File contains closed records is " & File_3 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input3:
     Else
     End If
 Input4:
     File_4 = Application.GetOpenFilename _
-    (Title:="Please choose a file that contains short descriptions of the closed records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+        (Title:="Please choose a file that contains short descriptions of the closed records", _
+        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
     If MsgBox("File contains open records is " & File_4 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input4:
     Else
@@ -734,5 +741,65 @@ ActiveWorkbook.SaveAs Filename:=CloseSheet_Name & "_c.xlsx" _
 '-----------------------------------------------------------------
 'Output Weekly Results
 '-----------------------------------------------------------------
-
+SumSheet_Name = "Week_" & week_num
+ChartSheet_Name = "Week_" & week_num & "_chart"
+Windows("Week_" & week_num & "_summary.xlsx").Activate
+Sheets.Add after:=Sheets(SumSheet_Name)
+Sheets(Sheets.Count).Select
+Sheets(Sheets.Count).Name = ChartSheet_Name
+ActiveSheet.Shapes.AddChart.Select
+ActiveChart.ChartType = xlColumnStacked
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(1).Name = "=""< 23 Days"""
+ActiveChart.SeriesCollection(1).Values = "=Week_" & week_num & "!" & "$B$3:$B$7"
+ActiveChart.SeriesCollection(1).XValues = "=Week_" & week_num & "!" & "$A$3:$A$7"
+ActiveChart.SeriesCollection(1).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(2).Name = "=""24-30 Days"""
+ActiveChart.SeriesCollection(2).Values = "=Week_" & week_num & "!" & "$C$3:$C$7"
+ActiveChart.SeriesCollection(2).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(3).Name = "=""> 30 Days"""
+ActiveChart.SeriesCollection(3).Values = "=Week_" & week_num & "!" & "$J$3:$J$7"
+ActiveChart.SeriesCollection(3).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(4).Values = "=Week_" & week_num & "!" & "$K$3:$K$7"
+ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
+ActiveChart.SeriesCollection(4).ApplyDataLabels
+ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
+ActiveChart.SeriesCollection(4).MarkerStyle = -4142
+ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
+ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
+ActiveChart.Legend.LegendEntries(4).Delete
+ActiveChart.ChartStyle = 26
+With ActiveChart
+    .HasTitle = True
+    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & week_num & ", " & Right(cutoff, 4) & ")"
+End With
+ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+ActiveSheet.Shapes.AddChart.Select
+ActiveChart.ChartType = xlColumnStacked
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(1).Name = "=""On Time"""
+ActiveChart.SeriesCollection(1).Values = "=Week_" & week_num & "!" & "$AG$3:$AG$7"
+ActiveChart.SeriesCollection(1).XValues = "=Week_" & week_num & "!" & "$A$3:$A$7"
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(2).Name = "=""Aged"""
+ActiveChart.SeriesCollection(2).Values = "=Week_" & week_num & "!" & "$AH$3:$AH$7"
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(3).Name = "=""Total"""
+ActiveChart.SeriesCollection(3).Values = "=Week_" & week_num & "!" & "$AI$3:$AI$7"
+ActiveChart.SeriesCollection(3).ChartType = xlLineMarkers
+ActiveChart.SeriesCollection(3).ApplyDataLabels
+ActiveChart.SeriesCollection(3).DataLabels.Position = xlLabelPositionAbove
+ActiveChart.SeriesCollection(3).MarkerStyle = -4142
+ActiveChart.SeriesCollection(3).Format.Fill.Visible = msoFalse
+ActiveChart.SeriesCollection(3).Format.Line.Visible = msoFalse
+ActiveChart.Legend.LegendEntries(3).Delete
+ActiveChart.ChartStyle = 26
+With ActiveChart
+    .HasTitle = True
+    .ChartTitle.Text = "CQ Number of Records Closed on Week " & week_num & ", " & Right(cutoff, 4)
+End With
+ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 End Sub
