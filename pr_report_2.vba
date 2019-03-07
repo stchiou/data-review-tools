@@ -22,6 +22,8 @@ Dim File_1 As String
 Dim File_2 As String
 Dim File_3 As String
 Dim File_4 As String
+Dim Window_1 As String
+Dim Window_2 As String
 Dim week_num As Integer
 Dim cutoff As String
 Dim OpenRecNum As Long
@@ -59,19 +61,37 @@ Dim address_2 As String
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
-File_1 = InputBox("Input filename and file extension of the Open Records data file of week " & week_num & " to be processed", "OPEN RECORDS")
-File_2 = InputBox("Input filename and file extension of the file contains short descriptions of the Open Records of week " & week_num, "OPEN RECORDS SHORT DESCRIPTION")
-File_3 = InputBox("Input filename and file extension of the Closed Records data file of week " & week_num & " to be processed", "CLOSED RECORDS")
-File_4 = InputBox("Input filename and file extension of the file contains short descriptions of the Closed Record of week " & week_num, "CLOSED RECORDS SHORT DESCRIPTION")
-OpenSheet_Name = Left(File_1, InStr(File_1, ".") - 1)
+'File_1 = InputBox("Input filename and file extension of the Open Records data file of week " & week_num & " to be processed", "OPEN RECORDS")
+'File_2 = InputBox("Input filename and file extension of the file contains short descriptions of the Open Records of week " & week_num, "OPEN RECORDS SHORT DESCRIPTION")
+'File_3 = InputBox("Input filename and file extension of the Closed Records data file of week " & week_num & " to be processed", "CLOSED RECORDS")
+'File_4 = InputBox("Input filename and file extension of the file contains short descriptions of the Closed Record of week " & week_num, "CLOSED RECORDS SHORT DESCRIPTION")
+'OpenSheet_Name = Left(File_1, InStr(File_1, ".") - 1)
+File_1 = Application.GetOpenFilename _
+(Title:="Please choose a file that contains open records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+File_2 = Application.GetOpenFilename _
+(Title:="Please choose a file that contains short descriptions of the open records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+File_3 = Application.GetOpenFilename _
+(Title:="Please choose a file that conatins closed records", filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+File_4 = Application.GetOpenFilename _
+(Title:="Please choose a file that contains short descriptions of the closed records", filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+MsgBox File_1
+MsgBox File_2
+MsgBox File_3
+MsgBox File_4
+OpenSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
+CloseSheet_Name = Mid(File_3, InStrRev(File_3, "\") + 1, (Len(File_3) - InStrRev(File_3, "\") - 4))
+MsgBox OpenSheet_Name
+MsgBox CloseSheet_Name
+Window_1 = OpenSheet_Name & ".csv"
+Window_2 = CloseSheet_Name & ".csv"
 '--------------------------------------------------------------------------------
 'Combine Short Description to Record File for Open Records
 '--------------------------------------------------------------------------------
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_1, local:=True
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_2, local:=True
+Workbooks.OpenText Filename:=File_1, local:=True
+Workbooks.OpenText Filename:=File_2, local:=True
 Columns("E:E").Select
 Selection.Copy
-Windows(File_1).Activate
+Windows(Window_1).Activate
 Columns("C:C").Select
 Selection.Insert Shift:=xlToRight
 Worksheets(OpenSheet_Name).Activate
@@ -454,11 +474,11 @@ ReplCol = Worksheets("Week_" & week_num).Cells(1, 1).End(xlToRight).Column
 'Insert Short Descriptions to the Sheet that Contains Closed Records
 '--------------------------------------------------------------------------
 CloseSheet_Name = Left(File_3, InStr(File_3, ".") - 1)
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_3, local:=True
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_4, local:=True
+Workbooks.OpenText Filename:=File_3, local:=True
+Workbooks.OpenText Filename:=File_4, local:=True
 Columns("E:E").Select
 Selection.Copy
-Windows(File_3).Activate
+Windows(Window_2).Activate
 Columns("C:C").Select
 Selection.Insert Shift:=xlToRight
 Worksheets(CloseSheet_Name).Activate
@@ -570,7 +590,7 @@ For i = 0 To 2
 Next i
 '---------------------------------------------------------------------------
 ReplCol = ReplCol + 1
-Windows(File_1).Activate
+Windows(Window_1).Activate
 Worksheets("Week_" & week_num).Cells(1, ReplCol).Activate
 ActiveCell.Value = "Recod Type"
 ActiveCell.Offset(0, 1).Value = "On Time"
@@ -687,10 +707,10 @@ Next i
 Sheets("Week_" & week_num).Move
 Worksheets("Week_" & week_num).Activate
 ActiveWorkbook.SaveAs Filename:="Week_" & week_num & "_summary"
-Windows(File_1).Activate
+Windows(Window_1).Activate
 ActiveWorkbook.SaveAs Filename:=OpenSheet_Name & "_o.xlsx" _
 , FileFormat:=xlOpenXMLWorkbook
-Windows(File_3).Activate
+Windows(Window_2).Activate
 ActiveWorkbook.SaveAs Filename:=CloseSheet_Name & "_c.xlsx" _
 , FileFormat:=xlOpenXMLWorkbook
 '-----------------------------------------------------------------
