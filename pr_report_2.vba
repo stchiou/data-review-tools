@@ -59,15 +59,18 @@ Dim address_1 As String
 Dim address_2 As String
 Dim SumSheet_Name As String
 Dim ChartSheet_Name As String
+Dim Commit_Num As Long
+Dim Commit_Pr() As String
 
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
+
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
 Input1:
     File_1 = Application.GetOpenFilename _
-        (Title:="Please choose a file that contains open records", _
+        (Title:="OPEN RECORDS", _
         filefilter:="CSV (Comma delimited) (*.csv),*.csv")
     If MsgBox("File contains open records is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input1:
@@ -75,7 +78,7 @@ Input1:
     End If
 Input2:
     File_2 = Application.GetOpenFilename _
-        (Title:="Please choose a file that contains short descriptions of the open records", _
+        (Title:="OPEN RECORDS DESCRIPTION", _
         filefilter:="CSV (Comma delimited)(*.csv),*.csv")
      If MsgBox("File contains short description of the open records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input2:
@@ -83,7 +86,7 @@ Input2:
     End If
 Input3:
     File_3 = Application.GetOpenFilename _
-        (Title:="Please choose a file that conatins closed records", _
+        (Title:="CLOSED RECORDS", _
         filefilter:="CSV (Comma delimited) (*.csv),*.csv")
     If MsgBox("File contains closed records is " & File_3 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input3:
@@ -91,7 +94,7 @@ Input3:
     End If
 Input4:
     File_4 = Application.GetOpenFilename _
-        (Title:="Please choose a file that contains short descriptions of the closed records", _
+        (Title:="CLOSED RECORDS DESCRIPTIONS", _
         filefilter:="CSV (Comma delimited)(*.csv),*.csv")
     If MsgBox("File contains open records is " & File_4 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input4:
@@ -805,4 +808,38 @@ ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 '------------------------------------------------------------------------
 'Process Committed Records
 '------------------------------------------------------------------------
+If MsgBox("Do you want to process committed records?", vbYesNo) = vbNo Then
+    Exit Sub
+Else
+    GoTo Committed_Record:
+End If
+Committed_Record:
+    Commit_Num = InputBox("How many committed record do we have this week?", "RECORD NUMBER")
+    ReDim Commit_Pr(Commit_Num) As String
+    For i = 1 To Commit_Num
+Input_PR:
+    Commit_Pr(i) = InputBox("Please enter PR Number for record number " & i)
+    If MsgBox("You have entered " & Commit_Pr(i) & "." _
+        & vbCr & "Is this correct?", vbYesNo, "CONFIRM ENTERED PR") = vbNo Then
+        GoTo Input_PR:
+    Else
+    End If
+    Next i
+Worksheets(SumSheet_Name).Activate
+ReplCol = Cells(2, 1).End(xlToRight).Column
+ReplCol = ReplCol + 1
+Cells(2, ReplCol).Activate
+ActiveCell.Value = "Record ID"
+ActiveCell.Offset(0, 1).Value = "Short Description"
+ActiveCell.Offset(0, 2).Value = "Reocrd Type"
+For i = 2 To Commit_Num
+    For j = 1 To OpenRecNum
+        If Commit_Pr(i) = OpenRec(j, 0) Then
+            ActiveCell.Offset(i, 0).Value = Commit_Pr(i)
+            ActiveCell.Offset(i, 1).Value = OpenRec(j, 1)
+            ActiveCell.Offset(i, 2).Value = OpenRec(j, 3)
+        Else
+        End If
+    Next j
+Next i
 End Sub
