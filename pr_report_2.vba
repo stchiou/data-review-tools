@@ -64,7 +64,7 @@ Dim ChartSheet_Name As String
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
-cutoff = InputBox("Input Cut-off Date for the Report in the format of 'Mmm dd, yyyy'", "CUTOFF DATE")
+cutoff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
 Input1:
     File_1 = Application.GetOpenFilename _
         (Title:="Please choose a file that contains open records", _
@@ -802,4 +802,7 @@ With ActiveChart
     .ChartTitle.Text = "CQ Number of Records Closed on Week " & week_num & ", " & Right(cutoff, 4)
 End With
 ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+'------------------------------------------------------------------------
+'Process Committed Records
+'------------------------------------------------------------------------
 End Sub
