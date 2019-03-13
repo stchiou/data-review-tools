@@ -2,7 +2,7 @@ Attribute VB_Name = "PR_Status_Report"
 Sub PR_Report()
 '-----------------------------------------------------------------
 'Macro for computing weekly PR Status
-'Sean Chiou, version 1.2, 02/25/2019
+'Sean Chiou, version 3, 03/13/2019
 '-----------------------------------------------------------------
 'Items required:
 '1. total opein-categorized by type of records
