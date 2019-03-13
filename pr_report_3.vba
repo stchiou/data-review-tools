@@ -57,24 +57,52 @@ Dim address_2 As String
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
 week_num = InputBox("Input week number of the year", "WEEK NUMBER")
-File_1 = InputBox("Input filename and file extension of the Open Records data file of week " & week_num & " to be processed", "OPEN RECORDS")
-File_2 = InputBox("Input filename and file extension of the file contains short descriptions of the Open Records of week " & week_num, "OPEN RECORDS SHORT DESCRIPTION")
-File_3 = InputBox("Input filename and file extension of the Closed Records data file of week " & week_num & " to be processed", "CLOSED RECORDS")
-File_4 = InputBox("Input filename and file extension of the file contains short descriptions of the Closed Record of week " & week_num, "CLOSED RECORDS SHORT DESCRIPTION")
-OpenSheet_Name = Left(File_1, InStr(File_1, ".") - 1)
-'--------------------------------------------------------------------------------
-'Combine Short Description to Record File for Open Records
-'--------------------------------------------------------------------------------
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_1, local:=True
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_2, local:=True
-Columns("E:E").Select
-Selection.Copy
-Windows(File_1).Activate
-Columns("C:C").Select
-Selection.Insert Shift:=xlToRight
-Worksheets(OpenSheet_Name).Activate
-OpenlRow = Cells(1, 1).End(xlDown).Row
-OpenlCol = Cells(1, 1).End(xlToRight).Column
+cutoff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
+Input1:
+    File_1 = Application.GetOpenFilename _
+        (Title:="OPEN RECORDS", _
+        filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+    If MsgBox("File contains open records is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input1:
+    Else
+    End If
+Input2:
+    File_2 = Application.GetOpenFilename _
+        (Title:="OPEN RECORDS DESCRIPTION", _
+        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+     If MsgBox("File contains short description of the open records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input2:
+    Else
+    End If
+Input3:
+    File_3 = Application.GetOpenFilename _
+        (Title:="CLOSED RECORDS", _
+        filefilter:="CSV (Comma delimited) (*.csv),*.csv")
+    If MsgBox("File contains closed records is " & File_3 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input3:
+    Else
+    End If
+Input4:
+    File_4 = Application.GetOpenFilename _
+        (Title:="CLOSED RECORDS DESCRIPTIONS", _
+        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+    If MsgBox("File contains open records is " & File_4 & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input4:
+    Else
+    End If
+If MsgBox("These are data files that you select:" _
+    & vbCr & File_1 _
+    & vbCr & File_2 _
+    & vbCr & File_3 _
+    & vbCr & File_4 _
+    & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
+    GoTo Input1:
+Else
+End If
+OpenSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
+CloseSheet_Name = Mid(File_3, InStrRev(File_3, "\") + 1, (Len(File_3) - InStrRev(File_3, "\") - 4))
+Window_1 = OpenSheet_Name & ".csv"
+Window_2 = CloseSheet_Name & ".csv"
 '------------------------------------------------------------------------------
 'Removing approved record on Open Records
 '------------------------------------------------------------------------------
