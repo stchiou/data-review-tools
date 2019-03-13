@@ -20,10 +20,53 @@ Sub PR_Report()
 '------------------------------------------------------------------------------------------------------------------
 Dim File_1 As String
 Dim File_2 As String
-Dim File_3 As String
-Dim File_4 As String
 Dim week_num As Integer
-Dim OpenRecNum As Long
+Dim record_num As Long
+'-------------------------------------------------------
+'Fields in raw data
+'-------------------------------------------------------
+Dim pr_id() As String
+Dim short_description_title() As String
+Dim record_type() As String
+Dim investigation_type() As String
+Dim related_records() As String
+Dim event_code() As String
+Dim qar_required() As String
+Dim special_or_common_cuase As String
+Dim capa_effectiveness_bsc_metric() As String
+Dim date_open() As String
+Dim discovery_date() As String
+Dim date_closed() As String
+Dim due_date() As String
+Dim original_due_date() As String
+Dim number_of_approved_extensions() As Integer
+Dim qa_fin_app_on() As String
+Dim site_qa_approval_on() As String
+Dim material_involved() As String
+Dim bu_area() As String
+Dim operation() As String
+Dim test_description() As String
+Dim other_test_description() As String
+Dim procedure_method() As String
+Dim product_families() As String
+Dim product_names() As String
+Dim initial_inv_analyst() As String
+Dim hp_root_cause_categ_1() As String
+Dim hp_root_cause_categ_2() As String
+Dim hp_root_cause_categ_3() As String
+Dim root_cause_1() As String
+Dim root_cause_2() As String
+Dim root_cause_3() As String
+Dim recom_diposition_comments() As String
+Dim final_comments() As String
+Dim assignable_cause_class() As String
+Dim assignable_cause() As String
+Dim supplier_name_lot_no() As String
+Dim area_disocovered() As String
+Dim areas_affected() As String
+Dim analyst_personnel_sub_category() As String
+Dim pr_state() As String
+'-----------------------------------------------------------------
 Dim OpenSheet_Name As String
 Dim OpenCount() As Integer
 Dim OpenAge() As Integer
@@ -60,41 +103,23 @@ week_num = InputBox("Input week number of the year", "WEEK NUMBER")
 cutoff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
 Input1:
     File_1 = Application.GetOpenFilename _
-        (Title:="OPEN RECORDS", _
+        (Title:="Data File", _
         filefilter:="CSV (Comma delimited) (*.csv),*.csv")
-    If MsgBox("File contains open records is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
+    If MsgBox("File contains records to be processed is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input1:
     Else
     End If
 Input2:
     File_2 = Application.GetOpenFilename _
-        (Title:="OPEN RECORDS DESCRIPTION", _
+        (Title:="Snapshot File", _
         filefilter:="CSV (Comma delimited)(*.csv),*.csv")
-     If MsgBox("File contains short description of the open records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
+     If MsgBox("File contains snapshots of the past records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input2:
-    Else
-    End If
-Input3:
-    File_3 = Application.GetOpenFilename _
-        (Title:="CLOSED RECORDS", _
-        filefilter:="CSV (Comma delimited) (*.csv),*.csv")
-    If MsgBox("File contains closed records is " & File_3 & ". Is this correct?", vbYesNo) = vbNo Then
-        GoTo Input3:
-    Else
-    End If
-Input4:
-    File_4 = Application.GetOpenFilename _
-        (Title:="CLOSED RECORDS DESCRIPTIONS", _
-        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
-    If MsgBox("File contains open records is " & File_4 & ". Is this correct?", vbYesNo) = vbNo Then
-        GoTo Input4:
     Else
     End If
 If MsgBox("These are data files that you select:" _
     & vbCr & File_1 _
     & vbCr & File_2 _
-    & vbCr & File_3 _
-    & vbCr & File_4 _
     & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
     GoTo Input1:
 Else
