@@ -20,19 +20,24 @@ Sub PR_Report()
 '------------------------------------------------------------------------------------------------------------------
 Dim File_1 As String
 Dim File_2 As String
-Dim week_num As Integer
-Dim record_num As Long
+Dim Report_Type As Integer
+Dim Week_Num As Integer
+Dim CutOff As String
+Dim Record_Num As Long
+Dim DataSheet_Name As String
+Dim SnapShot_Name As String
 '-------------------------------------------------------
 'Fields in raw data
 '-------------------------------------------------------
 Dim pr_id() As String
-Dim short_description_title() As String
+Dim title_short_description() As String
+Dim responsible_person() As String
 Dim record_type() As String
 Dim investigation_type() As String
 Dim related_records() As String
 Dim event_code() As String
 Dim qar_required() As String
-Dim special_or_common_cuase As String
+Dim special_or_common_cuase() As String
 Dim capa_effectiveness_bsc_metric() As String
 Dim date_open() As String
 Dim discovery_date() As String
@@ -40,7 +45,7 @@ Dim date_closed() As String
 Dim due_date() As String
 Dim original_due_date() As String
 Dim number_of_approved_extensions() As Integer
-Dim qa_fin_app_on() As String
+Dim qa_final_app_on() As String
 Dim site_qa_approval_on() As String
 Dim material_involved() As String
 Dim bu_area() As String
@@ -67,8 +72,9 @@ Dim areas_affected() As String
 Dim analyst_personnel_sub_category() As String
 Dim pr_state() As String
 '-----------------------------------------------------------------
-Dim OpenSheet_Name As String
-Dim OpenCount() As Integer
+Dim OpenRecNum As Integer
+Dim Open_Index() As Integer
+
 Dim OpenAge() As Integer
 Dim OpenStage() As Integer
 Dim OpenlRow As Integer
@@ -99,8 +105,13 @@ Dim address_2 As String
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
-week_num = InputBox("Input week number of the year", "WEEK NUMBER")
-cutoff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
+Report_Type = InputBox("Which type of report you want to generate?" _
+    & vbCr & "1. Weekly" _
+    & vbCr & "2. Monthly" _
+    & vbCr & "3. Quarterly" _
+    & vbCr & "4. Annually")
+Week_Num = InputBox("Input week number of the year", "WEEK NUMBER")
+CutOff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
 Input1:
     File_1 = Application.GetOpenFilename _
         (Title:="Data File", _
@@ -112,7 +123,7 @@ Input1:
 Input2:
     File_2 = Application.GetOpenFilename _
         (Title:="Snapshot File", _
-        filefilter:="CSV (Comma delimited)(*.csv),*.csv")
+        filefilter:="Worksheet(*.xlsx),*.xlsx")
      If MsgBox("File contains snapshots of the past records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input2:
     Else
@@ -124,36 +135,190 @@ If MsgBox("These are data files that you select:" _
     GoTo Input1:
 Else
 End If
-OpenSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
-CloseSheet_Name = Mid(File_3, InStrRev(File_3, "\") + 1, (Len(File_3) - InStrRev(File_3, "\") - 4))
-Window_1 = OpenSheet_Name & ".csv"
-Window_2 = CloseSheet_Name & ".csv"
+DataSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
+SnapShot_Name = Mid(File_2, InStrRev(File_2, "\") + 1, (Len(File_2) - InStrRev(File_2, "\") - 4))
+window_1 = DataSheet_Name & ".csv"
+Window_2 = SnapShot_Name & ".xlsx"
+'-------------------------------------------------------------------------------
+'Calculate Record Number and redeclare array for raw data
+'-------------------------------------------------------------------------------
+Workbooks.OpenText Filename:=File_1, local:=True
+Workbooks.Open Filename:=File_2, local:=True
+Windows(window_1).Activate
+Record_Num = Cells(1, 1).End(xlDown).Row
+ReDim pr_id(Record_Num) As String
+ReDim title_short_description(Record_Num) As String
+ReDim responsible_person(Record_Num) As String
+ReDim record_type(Record_Num) As String
+ReDim investigation_type(Record_Num) As String
+ReDim related_records(Record_Num) As String
+ReDim event_code(Record_Num) As String
+ReDim qar_required(Record_Num) As String
+ReDim special_or_common_cuase(Record_Num) As String
+ReDim capa_effectiveness_bsc_metric(Record_Num) As String
+ReDim date_open(Record_Num) As String
+ReDim discovery_date(Record_Num) As String
+ReDim date_closed(Record_Num) As String
+ReDim due_date(Record_Num) As String
+ReDim original_due_date(Record_Num) As String
+ReDim number_of_approved_extensions(Record_Num) As Integer
+ReDim qa_final_app_on(Record_Num) As String
+ReDim site_qa_approval_on(Record_Num) As String
+ReDim material_involved(Record_Num) As String
+ReDim bu_area(Record_Num) As String
+ReDim operation(Record_Num) As String
+ReDim test_description(Record_Num) As String
+ReDim other_test_description(Record_Num) As String
+ReDim procedure_method(Record_Num) As String
+ReDim product_families(Record_Num) As String
+ReDim product_names(Record_Num) As String
+ReDim initial_inv_analyst(Record_Num) As String
+ReDim hp_root_cause_categ_1(Record_Num) As String
+ReDim hp_root_cause_categ_2(Record_Num) As String
+ReDim hp_root_cause_categ_3(Record_Num) As String
+ReDim root_cause_1(Record_Num) As String
+ReDim root_cause_2(Record_Num) As String
+ReDim root_cause_3(Record_Num) As String
+ReDim recom_diposition_comments(Record_Num) As String
+ReDim final_comments(Record_Num) As String
+ReDim assignable_cause_class(Record_Num) As String
+ReDim assignable_cause(Record_Num) As String
+ReDim supplier_name_lot_no(Record_Num) As String
+ReDim area_disocovered(Record_Num) As String
+ReDim areas_affected(Record_Num) As String
+ReDim analyst_personnel_sub_category(Record_Num) As String
+ReDim pr_state(Record_Num) As String
+For i = 2 To Record_Num
+    Cells(i, 1).Activate
+    pr_id(i) = ActiveCell.Value
+    title_short_description(i) = ActiveCell.Offset(0, 1).Value
+    responsible_person(i) = ActiveCell.Offset(0, 2).Value
+    record_type(i) = ActiveCell.Offset(0, 3).Value
+    investigation_type(i) = ActiveCell.Offset(0, 4).Value
+    related_records(i) = ActiveCell.Offset(0, 5).Value
+    event_code(i) = ActiveCell.Offset(0, 6).Value
+    qar_required(i) = ActiveCell.Offset(0, 7).Value
+    special_or_common_cuase(i) = ActiveCell.Offset(0, 8).Value
+    capa_effectiveness_bsc_metric(i) = ActiveCell.Offset(0, 9).Value
+    date_open(i) = ActiveCell.Offset(0, 10).Value
+    discovery_date(i) = ActiveCell.Offset(0, 11).Value
+    date_closed(i) = ActiveCell.Offset(0, 12).Value
+    due_date(i) = ActiveCell.Offset(0, 13).Value
+    original_due_date(i) = ActiveCell.Offset(0, 14).Value
+    number_of_approved_extensions(i) = ActiveCell.Offset(0, 15).Value
+    qa_final_app_on(i) = ActiveCell.Offset(0, 16).Value
+    site_qa_approval_on(i) = ActiveCell.Offset(0, 17).Value
+    material_involved(i) = ActiveCell.Offset(0, 18).Value
+    bu_area(i) = ActiveCell.Offset(0, 19).Value
+    operation(i) = ActiveCell.Offset(0, 20).Value
+    test_description(i) = ActiveCell.Offset(0, 21).Value
+    other_test_description(i) = ActiveCell.Offset(0, 22).Value
+    procedure_method(i) = ActiveCell.Offset(0, 23).Value
+    product_families(i) = ActiveCell.Offset(0, 24).Value
+    product_names(i) = ActiveCell.Offset(0, 25).Value
+    initial_inv_analyst(i) = ActiveCell.Offset(0, 26).Value
+    hp_root_cause_categ_1(i) = ActiveCell.Offset(0, 27).Value
+    hp_root_cause_categ_2(i) = ActiveCell.Offset(0, 28).Value
+    hp_root_cause_categ_3(i) = ActiveCell.Offset(0, 29).Value
+    root_cause_1(i) = ActiveCell.Offset(0, 30).Value
+    root_cause_2(i) = ActiveCell.Offset(0, 31).Value
+    root_cause_3(i) = ActiveCell.Offset(0, 32).Value
+    recom_diposition_comments(i) = ActiveCell.Offset(0, 33).Value
+    final_comments(i) = ActiveCell.Offset(0, 34).Value
+    assignable_cause_class(i) = ActiveCell.Offset(0, 35).Value
+    assignable_cause(i) = ActiveCell.Offset(0, 36).Value
+    supplier_name_lot_no(i) = ActiveCell.Offset(0, 37).Value
+    area_disocovered(i) = ActiveCell.Offset(0, 38).Value
+    areas_affected(i) = ActiveCell.Offset(0, 39).Value
+    analyst_personnel_sub_category(i) = ActiveCell.Offset(0, 40).Value
+    pr_state(i) = ActiveCell.Offset(0, 41).Value
+Next i
 '------------------------------------------------------------------------------
-'Removing approved record on Open Records
+'Count Number of Open Record
+'1. Count all the pr_state that are opened upto cut-off date
+'2. Remove the recods from 1. that qa_final_app_on has a value
+'3. Remove the records from 2. that site_qa_approval_on has a value
 '------------------------------------------------------------------------------
-For i = 2 To OpenlRow
-      temp = Cells(i, 9).Value
-      If InStr(temp, "Awaiting SQL Approval") > 0 Then
-      Else
-          If InStr(temp, "OPUQL") > 0 Then
-          Else
-              tempval = Cells(i, 6)
-              If tempval > 0 Then
-                  Rows(i).EntireRow.Delete
-                  i = i - 1
-                  OpenlRow = OpenlRow - 1
-              Else
-                  tempval = Cells(i, 7)
-                  If tempval > 0 Then
-                      Rows(i).EntireRow.Delete
-                      i = i - 1
-                      OpenlRow = OpenlRow - 1
-                  Else
-                  End If
-              End If
-          End If
-      End If
-  Next i
+OpenRecNum = 0
+ReDim Open_Index(Record_Num)
+For i = 2 To Record_Num
+  If pr_state(i) <> "Closed" Then
+    If pr_state(i) <> "Cancelled" Then
+        If pr_state(i) <> "Awaiting SQL Approval" Then
+            If InStr("OPUQL", pr_state(i)) = 0 Then
+                If discovery_date(i) <= DateValue(CutOff) Then
+                    If qa_final_app_on(i) = "" Then
+                        If site_qa_approval_on(i) = "" Then
+                            OpenRecNum = OpenRecNum + 1
+                            Open_Index(i) = i
+                        Else
+                            OpenRecNum = OpenRecNum
+                            Open_Index(i) = 0
+                        End If
+                    Else
+                        OpenRecNum = OpenRecNum
+                        Open_Index(i) = 0
+                    End If
+                Else
+                    OpenRecNum = OpenRecNum
+                    Open_Index(i) = 0
+                End If
+            Else
+                OpenRecNum = OpenRecNum
+                Open_Index(i) = 0
+            End If
+        Else
+            OpenRecNum = OpenRecNum
+            Open_Index(i) = 0
+        End If
+    Else
+        OpenRecNum = OpenRecNum
+        Open_Index(i) = 0
+    End If
+  Else
+    OpenRecNum = OpenRecNum
+    Open_Index(i) = 0
+  End If
+Next i
+ReDim OpenList(OpenRecNum) As String
+Dim Last_filled_index As Integer
+Last_filled_index = 2
+'For i = 1 To OpenRecNum
+'    For j = Last_filled_index To Record_Num
+'        If Open_Index(j) <> 0 Then
+'            OpenList(i) = Open_Index(j)
+'            Last_filled_index = j
+'        Else
+'        End If
+'    Next j
+'Next i
+    
+''------------------------------------------------------------------------------
+''Removing approved record on Open Records
+''------------------------------------------------------------------------------
+'For i = 2 To OpenlRow
+'      temp = Cells(i, 9).Value
+'      If InStr(temp, "Awaiting SQL Approval") > 0 Then
+'      Else
+'          If InStr(temp, "OPUQL") > 0 Then
+'          Else
+'              tempval = Cells(i, 6)
+'              If tempval > 0 Then
+'                  Rows(i).EntireRow.Delete
+'                  i = i - 1
+'                  OpenlRow = OpenlRow - 1
+'              Else
+'                  tempval = Cells(i, 7)
+'                  If tempval > 0 Then
+'                      Rows(i).EntireRow.Delete
+'                      i = i - 1
+'                      OpenlRow = OpenlRow - 1
+'                  Else
+'                  End If
+'              End If
+'          End If
+'      End If
+'  Next i
 '---------------------------------------------------------------------------------
 'Calculate Age of Open Records
 '---------------------------------------------------------------------------------
@@ -388,27 +553,27 @@ Next i
 '----------------------------------------------------------------
 Sheets.Add after:=Sheets(OpenSheet_Name)
 Sheets(Sheets.Count).Select
-Sheets(Sheets.Count).Name = "Week_" & week_num
+Sheets(Sheets.Count).Name = "Week_" & Week_Num
 '----------------------------------------------------------------
 'Create Headers Row and Column of the Report
 '----------------------------------------------------------------
-Worksheets("Week_" & week_num).Cells(1, 1).Value = "Record Type"
-Worksheets("Week_" & week_num).Cells(1, 2).Value = "<23 Days"
-Worksheets("Week_" & week_num).Cells(1, 3).Value = "24-30 Days"
-Worksheets("Week_" & week_num).Cells(1, 4).Value = "31-60 Days"
-Worksheets("Week_" & week_num).Cells(1, 5).Value = "61-90 Days"
-Worksheets("Week_" & week_num).Cells(1, 6).Value = "91-120 Days"
-Worksheets("Week_" & week_num).Cells(1, 7).Value = "121-150 Days"
-Worksheets("Week_" & week_num).Cells(1, 8).Value = "151-180 Days"
-Worksheets("Week_" & week_num).Cells(1, 9).Value = ">181 Days"
-Worksheets("Week_" & week_num).Cells(1, 10).Value = "Aged"
-Worksheets("Week_" & week_num).Cells(1, 11).Value = "Total"
-Worksheets("Week_" & week_num).Cells(2, 1).Value = "LIR"
-Worksheets("Week_" & week_num).Cells(3, 1).Value = "RAAC"
-Worksheets("Week_" & week_num).Cells(4, 1).Value = "ER"
-Worksheets("Week_" & week_num).Cells(5, 1).Value = "QAR"
-Worksheets("Week_" & week_num).Cells(6, 1).Value = "INC"
-Worksheets("Week_" & week_num).Cells(7, 1).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(1, 1).Value = "Record Type"
+Worksheets("Week_" & Week_Num).Cells(1, 2).Value = "<23 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 3).Value = "24-30 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 4).Value = "31-60 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 5).Value = "61-90 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 6).Value = "91-120 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 7).Value = "121-150 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 8).Value = "151-180 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 9).Value = ">181 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 10).Value = "Aged"
+Worksheets("Week_" & Week_Num).Cells(1, 11).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "LIR"
+Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "RAAC"
+Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "ER"
+Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "QAR"
+Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "INC"
+Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "Total"
 '----------------------------------------------------------------
 'Writing Open Record Matrix
 '----------------------------------------------------------------
@@ -425,10 +590,10 @@ ReplCol = Cells(1, 1).End(xlToRight).Column
 'Generate Headers for Details Section of the Summary Report
 '--------------------------------------------------------------
 For i = 0 To 4
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
 Next i
 '-----------------------------------------------------------------------------------------------
 'Create Array to Capture Positions of Where Each Record Being Output in the Summary Spreadsheet
@@ -499,14 +664,14 @@ For i = 2 To OpenRecNum
     End If
   End If
 Next i
-ReplCol = Worksheets("Week_" & week_num).Cells(1, 1).End(xlToRight).Column
+ReplCol = Worksheets("Week_" & Week_Num).Cells(1, 1).End(xlToRight).Column
 '--------------------------------------------------------------------------
 'Open Files Contains Closed Records and Short Description of Closed Records
 'Insert Short Descriptions to the Sheet that Contains Closed Records
 '--------------------------------------------------------------------------
 CloseSheet_Name = Left(File_3, InStr(File_3, ".") - 1)
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_3, local:=True
-Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & week_num & "\" & File_4, local:=True
+Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & Week_Num & "\" & File_3, local:=True
+Workbooks.OpenText Filename:="C:\Users\chious\Box Sync\vba-projects\pr-status\week" & Week_Num & "\" & File_4, local:=True
 Columns("E:E").Select
 Selection.Copy
 Windows(File_3).Activate
@@ -622,7 +787,7 @@ Next i
 '---------------------------------------------------------------------------
 ReplCol = ReplCol + 1
 Windows(File_1).Activate
-Worksheets("Week_" & week_num).Cells(1, ReplCol).Activate
+Worksheets("Week_" & Week_Num).Cells(1, ReplCol).Activate
 ActiveCell.Value = "Recod Type"
 ActiveCell.Offset(0, 1).Value = "On Time"
 ActiveCell.Offset(0, 2).Value = "Aged"
@@ -640,10 +805,10 @@ For i = 1 To 6
 Next i
 ReplCol = Cells(1, 1).End(xlToRight).Column + 1
 For i = 0 To 4
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i).Value = "Record ID"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 1).Value = "Short Description"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 2).Value = "Record Stage"
-  Worksheets("Week_" & week_num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Type"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i).Value = "Record ID"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 1).Value = "Short Description"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 2).Value = "Record Stage"
+  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Type"
 Next i
 CloseCurRec(0, 1) = 2
 CloseCurRec(1, 1) = ReplCol
@@ -707,7 +872,7 @@ For i = 2 To CloseRecNum
       End If
   End If
 Next i
-Worksheets("Week_" & week_num).Cells(1, 1).Activate
+Worksheets("Week_" & Week_Num).Cells(1, 1).Activate
 ActiveCell.EntireRow.Insert
 Cells(1, 1).Value = "Open Records"
 Cells(1, 12).Value = "Open LIR"
