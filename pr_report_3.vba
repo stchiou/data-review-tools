@@ -357,31 +357,15 @@ For i = 0 To 6
         OpenRecCount(i, j) = 0
     Next j
 Next i
-'---------------------------------------------------------------
-'       |0    |1   |2   |3   |4    |5    |6    |7    |8    |
-'       |< 23 |<30 |<60 |<90 |<120 |<150 |<180 |>=180|Total
-'---------------------------------------------------------------
-'0      |
-'n/a    |
-'-------------------------------------------------------------
-'1      |
-'LIR    |
-'-------------------------------------------------------------
-'2      |
-'RAAC   |
-'-------------------------------------------------------------
-'3      |
-'ER     |
-'--------------------------------------------------------------
-'4      |
-'QAR    |
-'--------------------------------------------------------------
-'5      |
-'INC    |
-'--------------------------------------------------------------
-'6      |
-'Total  |
-'--------------------------------------------------------------
+'----------------------------------------------------------------------------
+'First dimension
+'---------------
+'0(n/a); 1(LIR); 2(RAAC); 3(ER); 4(QAR); 5(INC); 6(Total)
+'----------------
+'Second dimension
+'----------------
+'0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(total)
+'-----------------------------------------------------------------------------
 For i = 1 To OpenRecNum
     Select Case OpenRecType(i)
         Case Is = 1
@@ -402,7 +386,7 @@ For i = 1 To OpenRecNum
                     OpenRecCount(1, 6) = OpenRecCount(1, 6) + 1
                 Case Is = 7
                     OpenRecCount(1, 7) = OpenRecCount(1, 7) + 1
-            End
+            End Select
         Case Is = 2
             Select Case OpenStage(i)
                 Case Is = 0
@@ -421,7 +405,7 @@ For i = 1 To OpenRecNum
                     OpenRecCount(2, 6) = OpenRecCount(2, 6) + 1
                 Case Is = 7
                     OpenRecCount(2, 7) = OpenRecCount(2, 7) + 1
-            End
+            End Select
         Case Is = 3
             Select Case OpenStage(i)
                 Case Is = 0
@@ -440,7 +424,7 @@ For i = 1 To OpenRecNum
                     OpenRecCount(3, 6) = OpenRecCount(3, 6) + 1
                 Case Is = 7
                     OpenRecCount(3, 7) = OpenRecCount(3, 7) + 1
-            End
+            End Select
         Case Is = 4
             Select Case OpenStage(i)
                 Case Is = 0
@@ -459,7 +443,7 @@ For i = 1 To OpenRecNum
                     OpenRecCount(4, 6) = OpenRecCount(4, 6) + 1
                 Case Is = 7
                     OpenRecCount(4, 7) = OpenRecCount(4, 7) + 1
-            End
+            End Select
         Case Is = 5
             Select Case OpenStage(i)
                 Case Is = 0
@@ -478,20 +462,29 @@ For i = 1 To OpenRecNum
                     OpenRecCount(5, 6) = OpenRecCount(5, 6) + 1
                 Case Is = 7
                     OpenRecCount(5, 7) = OpenRecCount(5, 7) + 1
-            End
+            End Select
     End Select
+Next i
+For i = 1 To 5
+   OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1) + OpenRecCount(i, 2) _
+   + OpenRecCount(i, 3) + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
+   + OpenRecCount(i, 7)
+Next i
+For i = 0 To 8
+    OpenRecCount(6, i) = OpenRecCount(1, i) + OpenRecCount(2, i) + OpenRecCount(3, i) _
+    + OpenRecCount(4, i) + OpenRecCount(5, i)
 Next i
 '----------------------------------------------------------------
 'Count Number of Closed Record within Specified Time Range
 '----------------------------------------------------------------
 
-'For i = 1 To 5
+For i = 1 To 5
 '      OpenCount(i, 8) = OpenCount(i, 2) + OpenCount(i, 3) + OpenCount(i, 4) + OpenCount(i, 5) + OpenCount(i, 6) + OpenCount(i, 7)
 '      OpenCount(i, 9) = OpenCount(i, 0) + OpenCount(i, 1) + OpenCount(i, 8)
 'Next i
 'For i = 0 To 9
 '  OpenCount(6, i) = OpenCount(1, i) + OpenCount(2, i) + OpenCount(3, i) + OpenCount(4, i) + OpenCount(5, i)
-'Next i
+Next i
 ''----------------------------------------------------------------
 ''Generate Summary Report
 ''----------------------------------------------------------------
