@@ -39,7 +39,7 @@ Dim event_code() As String
 Dim qar_required() As String
 Dim special_or_common_cuase() As String
 Dim capa_effectiveness_bsc_metric() As String
-Dim date_open() As String
+Dim date_open() As Date
 Dim discovery_date() As String
 Dim date_closed() As String
 Dim due_date() As String
@@ -75,28 +75,27 @@ Dim reason_for_investigating() As String
 '-----------------------------------------------------------------
 Dim OpenRecNum As Integer
 Dim Open_Index() As Integer
-Dim openlist() As Integer
+Dim OpenList() As Integer
 Dim OpenList_Pos As Integer
 Dim OpenAge() As Integer
 Dim OpenStage() As Integer
 Dim OpenRecType() As Integer
 Dim OpenRecCount() As Integer
+'---------------------------------------------------------------
+Dim ClosedRecNum As Integer
+Dim Closed_Index() As Integer
+Dim ClosedList() As Integer
+Dim ClosedList_Pos As Integer
+Dim ClosedStage() As Integer
+Dim ClosedRecType() As Integer
+Dim ClosedRecCount() As Integer
+'-----------------------------------------------------------------
 
 
-
-Dim OpenCurRec() As Integer
-Dim temp As String
+Dim temp() As Integer
 Dim tempval As Long
 Dim OpenRec() As String
-Dim CloseRecNum As Long
-Dim CloselRow As Integer
-Dim CloselCol As Integer
-Dim CloseCount() As Integer
-Dim CloseAge() As Integer
-Dim CloseStage() As Integer
-Dim CloseRecType() As Integer
-Dim CloseCurRec() As Integer
-Dim CloseRec() As String
+
 Dim ReplCol As Long
 Dim ReplRow As Long
 Dim CloseSheet_Name As String
@@ -150,49 +149,49 @@ Workbooks.OpenText Filename:=File_1, local:=True
 Workbooks.Open Filename:=File_2, local:=True
 Windows(window_1).Activate
 Record_Num = Cells(1, 1).End(xlDown).Row
-ReDim pr_id(Record_Num) As String
-ReDim title_short_description(Record_Num) As String
-ReDim responsible_person(Record_Num) As String
-ReDim record_type(Record_Num) As String
-ReDim investigation_type(Record_Num) As String
-ReDim related_records(Record_Num) As String
-ReDim event_code(Record_Num) As String
-ReDim qar_required(Record_Num) As String
-ReDim special_or_common_cuase(Record_Num) As String
-ReDim capa_effectiveness_bsc_metric(Record_Num) As String
-ReDim date_open(Record_Num) As String
-ReDim discovery_date(Record_Num) As String
-ReDim date_closed(Record_Num) As String
-ReDim due_date(Record_Num) As String
-ReDim original_due_date(Record_Num) As String
-ReDim number_of_approved_extensions(Record_Num) As Integer
-ReDim qa_final_app_on(Record_Num) As String
-ReDim site_qa_approval_on(Record_Num) As String
-ReDim material_involved(Record_Num) As String
-ReDim bu_area(Record_Num) As String
-ReDim operation(Record_Num) As String
-ReDim test_description(Record_Num) As String
-ReDim other_test_description(Record_Num) As String
-ReDim procedure_method(Record_Num) As String
-ReDim product_families(Record_Num) As String
-ReDim product_names(Record_Num) As String
-ReDim initial_inv_analyst(Record_Num) As String
-ReDim hp_root_cause_categ_1(Record_Num) As String
-ReDim hp_root_cause_categ_2(Record_Num) As String
-ReDim hp_root_cause_categ_3(Record_Num) As String
-ReDim root_cause_1(Record_Num) As String
-ReDim root_cause_2(Record_Num) As String
-ReDim root_cause_3(Record_Num) As String
-ReDim recom_diposition_comments(Record_Num) As String
-ReDim final_comments(Record_Num) As String
-ReDim assignable_cause_class(Record_Num) As String
-ReDim assignable_cause(Record_Num) As String
-ReDim supplier_name_lot_no(Record_Num) As String
-ReDim area_disocovered(Record_Num) As String
-ReDim areas_affected(Record_Num) As String
-ReDim analyst_personnel_sub_category(Record_Num) As String
-ReDim pr_state(Record_Num) As String
-ReDim reason_for_investigation(Record_Num) As String
+ReDim pr_id(Record_Num)
+ReDim title_short_description(Record_Num)
+ReDim responsible_person(Record_Num)
+ReDim record_type(Record_Num)
+ReDim investigation_type(Record_Num)
+ReDim related_records(Record_Num)
+ReDim event_code(Record_Num)
+ReDim qar_required(Record_Num)
+ReDim special_or_common_cuase(Record_Num)
+ReDim capa_effectiveness_bsc_metric(Record_Num)
+ReDim date_open(Record_Num)
+ReDim discovery_date(Record_Num)
+ReDim date_closed(Record_Num)
+ReDim due_date(Record_Num)
+ReDim original_due_date(Record_Num)
+ReDim number_of_approved_extensions(Record_Num)
+ReDim qa_final_app_on(Record_Num)
+ReDim site_qa_approval_on(Record_Num)
+ReDim material_involved(Record_Num)
+ReDim bu_area(Record_Num)
+ReDim operation(Record_Num)
+ReDim test_description(Record_Num)
+ReDim other_test_description(Record_Num)
+ReDim procedure_method(Record_Num)
+ReDim product_families(Record_Num)
+ReDim product_names(Record_Num)
+ReDim initial_inv_analyst(Record_Num)
+ReDim hp_root_cause_categ_1(Record_Num)
+ReDim hp_root_cause_categ_2(Record_Num)
+ReDim hp_root_cause_categ_3(Record_Num)
+ReDim root_cause_1(Record_Num)
+ReDim root_cause_2(Record_Num)
+ReDim root_cause_3(Record_Num)
+ReDim recom_diposition_comments(Record_Num)
+ReDim final_comments(Record_Num)
+ReDim assignable_cause_class(Record_Num)
+ReDim assignable_cause(Record_Num)
+ReDim supplier_name_lot_no(Record_Num)
+ReDim area_disocovered(Record_Num)
+ReDim areas_affected(Record_Num)
+ReDim analyst_personnel_sub_category(Record_Num)
+ReDim pr_state(Record_Num)
+ReDim reason_for_investigation(Record_Num)
 For i = 2 To Record_Num
     Cells(i, 1).Activate
     pr_id(i) = ActiveCell.Value
@@ -289,11 +288,11 @@ Next i
 '-------------------------------------------------------------------------------
 'Fill the list of Open Records with index numbers of the whole data set
 '-------------------------------------------------------------------------------
-ReDim openlist(OpenRecNum)
+ReDim OpenList(OpenRecNum)
 OpenList_Pos = 1
 For i = 1 To Record_Num
         If Open_Index(i) <> 0 Then
-            openlist(OpenList_Pos) = Open_Index(i)
+            OpenList(OpenList_Pos) = Open_Index(i)
             OpenList_Pos = OpenList_Pos + 1
         Else
         End If
@@ -301,11 +300,11 @@ Next i
 '---------------------------------------------------------------------------------
 'Calculate Age , Stage and Type of Open Records
 '---------------------------------------------------------------------------------
-ReDim OpenAge(OpenRecNum) As Integer
-ReDim OpenStage(OpenRecNum) As Integer
-ReDim OpenRecType(OpenRecNum) As Integer
+ReDim OpenAge(OpenRecNum)
+ReDim OpenStage(OpenRecNum)
+ReDim OpenRecType(OpenRecNum)
 For i = 1 To OpenRecNum
-    OpenAge(i) = DateValue(CutOff) - DateValue(discovery_date(openlist(i)))
+    OpenAge(i) = DateValue(CutOff) - DateValue(discovery_date(OpenList(i)))
     If OpenAge(i) < 23 Then
         OpenStage(i) = 0
     Else
@@ -335,7 +334,7 @@ For i = 1 To OpenRecNum
             End If
         End If
     End If
-    Select Case record_type(openlist(i))
+    Select Case record_type(OpenList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             OpenRecType(i) = 1
         Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
@@ -465,6 +464,9 @@ For i = 1 To OpenRecNum
             End Select
     End Select
 Next i
+'--------------------------------------------------------------
+'Calculate Summary of the Opened Records
+'--------------------------------------------------------------
 For i = 1 To 5
    OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1) + OpenRecCount(i, 2) _
    + OpenRecCount(i, 3) + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
@@ -475,47 +477,147 @@ For i = 0 To 8
     + OpenRecCount(4, i) + OpenRecCount(5, i)
 Next i
 '----------------------------------------------------------------
-'Count Number of Closed Record within Specified Time Range
+'Identify Closed Record within Specified Time Range
+'1. pr_state ="closed", and date_closed >= datevalue(cutoff)-7
+'2. qa_final_app_on is not blank, and qa_final_app_on >= datevalue(cutoff)-7
+'3. site_qa_approval_on is not blank, and site_qa_approval_on >= datevalue(cutoff)-7
 '----------------------------------------------------------------
-
-For i = 1 To 5
-'      OpenCount(i, 8) = OpenCount(i, 2) + OpenCount(i, 3) + OpenCount(i, 4) + OpenCount(i, 5) + OpenCount(i, 6) + OpenCount(i, 7)
-'      OpenCount(i, 9) = OpenCount(i, 0) + OpenCount(i, 1) + OpenCount(i, 8)
-'Next i
-'For i = 0 To 9
-'  OpenCount(6, i) = OpenCount(1, i) + OpenCount(2, i) + OpenCount(3, i) + OpenCount(4, i) + OpenCount(5, i)
+ClosedRecNum = 0
+ReDim Closed_Index(Record_Num)
+For i = 2 To Record_Num
+    If pr_state(i) = "Closed" Then
+        If DateValue(CutOff) - DateValue(date_closed(i)) <= 7 Then
+            ClosedRecNum = ClosedRecNum + 1
+            Closed_Index(i) = i
+        Else 'date_closed(i) >= DateValue(CutOff) - 7
+            CloseRecNum = CloseRecNum
+            Closed_Index(i) = 0
+        End If 'date_closed(i) >= DateValue(CutOff) - 7
+    Else 'pr_state(i) = "Closed"
+        If qa_final_app_on(i) <> "" Then
+            If DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7 Then
+                ClosedRecNum = ClosedRecNum + 1
+                Closed_Index(i) = i
+            Else 'DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7
+                If site_qa_approval_on(i) <> "" Then
+                    If DateValue(CutOff) - DateValue(site_qa_approval_on(i)) <= 7 Then
+                        ClosedRecNum = ClosedRecNum + 1
+                        Closed_Index(i) = i
+                    Else 'DateValue(CutOff) - DateValue(site_qa_approval_on(i))
+                        ClosedRecNum = ClosedRecNum
+                        Closed_Index(i) = 0
+                    End If 'DateValue(CutOff) - DateValue(site_qa_approval_on(i))
+                Else 'site_qa_approval_on(i) <> "" Then
+                    ClosedRecNum = ClosedRecNum
+                    Closed_Index(i) = 0
+                End If 'site_qa_approval_on(i) <> "" Then
+            End If 'DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7
+        Else 'qa_final_app_on(i) <> ""
+            CloseRecNum = CloseRecNum
+            Closed_Index(i) = 0
+        End If 'qa_final_app_on(i) <> ""
+    End If 'pr_state(i) = "Closed"
 Next i
-''----------------------------------------------------------------
-''Generate Summary Report
-''----------------------------------------------------------------
-'Sheets.Add after:=Sheets(OpenSheet_Name)
-'Sheets(Sheets.Count).Select
-'Sheets(Sheets.Count).Name = "Week_" & Week_Num
-''----------------------------------------------------------------
-''Create Headers Row and Column of the Report
-''----------------------------------------------------------------
-'Worksheets("Week_" & Week_Num).Cells(1, 1).Value = "Record Type"
-'Worksheets("Week_" & Week_Num).Cells(1, 2).Value = "<23 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 3).Value = "24-30 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 4).Value = "31-60 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 5).Value = "61-90 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 6).Value = "91-120 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 7).Value = "121-150 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 8).Value = "151-180 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 9).Value = ">181 Days"
-'Worksheets("Week_" & Week_Num).Cells(1, 10).Value = "Aged"
-'Worksheets("Week_" & Week_Num).Cells(1, 11).Value = "Total"
-'Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "LIR"
-'Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "RAAC"
-'Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "ER"
-'Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "QAR"
-'Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "INC"
-'Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "Total"
-''----------------------------------------------------------------
-''Writing Open Record Matrix
-''----------------------------------------------------------------
+'---------------------------------------------------------
+'Writing closed record index into array
+'---------------------------------------------------------
+ReDim ClosedList(ClosedRecNum)
+ClosedList_Pos = 1
+For i = 2 To Record_Num
+    If Closed_Index(i) <> 0 Then
+        ClosedList(ClosedList_Pos) = Closed_Index(i)
+        ClosedList_Pos = ClosedList_Pos + 1
+    Else
+    End If
+Next i
+'--------------------------------------------------------------------------
+'Compute Age and Stage of closed record
+'--------------------------------------------------------------------------
+ReDim CloseAge(ClosedRecNum)
+ReDim CloseStage(ClosedRecNum)
+ReDim CloseRecType(ClosedRecNum)
+ReDim ClosedRecCount(ClosedRecNum)
+For i = 1 To ClosedRecNum
+    If qa_final_app_on(ClosedList(i)) <> "" Then
+        CloseAge(i) = DateValue(qa_final_app_on(ClosedList(i))) - DateValue(discovery_date(ClosedList(i)))
+    Else
+        CloseAge(i) = DateValue(site_qa_approval_on(ClosedList(i))) - DateValue(discovery_date(ClosedList(i)))
+    End If
+    If CloseAge(i) > 30 Then
+        CloseStage(i) = 1
+    Else
+        CloseStage(i) = 0
+    End If
+'----------------------------------------------------------------
+'Closed Recrod Type
+'----------------------------------------------------------------
+    Select Case record_type(ClosedList(i))
+        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+            ClosedRecType(i) = 1
+        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+            ClosedRecType(i) = 2
+        Case "Manufacturing Investigations / Event Report"
+            ClosedRecType(i) = 3
+        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+            ClosedRecType(i) = 4
+        Case "Manufacturing Investigations / Incident"
+            ClosedRecType(i) = 5
+    End Select
+Next i
+'----------------------------------------------------------------
+'Computing Summary of the Closed Records
+'----------------------------------------------------------------
+ReDim ClosedRecCount(6, 2)
+For i = 0 To 6
+    For j = 0 To 2
+        ClosedRecCount(i, j) = 0
+    Next j
+Next i
+'---------------------------------------------------------------
+'First Dimension
+'---------------
+'0(n/a); 1(LIR); 2(RAAC); 3(ER); 4(QAR); 5(INC); 6(Total)
+'---------------
+'Second Dimension
+'---------------
+'0(ontime); 1(aged); 2(Total)
+'----------------------------------------------------------------
+For i = 1 To ClosedRecNum
+    Select Case ClosedRecType(i)
+        
+    End Select
+Next i
+'----------------------------------------------------------------
+'Generate Summary Report
+'----------------------------------------------------------------
+Sheets.Add after:=Sheets(DataSheet_Name)
+Sheets(Sheets.Count).Select
+Sheets(Sheets.Count).Name = "Week_" & Week_Num
+'----------------------------------------------------------------
+'Create Headers Row and Column of the Report
+'----------------------------------------------------------------
+Worksheets("Week_" & Week_Num).Cells(1, 1).Value = "Record Type"
+Worksheets("Week_" & Week_Num).Cells(1, 2).Value = "<23 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 3).Value = "24-30 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 4).Value = "31-60 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 5).Value = "61-90 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 6).Value = "91-120 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 7).Value = "121-150 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 8).Value = "151-180 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 9).Value = ">181 Days"
+Worksheets("Week_" & Week_Num).Cells(1, 10).Value = "Aged"
+Worksheets("Week_" & Week_Num).Cells(1, 11).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "LIR"
+Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "RAAC"
+Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "ER"
+Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "QAR"
+Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "INC"
+Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "Total"
+'----------------------------------------------------------------
+'Writing Open Record Matrix
+'----------------------------------------------------------------
 'For i = 1 To 6
-'  For j = 0 To 9
+'  For j = 0 To 8
 '      Cells(i + 1, j + 2).Value = OpenCount(i, j)
 '  Next j
 'Next i
