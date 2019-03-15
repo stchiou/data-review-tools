@@ -92,7 +92,11 @@ Dim ClosedRecCount() As Integer
 '-----------------------------------------------------------------
 
 
+<<<<<<< HEAD
 Dim temp() As Integer
+=======
+Dim temp As String
+>>>>>>> 6d04fa8b7ffa77913c04f6a25b83d0133790807b
 Dim tempval As Long
 Dim OpenRec() As String
 
