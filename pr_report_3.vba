@@ -75,28 +75,27 @@ Dim reason_for_investigating() As String
 '-----------------------------------------------------------------
 Dim OpenRecNum As Integer
 Dim Open_Index() As Integer
-Dim openlist() As Integer
+Dim OpenList() As Integer
 Dim OpenList_Pos As Integer
 Dim OpenAge() As Integer
 Dim OpenStage() As Integer
 Dim OpenRecType() As Integer
 Dim OpenRecCount() As Integer
+'---------------------------------------------------------------
+Dim ClosedRecNum As Integer
+Dim Closed_Index() As Integer
+Dim ClosedList() As Integer
+Dim ClosedList_Pos As Integer
+Dim ClosedStage() As Integer
+Dim ClosedRecType() As Integer
+Dim ClosedRecCount() As Integer
+'-----------------------------------------------------------------
 
 
-
-Dim OpenCurRec() As Integer
 Dim temp As String
 Dim tempval As Long
 Dim OpenRec() As String
-Dim CloseRecNum As Long
-Dim CloselRow As Integer
-Dim CloselCol As Integer
-Dim CloseCount() As Integer
-Dim CloseAge() As Integer
-Dim CloseStage() As Integer
-Dim CloseRecType() As Integer
-Dim CloseCurRec() As Integer
-Dim CloseRec() As String
+
 Dim ReplCol As Long
 Dim ReplRow As Long
 Dim CloseSheet_Name As String
@@ -289,11 +288,11 @@ Next i
 '-------------------------------------------------------------------------------
 'Fill the list of Open Records with index numbers of the whole data set
 '-------------------------------------------------------------------------------
-ReDim openlist(OpenRecNum)
+ReDim OpenList(OpenRecNum)
 OpenList_Pos = 1
 For i = 1 To Record_Num
         If Open_Index(i) <> 0 Then
-            openlist(OpenList_Pos) = Open_Index(i)
+            OpenList(OpenList_Pos) = Open_Index(i)
             OpenList_Pos = OpenList_Pos + 1
         Else
         End If
@@ -305,7 +304,7 @@ ReDim OpenAge(OpenRecNum) As Integer
 ReDim OpenStage(OpenRecNum) As Integer
 ReDim OpenRecType(OpenRecNum) As Integer
 For i = 1 To OpenRecNum
-    OpenAge(i) = DateValue(CutOff) - DateValue(discovery_date(openlist(i)))
+    OpenAge(i) = DateValue(CutOff) - DateValue(discovery_date(OpenList(i)))
     If OpenAge(i) < 23 Then
         OpenStage(i) = 0
     Else
@@ -335,7 +334,7 @@ For i = 1 To OpenRecNum
             End If
         End If
     End If
-    Select Case record_type(openlist(i))
+    Select Case record_type(OpenList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             OpenRecType(i) = 1
         Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
@@ -465,6 +464,9 @@ For i = 1 To OpenRecNum
             End Select
     End Select
 Next i
+'--------------------------------------------------------------
+'Calculate Summary of the Opened Records
+'--------------------------------------------------------------
 For i = 1 To 5
    OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1) + OpenRecCount(i, 2) _
    + OpenRecCount(i, 3) + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
