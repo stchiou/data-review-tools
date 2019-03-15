@@ -584,8 +584,49 @@ Next i
 '----------------------------------------------------------------
 For i = 1 To ClosedRecNum
     Select Case ClosedRecType(i)
-        
+        Case Is = 1
+            Select Case closedrecstage(i)
+                Case Is = 0
+                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                Case Is = 1
+                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+            End Select
+        Case Is = 2
+            Select Case closedrecstage(i)
+                Case Is = 0
+                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                Case Is = 1
+                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+            End Select
+        Case Is = 3
+            Select Case closedrecstage(i)
+                Case Is = 0
+                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                Case Is = 1
+                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+            End Select
+        Case Is = 4
+            Select Case closedrecstage(i)
+                Case Is = 0
+                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                Case Is = 1
+                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+            End Select
+        Case Is = 5
+            Select Case closedrecstage(i)
+                Case Is = 0
+                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                Case Is = 1
+                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+            End Select
     End Select
+Next i
+For i = 1 To 5
+    ClosedRecCount(i, 2) = ClosedRecCount(i, 0) + ClosedRecCount(i, 1)
+Next i
+For i = 0 To 2
+    ClosedRecCount(6, i) = ClosedRecCount(1, i) + ClosedRecCount(2, i) _
+    + ClosedRecCount(3, i) + ClosedRecCount(4, i) + ClosedRecCount(5, i)
 Next i
 '----------------------------------------------------------------
 'Generate Summary Report
