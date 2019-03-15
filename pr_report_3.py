@@ -8,3 +8,4 @@ with open(r'''C:\Users\chious\Box Sync\vba-projects\pr-status\week0\v3-test-data
     headers=next(readCSV)
     for row in readCSV:
         rawdata.append(row)
+print(headers[0:2])
