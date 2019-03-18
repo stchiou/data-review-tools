@@ -11,6 +11,10 @@ Sub PR_Report()
 '4. aging up (age > 23 days)
 '5. committed to close this week
 '6. aged that will close
+'7. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
+'8. PRs by writer
+'9. PRs opened (CQ vs IM)
+
 '------------------------------------------------------------------------------------------------------------------
 'Features:
 '1. Combine output records with corresponding short description
@@ -90,14 +94,15 @@ Dim ClosedStage() As Integer
 Dim ClosedRecType() As Integer
 Dim ClosedRecCount() As Integer
 '-----------------------------------------------------------------
-
-
+Dim shift As Integer
+Dim ReplCol As Long
+Dim ReplRow As Long
 Dim temp() As Integer
 Dim tempval As Long
 Dim OpenRec() As String
+Dim ClosedRec() As String
 
-Dim ReplCol As Long
-Dim ReplRow As Long
+
 Dim CloseSheet_Name As String
 Dim i As Integer
 Dim j As Integer
@@ -350,9 +355,9 @@ Next i
 '--------------------------------------------------------------
 'Compute Subtotal and Grand Total of the Open Records Matrix
 '--------------------------------------------------------------
-ReDim OpenRecCount(6, 8)
+ReDim OpenRecCount(6, 10)
 For i = 0 To 6
-    For j = 0 To 8
+    For j = 0 To 10
         OpenRecCount(i, j) = 0
     Next j
 Next i
@@ -363,7 +368,8 @@ Next i
 '----------------
 'Second dimension
 '----------------
-'0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(total)
+'0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(on-time);
+'9(aged); 10(total)
 '-----------------------------------------------------------------------------
 For i = 1 To OpenRecNum
     Select Case OpenRecType(i)
@@ -467,14 +473,41 @@ Next i
 '--------------------------------------------------------------
 'Calculate Summary of the Opened Records
 '--------------------------------------------------------------
-For i = 1 To 5
-   OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1) + OpenRecCount(i, 2) _
-   + OpenRecCount(i, 3) + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
-   + OpenRecCount(i, 7)
+For i = 1 To 6
+    OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1)
 Next i
-For i = 0 To 8
+For i = 1 To 6
+    OpenRecCount(i, 9) = OpenRecCount(i, 2) + OpenRecCount(i, 3) _
+    + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
+    + OpenRecCount(i, 7)
+Next i
+For i = 1 To 6
+    OpenRecCount(i, 10) = OpenRecCount(i, 0) + OpenRecCount(i, 1) _
+    + OpenRecCount(i, 2) + OpenRecCount(i, 3) + OpenRecCount(i, 4) _
+    + OpenRecCount(i, 5) + OpenRecCount(i, 6) + OpenRecCount(i, 7)
+Next i
+For i = 0 To 10
     OpenRecCount(6, i) = OpenRecCount(1, i) + OpenRecCount(2, i) + OpenRecCount(3, i) _
     + OpenRecCount(4, i) + OpenRecCount(5, i)
+Next i
+'----------------------------------------------------------------
+'Write Open Record Description into Array
+'----------------------------------------------------------------
+ReDim OpenRec(OpenRecNum, 4)
+'--------------------------------------
+'First Dimension
+'---------------
+'Open Record Number 1-OpenRecNum
+'----------------
+'Second Dimension
+'---------------
+'1(pr_id); 2(short_description); 3(OpenStage); 4(OpenRecType)
+'--------------------------------------
+For i = 1 To OpenRecNum
+    OpenRec(i, 1) = pr_id(OpenList(i))
+    OpenRec(i, 2) = title_short_description(OpenList(i))
+    OpenRec(i, 3) = OpenStage(i)
+    OpenRec(i, 4) = OpenRecType(i)
 Next i
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
@@ -490,7 +523,7 @@ For i = 2 To Record_Num
             ClosedRecNum = ClosedRecNum + 1
             Closed_Index(i) = i
         Else 'date_closed(i) >= DateValue(CutOff) - 7
-            CloseRecNum = CloseRecNum
+            ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
         End If 'date_closed(i) >= DateValue(CutOff) - 7
     Else 'pr_state(i) = "Closed"
@@ -513,7 +546,7 @@ For i = 2 To Record_Num
                 End If 'site_qa_approval_on(i) <> "" Then
             End If 'DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7
         Else 'qa_final_app_on(i) <> ""
-            CloseRecNum = CloseRecNum
+            ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
         End If 'qa_final_app_on(i) <> ""
     End If 'pr_state(i) = "Closed"
@@ -535,7 +568,7 @@ Next i
 '--------------------------------------------------------------------------
 ReDim CloseAge(ClosedRecNum)
 ReDim CloseStage(ClosedRecNum)
-ReDim CloseRecType(ClosedRecNum)
+ReDim ClosedRecType(ClosedRecNum)
 ReDim ClosedRecCount(ClosedRecNum)
 For i = 1 To ClosedRecNum
     If qa_final_app_on(ClosedList(i)) <> "" Then
@@ -543,10 +576,34 @@ For i = 1 To ClosedRecNum
     Else
         CloseAge(i) = DateValue(site_qa_approval_on(ClosedList(i))) - DateValue(discovery_date(ClosedList(i)))
     End If
-    If CloseAge(i) > 30 Then
-        CloseStage(i) = 1
-    Else
+    If CloseAge(i) < 23 Then
         CloseStage(i) = 0
+    Else
+        If CloseAge(i) < 30 Then
+            CloseStage(i) = 1
+        Else
+            If CloseAge(i) < 60 Then
+                CloseStage(i) = 2
+            Else
+                If CloseAge(i) < 90 Then
+                    CloseStage(i) = 3
+                Else
+                    If CloseAge(i) < 120 Then
+                        CloseStage(i) = 4
+                    Else
+                        If CloseAge(i) < 150 Then
+                            CloseStage(i) = 5
+                        Else
+                            If CloseAge(i) < 180 Then
+                                CloseStage(i) = 6
+                            Else
+                                CloseStage(i) = 7
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
     End If
 '----------------------------------------------------------------
 'Closed Recrod Type
@@ -567,7 +624,7 @@ Next i
 '----------------------------------------------------------------
 'Computing Summary of the Closed Records
 '----------------------------------------------------------------
-ReDim ClosedRecCount(6, 2)
+ReDim ClosedRecCount(6, 10)
 For i = 0 To 6
     For j = 0 To 2
         ClosedRecCount(i, j) = 0
@@ -580,7 +637,8 @@ Next i
 '---------------
 'Second Dimension
 '---------------
-'0(ontime); 1(aged); 2(Total)
+'0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(on-time)
+'9(aged); 10(total)
 '----------------------------------------------------------------
 For i = 1 To ClosedRecNum
     Select Case ClosedRecType(i)
@@ -590,43 +648,133 @@ For i = 1 To ClosedRecNum
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
                     ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+                Case Is = 2
+                    ClosedRecCount(1, 2) = ClosedRecCount(1, 2) + 1
+                Case Is = 3
+                    ClosedRecCount(1, 3) = ClosedRecCount(1, 3) + 1
+                Case Is = 4
+                    ClosedRecCount(1, 4) = ClosedRecCount(1, 4) + 1
+                Case Is = 5
+                    ClosedRecCount(1, 5) = ClosedRecCount(1, 5) + 1
+                Case Is = 6
+                    ClosedRecCount(1, 6) = ClosedRecCount(1, 6) + 1
+                Case Is = 7
+                    ClosedRecCount(1, 7) = ClosedRecCount(1, 7) + 1
             End Select
         Case Is = 2
             Select Case CloseStage(i)
                 Case Is = 0
-                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                    ClosedRecCount(2, 0) = ClosedRecCount(2, 0) + 1
                 Case Is = 1
-                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+                    ClosedRecCount(2, 1) = ClosedRecCount(2, 1) + 1
+                Case Is = 2
+                    ClosedRecCount(2, 2) = ClosedRecCount(2, 2) + 1
+                Case Is = 3
+                    ClosedRecCount(2, 3) = ClosedRecCount(2, 3) + 1
+                Case Is = 4
+                    ClosedRecCount(2, 4) = ClosedRecCount(2, 4) + 1
+                Case Is = 5
+                    ClosedRecCount(2, 5) = ClosedRecCount(2, 5) + 1
+                Case Is = 6
+                    ClosedRecCount(2, 6) = ClosedRecCount(2, 6) + 1
+                Case Is = 7
+                    ClosedRecCount(2, 7) = ClosedRecCount(2, 7) + 1
             End Select
         Case Is = 3
             Select Case CloseStage(i)
                 Case Is = 0
-                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                    ClosedRecCount(3, 0) = ClosedRecCount(3, 0) + 1
                 Case Is = 1
-                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+                    ClosedRecCount(3, 1) = ClosedRecCount(3, 1) + 1
+                Case Is = 2
+                    ClosedRecCount(3, 2) = ClosedRecCount(3, 2) + 1
+                Case Is = 3
+                    ClosedRecCount(3, 3) = ClosedRecCount(3, 3) + 1
+                Case Is = 4
+                    ClosedRecCount(3, 4) = ClosedRecCount(3, 4) + 1
+                Case Is = 5
+                    ClosedRecCount(3, 5) = ClosedRecCount(3, 5) + 1
+                Case Is = 6
+                    ClosedRecCount(3, 6) = ClosedRecCount(3, 6) + 1
+                Case Is = 7
+                    ClosedRecCount(3, 7) = ClosedRecCount(3, 7) + 1
             End Select
         Case Is = 4
             Select Case CloseStage(i)
                 Case Is = 0
-                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                    ClosedRecCount(4, 0) = ClosedRecCount(4, 0) + 1
                 Case Is = 1
-                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+                    ClosedRecCount(4, 1) = ClosedRecCount(4, 1) + 1
+                Case Is = 2
+                    ClosedRecCount(4, 2) = ClosedRecCount(4, 2) + 1
+                Case Is = 3
+                    ClosedRecCount(4, 3) = ClosedRecCount(4, 3) + 1
+                Case Is = 4
+                    ClosedRecCount(4, 4) = ClosedRecCount(4, 4) + 1
+                Case Is = 5
+                    ClosedRecCount(4, 5) = ClosedRecCount(4, 5) + 1
+                Case Is = 6
+                    ClosedRecCount(4, 6) = ClosedRecCount(4, 6) + 1
+                Case Is = 7
+                    ClosedRecCount(4, 7) = ClosedRecCount(4, 7) + 1
             End Select
         Case Is = 5
             Select Case CloseStage(i)
                 Case Is = 0
-                    ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
+                    ClosedRecCount(5, 0) = ClosedRecCount(5, 0) + 1
                 Case Is = 1
-                    ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
+                    ClosedRecCount(5, 1) = ClosedRecCount(5, 1) + 1
+                Case Is = 2
+                    ClosedRecCount(5, 2) = ClosedRecCount(5, 2) + 1
+                Case Is = 3
+                    ClosedRecCount(5, 3) = ClosedRecCount(5, 3) + 1
+                Case Is = 4
+                    ClosedRecCount(5, 4) = ClosedRecCount(5, 4) + 1
+                Case Is = 5
+                    ClosedRecCount(5, 5) = ClosedRecCount(5, 5) + 1
+                Case Is = 6
+                    ClosedRecCount(5, 6) = ClosedRecCount(5, 6) + 1
+                Case Is = 7
+                    ClosedRecCount(5, 7) = ClosedRecCount(5, 7) + 1
             End Select
     End Select
 Next i
-For i = 1 To 5
-    ClosedRecCount(i, 2) = ClosedRecCount(i, 0) + ClosedRecCount(i, 1)
+'-------------------------------------------------------------------------------------
+For i = 1 To 6
+    ClosedRecCount(i, 8) = ClosedRecCount(i, 0) + ClosedRecCount(i, 1)
 Next i
-For i = 0 To 2
-    ClosedRecCount(6, i) = ClosedRecCount(1, i) + ClosedRecCount(2, i) _
-    + ClosedRecCount(3, i) + ClosedRecCount(4, i) + ClosedRecCount(5, i)
+For i = 1 To 6
+    ClosedRecCount(i, 9) = ClosedRecCount(i, 2) + ClosedRecCount(i, 3) _
+    + ClosedRecCount(i, 4) + ClosedRecCount(i, 5) + ClosedRecCount(i, 6) _
+    + ClosedRecCount(i, 7)
+Next i
+For i = 1 To 6
+    ClosedRecCount(i, 10) = ClosedRecCount(i, 0) + ClosedRecCount(i, 1) _
+    + ClosedRecCount(i, 2) + ClosedRecCount(i, 3) + ClosedRecCount(i, 4) _
+    + ClosedRecCount(i, 5) + ClosedRecCount(i, 6) + ClosedRecCount(i, 7)
+Next i
+For i = 0 To 10
+    ClosedRecCount(6, i) = ClosedRecCount(1, i) + ClosedRecCount(2, i) + ClosedRecCount(3, i) _
+    + ClosedRecCount(4, i) + ClosedRecCount(5, i)
+Next i
+'----------------------------------------------------------------
+'Write Closed Record Description into Array
+'----------------------------------------------------------------
+ReDim ClosedRec(ClosedRecNum, 4)
+'--------------------------------------
+'First Dimension
+'---------------
+'Closed Record Number 1-ClosedRecNum
+'----------------
+'Second Dimension
+'---------------
+'1(pr_id); 2(short_description); 3(OpenStage); 4(OpenRecType)
+'--------------------------------------
+For i = 1 To ClosedRecNum
+    ClosedRec(i, 1) = pr_id(ClosedList(i))
+    ClosedRec(i, 2) = title_short_description(ClosedList(i))
+    ClosedRec(i, 3) = CloseStage(i)
+    ClosedRec(i, 4) = ClosedRecType(i)
 Next i
 '----------------------------------------------------------------
 'Generate Summary Report
@@ -635,63 +783,61 @@ Sheets.Add after:=Sheets(DataSheet_Name)
 Sheets(Sheets.Count).Select
 Sheets(Sheets.Count).Name = "Week_" & Week_Num
 '----------------------------------------------------------------
-'Create Headers Row and Column of the Report
-'----------------------------------------------------------------
-Worksheets("Week_" & Week_Num).Cells(1, 1).Value = "Record Type"
-Worksheets("Week_" & Week_Num).Cells(1, 2).Value = "<23 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 3).Value = "24-30 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 4).Value = "31-60 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 5).Value = "61-90 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 6).Value = "91-120 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 7).Value = "121-150 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 8).Value = "151-180 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 9).Value = ">181 Days"
-Worksheets("Week_" & Week_Num).Cells(1, 10).Value = "Aged"
-Worksheets("Week_" & Week_Num).Cells(1, 11).Value = "Total"
-Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "LIR"
-Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "RAAC"
-Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "ER"
-Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "QAR"
-Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "INC"
-Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "Total"
+shift = 0
+Summary_Headers:
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 1).Value = "Record Type"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 2).Value = "<23 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 3).Value = "24-30 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 4).Value = "31-60 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 5).Value = "61-90 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 6).Value = "91-120 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 7).Value = "121-150 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 8).Value = "151-180 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 9).Value = ">181 Days"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 10).Value = "On-Time"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 11).Value = "Aged"
+Worksheets("Week_" & Week_Num).Cells(2 + shift, 12).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(3 + shift, 1).Value = "LIR"
+Worksheets("Week_" & Week_Num).Cells(4 + shift, 1).Value = "RAAC"
+Worksheets("Week_" & Week_Num).Cells(5 + shift, 1).Value = "ER"
+Worksheets("Week_" & Week_Num).Cells(6 + shift, 1).Value = "QAR"
+Worksheets("Week_" & Week_Num).Cells(7 + shift, 1).Value = "INC"
+Worksheets("Week_" & Week_Num).Cells(8 + shift, 1).Value = "Total"
+
 '----------------------------------------------------------------
 'Writing Open Record Matrix
 '----------------------------------------------------------------
-'For i = 1 To 6
-'  For j = 0 To 8
-'      Cells(i + 1, j + 2).Value = OpenCount(i, j)
-'  Next j
-'Next i
-''-------------------------------------------------------------
-''Update the number of Non-Empty Columns in the Summary Report
-''-------------------------------------------------------------
-'ReplCol = Cells(1, 1).End(xlToRight).Column
-''---------------------------------------------------------------
-''Generate Headers for Details Section of the Summary Report
-''--------------------------------------------------------------
-'For i = 0 To 4
-'  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 1).Value = "Record ID"
-'  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 2).Value = "Short Description"
-'  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 3).Value = "Record Stage"
-'  Worksheets("Week_" & Week_Num).Cells(1, ReplCol + 4 * i + 4).Value = "Record Type"
-'Next i
-''-----------------------------------------------------------------------------------------------
-''Create Array to Capture Positions of Where Each Record Being Output in the Summary Spreadsheet
-''-----------------------------------------------------------------------------------------------
-'OpenCurRec(0, 1) = 2
-'OpenCurRec(1, 1) = ReplCol + 1
-'OpenCurRec(0, 2) = 2
-'OpenCurRec(1, 2) = ReplCol + 5
-'OpenCurRec(0, 3) = 2
-'OpenCurRec(1, 3) = ReplCol + 9
-'OpenCurRec(0, 4) = 2
-'OpenCurRec(1, 4) = ReplCol + 13
-'OpenCurRec(0, 5) = 2
-'OpenCurRec(1, 5) = ReplCol + 17
-''----------------------------------------------------------------------------------
-''Writing Detail Information of Open Records from Array into Spreadsheet while
-''Updating Array that Captured Position of each Record in the Spreadsheet
-''----------------------------------------------------------------------------------
+Cells(1, 1).Value = "Open Records"
+For i = 1 To 6
+  For j = 0 To 10
+      Cells(i + 2, j + 2).Value = OpenRecCount(i, j)
+  Next j
+Next i
+'----------------------------------------------------------------------------------
+'Writing Detail Information of Open Records from Array into Spreadsheet while
+'Updating Array that Captured Position of each Record in the Spreadsheet
+'----------------------------------------------------------------------------------
+ReplRow = Cells(1, 1).End(xlDown).Row
+Cells(ReplRow, 1).Activate
+For j = 1 To 5
+    ActiveCell.Offset(1, 0).Value = "Record ID"
+    ActiveCell.Offset(1, 1).Value = "Short Description"
+    ActiveCell.Offset(1, 2).Value = "Record Stage"
+    ActiveCell.Offset(1, 3).Value = "Record Type"
+    ActiveCell.Offset(1, 0).Activate
+    For i = 1 To OpenRecNum
+        If OpenRec(i, 4) = j Then
+            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
+            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
+            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
+            ActiveCell.Offset(1, 3).Value = OpenRec(i, 4)
+            ActiveCell.Offset(1, 0).Activate
+        Else
+        End If
+    Next i
+Next j
+
+
 'For i = 2 To OpenRecNum
 '  If OpenRec(i, 3) = 1 Then
 '    Cells(OpenCurRec(0, 1), OpenCurRec(1, 1)).Activate
