@@ -140,14 +140,14 @@ Else
 End If
 DataSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
 SnapShot_Name = Mid(File_2, InStrRev(File_2, "\") + 1, (Len(File_2) - InStrRev(File_2, "\") - 4))
-window_1 = DataSheet_Name & ".csv"
+Window_1 = DataSheet_Name & ".csv"
 Window_2 = SnapShot_Name & ".xlsx"
 '-------------------------------------------------------------------------------
 'Calculate Record Number and redeclare array for raw data
 '-------------------------------------------------------------------------------
 Workbooks.OpenText Filename:=File_1, local:=True
 Workbooks.Open Filename:=File_2, local:=True
-Windows(window_1).Activate
+Windows(Window_1).Activate
 Record_Num = Cells(1, 1).End(xlDown).Row
 ReDim pr_id(Record_Num)
 ReDim title_short_description(Record_Num)
@@ -585,35 +585,35 @@ Next i
 For i = 1 To ClosedRecNum
     Select Case ClosedRecType(i)
         Case Is = 1
-            Select Case closedrecstage(i)
+            Select Case CloseStage(i)
                 Case Is = 0
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
                     ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
             End Select
         Case Is = 2
-            Select Case closedrecstage(i)
+            Select Case CloseStage(i)
                 Case Is = 0
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
                     ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
             End Select
         Case Is = 3
-            Select Case closedrecstage(i)
+            Select Case CloseStage(i)
                 Case Is = 0
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
                     ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
             End Select
         Case Is = 4
-            Select Case closedrecstage(i)
+            Select Case CloseStage(i)
                 Case Is = 0
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
                     ClosedRecCount(1, 1) = ClosedRecCount(1, 1) + 1
             End Select
         Case Is = 5
-            Select Case closedrecstage(i)
+            Select Case CloseStage(i)
                 Case Is = 0
                     ClosedRecCount(1, 0) = ClosedRecCount(1, 0) + 1
                 Case Is = 1
