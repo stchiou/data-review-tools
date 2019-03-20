@@ -15,143 +15,231 @@ Sub PR_Report()
 '8. PRs by writer
 '9. PRs opened (CQ vs IM)
 
-'------------------------------------------------------------------------------------------------------------------
+'------------------------------------------------------7------------------------------------------------------------
 'Features:
 '1. Combine output records with corresponding short description
 '2. Computes age of the records
 '3. Computes stage of the records based on age
 '4. Generate reports
 '------------------------------------------------------------------------------------------------------------------
-Public File_1 As String
-Public File_2 As String
-Public Report_Type As Integer
-Public Week_Num As Integer
-Public CutOff As String
-Public Record_Num As Long
-Public DataSheet_Name As String
-Public SnapShot_Name As String
+Dim File_1 As String
+Dim File_2 As String
+Dim Report_Type As Integer
+Dim Week_Num As Integer
+Dim Month_Num As Integer
+Dim Quarter_Num As Integer
+Dim Year_Num As Integer
+Dim Day_Num As Integer
+Dim r_y As Integer
+Dim r_m As Integer
+Dim r_d As Integer
+Dim CutOff As Date
+Dim Begin As Date
+Dim Record_Num As Long
+Dim DataSheet_Name As String
+Dim SnapShot_Name As String
 '-------------------------------------------------------
 'Fields in raw data
 '-------------------------------------------------------
-Public pr_id() As String
-Public title_short_description() As String
-Public responsible_person() As String
-Public record_type() As String
-Public investigation_type() As String
-Public related_records() As String
-Public event_code() As String
-Public qar_required() As String
-Public special_or_common_cuase() As String
-Public capa_effectiveness_bsc_metric() As String
-Public date_open() As Date
-Public discovery_date() As String
-Public date_closed() As String
-Public due_date() As String
-Public original_due_date() As String
-Public number_of_approved_extensions() As Integer
-Public qa_final_app_on() As String
-Public site_qa_approval_on() As String
-Public material_involved() As String
-Public bu_area() As String
-Public operation() As String
-Public test_description() As String
-Public other_test_description() As String
-Public procedure_method() As String
-Public product_families() As String
-Public product_names() As String
-Public initial_inv_analyst() As String
-Public hp_root_cause_categ_1() As String
-Public hp_root_cause_categ_2() As String
-Public hp_root_cause_categ_3() As String
-Public root_cause_1() As String
-Public root_cause_2() As String
-Public root_cause_3() As String
-Public recom_diposition_comments() As String
-Public final_comments() As String
-Public assignable_cause_class() As String
-Public assignable_cause() As String
-Public supplier_name_lot_no() As String
-Public area_disocovered() As String
-Public areas_affected() As String
-Public analyst_personnel_sub_category() As String
-Public pr_state() As String
-Public reason_for_investigating() As String
-Public idc_level_1() As String
-Public idc_level_2() As String
-Public idc_level_3() As String
+Dim pr_id() As String
+Dim title_short_description() As String
+Dim responsible_person() As String
+Dim record_type() As String
+Dim investigation_type() As String
+Dim related_records() As String
+Dim event_code() As String
+Dim qar_required() As String
+Dim special_or_common_cuase() As String
+Dim capa_effectiveness_bsc_metric() As String
+Dim date_open() As Date
+Dim discovery_date() As String
+Dim date_closed() As String
+Dim due_date() As String
+Dim original_due_date() As String
+Dim number_of_approved_extensions() As Integer
+Dim qa_final_app_on() As String
+Dim site_qa_approval_on() As String
+Dim material_involved() As String
+Dim bu_area() As String
+Dim operation() As String
+Dim test_description() As String
+Dim other_test_description() As String
+Dim procedure_method() As String
+Dim product_families() As String
+Dim product_names() As String
+Dim initial_inv_analyst() As String
+Dim hp_root_cause_categ_1() As String
+Dim hp_root_cause_categ_2() As String
+Dim hp_root_cause_categ_3() As String
+Dim root_cause_1() As String
+Dim root_cause_2() As String
+Dim root_cause_3() As String
+Dim recom_diposition_comments() As String
+Dim final_comments() As String
+Dim assignable_cause_class() As String
+Dim assignable_cause() As String
+Dim supplier_name_lot_no() As String
+Dim area_disocovered() As String
+Dim areas_affected() As String
+Dim analyst_personnel_sub_category() As String
+Dim pr_state() As String
+Dim reason_for_investigating() As String
+Dim idc_level_1() As String
+Dim idc_level_2() As String
+Dim idc_level_3() As String
 '-----------------------------------------------------------------
-Public OpenRecNum As Integer
-Public Open_Index() As Integer
-Public OpenList() As Integer
-Public OpenList_Pos As Integer
-Public OpenAge() As Integer
-Public OpenStage() As Integer
-Public OpenRecType() As Integer
-Public OpenRecCount() As Integer
+Dim OpenRecNum As Integer
+Dim Open_Index() As Integer
+Dim OpenList() As Integer
+Dim OpenList_Pos As Integer
+Dim OpenAge() As Integer
+Dim OpenStage() As Integer
+Dim OpenRecType() As Integer
+Dim OpenRecCount() As Integer
 '---------------------------------------------------------------
-Public ClosedRecNum As Integer
-Public Closed_Index() As Integer
-Public ClosedList() As Integer
-Public ClosedList_Pos As Integer
-Public ClosedStage() As Integer
-Public ClosedRecType() As Integer
-Public ClosedRecCount() As Integer
+Dim ClosedRecNum As Integer
+Dim Closed_Index() As Integer
+Dim ClosedList() As Integer
+Dim ClosedList_Pos As Integer
+Dim ClosedStage() As Integer
+Dim ClosedRecType() As Integer
+Dim ClosedRecCount() As Integer
 '-----------------------------------------------------------------
-Public ReplCol As Long
-Public ReplRow As Long
-Public temp() As Integer
-Public tempval As Long
-Public OpenRec() As String
-Public ClosedRec() As String
+Dim ReplCol As Long
+Dim ReplRow As Long
+Dim temp() As Integer
+Dim tempval As Long
+Dim OpenRec() As String
+Dim ClosedRec() As String
 
 
-Public CloseSheet_Name As String
-Public i As Integer
-Public j As Integer
-Public age As Integer
-Public stage As Integer
-Public address_1 As String
-Public address_2 As String
+Dim CloseSheet_Name As String
+Dim i As Integer
+Dim j As Integer
+Dim age As Integer
+Dim stage As Integer
+Dim address_1 As String
+Dim address_2 As String
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
 Input_report_type:
-Report_Type = InputBox("Which type of report you want to generate?" _
-    & vbCr & "1. Weekly" _
-    & vbCr & "2. Monthly" _
-    & vbCr & "3. Quarterly" _
-    & vbCr & "4. Annually")
-If Report_Type = 1 Then
-    GoTo Input_week_parameters:
-Else    'Report_type=1
-    If Report_Type = 2 Then
-        GoTo Input_month_parameters:
-    Else    'Report_type=2
-        If Report_Type = 3 Then
-            GoTo Input_quarter_parameters:
-        Else 'Report_type=3
-            If Report_Type = 4 Then
-                GoTo Input_year_parameters:
-            Else 'report_type=4
-                GoTo Input_report_type:
-            End If 'report_type=4
-        End If 'Report_type=3
-    End If  'Report_type=2
-End If  'Report_type=1
-
+    Report_Type = InputBox("Which type of report you want to generate?" _
+        & vbCr & "1. Weekly" _
+        & vbCr & "2. Monthly" _
+        & vbCr & "3. Quarterly" _
+        & vbCr & "4. Annually" _
+        & vbCr & "5. Arbitary Range")
+    If Report_Type = 1 Then
+        GoTo Input_week_parameters:
+    Else    'Report_type=1
+        If Report_Type = 2 Then
+            GoTo Input_month_parameters:
+        Else    'Report_type=2
+            If Report_Type = 3 Then
+                GoTo Input_quarter_parameters:
+            Else 'Report_type=3
+                If Report_Type = 4 Then
+                    GoTo Input_year_parameters:
+                Else 'report_type=4
+                    If Report_Type = 5 Then
+                        GoTo Input_range_parameters:
+                    Else 'Report_Type=5
+                        GoTo Input_report_type:
+                    End If 'Report_Type=5
+                End If 'report_type=4
+            End If 'Report_type=3
+        End If  'Report_type=2
+    End If  'Report_type=1
 Input_week_parameters:
-Week_Num = InputBox("Input week number of the year", "WEEK NUMBER")
-CutOff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
-GoTo Input_data_file:
+    Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
+    Month_Num = InputBox("Input numeric value the Month for the Report" _
+        & vbCr & "1. January" _
+        & vbCr & "2. February" _
+        & vbCr & "3. March" _
+        & vbCr & "4. April" _
+        & vbCr & "5. May" _
+        & vbCr & "6. June" _
+        & vbCr & "7. July" _
+        & vbCr & "8. August" _
+        & vbCr & "9. September" _
+        & vbCr & "10. October" _
+        & vbCr & "11. November" _
+        & vbCr & "12. December", "MONTH NUMBER")
+    Day_Num = InputBox("Input numeric value of the day of the month for the Report", "DAY NUMBER")
+    CutOff = DateSerial(Year_Num, Month_Num, Day_Num)
+    Week_Num = WorksheetFunction.WeekNum(DateValue(CutOff), 15)
+    Begin = CutOff - 6
+    GoTo Input_data_file:
 Input_month_parameters:
+    Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
+    Month_Num = InputBox("Input numeric value the Month for the Report" _
+        & vbCr & "1. January" _
+        & vbCr & "2. February" _
+        & vbCr & "3. March" _
+        & vbCr & "4. April" _
+        & vbCr & "5. May" _
+        & vbCr & "6. June" _
+        & vbCr & "7. July" _
+        & vbCr & "8. August" _
+        & vbCr & "9. September" _
+        & vbCr & "10. October" _
+        & vbCr & "11. November" _
+        & vbCr & "12. December", "MONTH NUMBER")
+    Begin = DateSerial(Year_Num, Month_Num, 1)
+    CutOff = DateSerial(Year_Num, Month_Num + 1, 0)
+    GoTo Input_data_file:
 Input_quarter_parameters:
+    Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
+    Quarter_Num = InputBox("Input numeric value of the quarter for the report", "QUARTER NUMBER")
+    Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
+    CutOff = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
+    GoTo Input_data_file:
 Input_year_parameters:
+    Year_Num = InputBox("Input numeric value of Year of the Report", "YEAR NUMBER")
+    Begin = DateSerial(Year_Num, 1, 1)
+    CutOff = DateSerial(Year_Num, 12, 31)
+    GoTo Input_data_file:
+Input_range_parameters:
+    Year_Num = InputBox("Input numeric value of Year that report starts", "START YEAR")
+    Month_Num = InputBox("Input numeric value of month that report starts" _
+        & vbCr & "1. January" _
+        & vbCr & "2. February" _
+        & vbCr & "3. March" _
+        & vbCr & "4. April" _
+        & vbCr & "5. May" _
+        & vbCr & "6. June" _
+        & vbCr & "7. July" _
+        & vbCr & "8. August" _
+        & vbCr & "9. September" _
+        & vbCr & "10. October" _
+        & vbCr & "11. November" _
+        & vbCr & "12. December", "START MONTH")
+    Day_Num = InputBox("Input numeric value of day of the month that report starts", "START DAY")
+    r_y = InputBox("Input numeric value of the Year that report ends", "END YEAR")
+    r_m = InputBox("Input numeric value of the month that report ends" _
+        & vbCr & "1. January" _
+        & vbCr & "2. February" _
+        & vbCr & "3. March" _
+        & vbCr & "4. April" _
+        & vbCr & "5. May" _
+        & vbCr & "6. June" _
+        & vbCr & "7. July" _
+        & vbCr & "8. August" _
+        & vbCr & "9. September" _
+        & vbCr & "10. October" _
+        & vbCr & "11. November" _
+        & vbCr & "12. December", "END MONTH")
+    r_d = InputBox("Input numeric value of day of the month that report ends", "END DAY")
+    Begin = DateSerial(Year_Num, Month_Num, Day_Num)
+    CutOff = DateSerial(r_y, r_m, r_d)
+    GoTo Input_data_file:
 Input_data_file:
     File_1 = Application.GetOpenFilename _
         (Title:="Data File", _
         filefilter:="CSV (Comma delimited) (*.csv),*.csv")
     If MsgBox("File contains records to be processed is " & File_1 & ". Is this correct?", vbYesNo) = vbNo Then
-        GoTo Input1:
+        GoTo Input_data_file:
     Else
     End If
 Input_snap_file:
@@ -159,16 +247,16 @@ Input_snap_file:
         (Title:="Snapshot File", _
         filefilter:="Worksheet(*.xlsx),*.xlsx")
      If MsgBox("File contains snapshots of the past records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
-        GoTo Input2:
+        GoTo Input_snap_file:
     Else
     End If
-If MsgBox("These are data files that you select:" _
-    & vbCr & File_1 _
-    & vbCr & File_2 _
-    & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
-    GoTo Input_data_file:
-Else
-End If
+    If MsgBox("These are data files that you select:" _
+        & vbCr & File_1 _
+        & vbCr & File_2 _
+        & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
+        GoTo Input_data_file:
+    Else
+    End If
 DataSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
 SnapShot_Name = Mid(File_2, InStrRev(File_2, "\") + 1, (Len(File_2) - InStrRev(File_2, "\") - 4))
 Window_1 = DataSheet_Name & ".csv"
