@@ -76,7 +76,9 @@ Public areas_affected() As String
 Public analyst_personnel_sub_category() As String
 Public pr_state() As String
 Public reason_for_investigating() As String
-
+Public idc_level_1() As String
+Public idc_level_2() As String
+Public idc_level_3() As String
 '-----------------------------------------------------------------
 Public OpenRecNum As Integer
 Public Open_Index() As Integer
@@ -95,7 +97,6 @@ Public ClosedStage() As Integer
 Public ClosedRecType() As Integer
 Public ClosedRecCount() As Integer
 '-----------------------------------------------------------------
-Public shift As Integer
 Public ReplCol As Long
 Public ReplRow As Long
 Public temp() As Integer
@@ -114,14 +115,38 @@ Public address_2 As String
 '---------------------------------------------------------------------------------
 'Capture File Names and Path of Data files
 '---------------------------------------------------------------------------------
+Input_report_type:
 Report_Type = InputBox("Which type of report you want to generate?" _
     & vbCr & "1. Weekly" _
     & vbCr & "2. Monthly" _
     & vbCr & "3. Quarterly" _
     & vbCr & "4. Annually")
+If Report_Type = 1 Then
+    GoTo Input_week_parameters:
+Else    'Report_type=1
+    If Report_Type = 2 Then
+        GoTo Input_month_parameters:
+    Else    'Report_type=2
+        If Report_Type = 3 Then
+            GoTo Input_quarter_parameters:
+        Else 'Report_type=3
+            If Report_Type = 4 Then
+                GoTo Input_year_parameters:
+            Else 'report_type=4
+                GoTo Input_report_type:
+            End If 'report_type=4
+        End If 'Report_type=3
+    End If  'Report_type=2
+End If  'Report_type=1
+
+Input_week_parameters:
 Week_Num = InputBox("Input week number of the year", "WEEK NUMBER")
 CutOff = InputBox("Input Cut-off Date for the Report in the format of 'mm/dd/yyyy'", "CUTOFF DATE")
-Input1:
+GoTo Input_data_file:
+Input_month_parameters:
+Input_quarter_parameters:
+Input_year_parameters:
+Input_data_file:
     File_1 = Application.GetOpenFilename _
         (Title:="Data File", _
         filefilter:="CSV (Comma delimited) (*.csv),*.csv")
@@ -129,7 +154,7 @@ Input1:
         GoTo Input1:
     Else
     End If
-Input2:
+Input_snap_file:
     File_2 = Application.GetOpenFilename _
         (Title:="Snapshot File", _
         filefilter:="Worksheet(*.xlsx),*.xlsx")
@@ -141,7 +166,7 @@ If MsgBox("These are data files that you select:" _
     & vbCr & File_1 _
     & vbCr & File_2 _
     & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
-    GoTo Input1:
+    GoTo Input_data_file:
 Else
 End If
 DataSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
@@ -198,6 +223,9 @@ ReDim areas_affected(Record_Num)
 ReDim analyst_personnel_sub_category(Record_Num)
 ReDim pr_state(Record_Num)
 ReDim reason_for_investigation(Record_Num)
+ReDim idc_level_1(Record_Num)
+ReDim idc_level_2(Record_Num)
+ReDim idc_levle_3(Record_Num)
 For i = 2 To Record_Num
     Cells(i, 1).Activate
     pr_id(i) = ActiveCell.Value
@@ -243,6 +271,9 @@ For i = 2 To Record_Num
     analyst_personnel_sub_category(i) = ActiveCell.Offset(0, 40).Value
     pr_state(i) = ActiveCell.Offset(0, 41).Value
     reason_for_investigation(i) = ActiveCell.Offset(0, 42).Value
+    idc_level_1(i) = ActiveCell.Offset(0, 43).Value
+    idc_level_2(i) = ActiveCell.Offset(0, 44).Value
+    idc_level_3(i) = ActiveCell.Offset(0, 45).Value
 Next i
 '------------------------------------------------------------------------------
 'Count Number of Open Record
@@ -784,26 +815,25 @@ Sheets.Add after:=Sheets(DataSheet_Name)
 Sheets(Sheets.Count).Select
 Sheets(Sheets.Count).Name = "Week_" & Week_Num
 '----------------------------------------------------------------
-shift = 0
 Summary_Headers:
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 1).Value = "Record Type"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 2).Value = "<23 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 3).Value = "24-30 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 4).Value = "31-60 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 5).Value = "61-90 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 6).Value = "91-120 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 7).Value = "121-150 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 8).Value = "151-180 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 9).Value = ">181 Days"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 10).Value = "On-Time"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 11).Value = "Aged"
-Worksheets("Week_" & Week_Num).Cells(2 + shift, 12).Value = "Total"
-Worksheets("Week_" & Week_Num).Cells(3 + shift, 1).Value = "LIR"
-Worksheets("Week_" & Week_Num).Cells(4 + shift, 1).Value = "RAAC"
-Worksheets("Week_" & Week_Num).Cells(5 + shift, 1).Value = "ER"
-Worksheets("Week_" & Week_Num).Cells(6 + shift, 1).Value = "QAR"
-Worksheets("Week_" & Week_Num).Cells(7 + shift, 1).Value = "INC"
-Worksheets("Week_" & Week_Num).Cells(8 + shift, 1).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "Record Type"
+Worksheets("Week_" & Week_Num).Cells(2, 2).Value = "<23 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 3).Value = "24-30 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 4).Value = "31-60 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 5).Value = "61-90 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 6).Value = "91-120 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 7).Value = "121-150 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 8).Value = "151-180 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 9).Value = ">181 Days"
+Worksheets("Week_" & Week_Num).Cells(2, 10).Value = "On-Time"
+Worksheets("Week_" & Week_Num).Cells(2, 11).Value = "Aged"
+Worksheets("Week_" & Week_Num).Cells(2, 12).Value = "Total"
+Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "LIR"
+Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "RAAC"
+Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "ER"
+Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "QAR"
+Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "INC"
+Worksheets("Week_" & Week_Num).Cells(8, 1).Value = "Total"
 
 '----------------------------------------------------------------
 'Writing Open Record Matrix
