@@ -23,9 +23,8 @@ Sub PR_Report()
 '4. Generate reports
 '------------------------------------------------------------------------------------------------------------------
 Dim File_1 As String
-Dim File_2 As String
 Dim Report_Type As Integer
-Dim Week_Num As Integer
+Dim Week_Num As Long
 Dim Month_Num As Integer
 Dim Quarter_Num As Integer
 Dim Year_Num As Integer
@@ -111,9 +110,18 @@ Dim temp() As Integer
 Dim tempval As Long
 Dim OpenRec() As String
 Dim ClosedRec() As String
-
-
-Dim CloseSheet_Name As String
+Dim week_range As Long
+Dim month_range As Long
+Dim quarter_range As Long
+Dim year_range As Long
+Dim Range_Weekly_Rec() As Long
+Dim Range_Monthly_Rec() As Long
+Dim Range_Quarterly_Rec() As Long
+Dim Range_Annual_Rec() As Long
+Dim New_record() As String
+Dim committed() As String
+'-----------------------------------------------------------------
+Dim ReportSheet_Name As String
 Dim i As Integer
 Dim j As Integer
 Dim age As Integer
@@ -168,7 +176,7 @@ Input_week_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Day_Num = InputBox("Input numeric value of the day of the month for the Report", "DAY NUMBER")
     CutOff = DateSerial(Year_Num, Month_Num, Day_Num)
-    Week_Num = WorksheetFunction.WeekNum(DateValue(CutOff), 15)
+    Week_Num = WorksheetFunction.WeekNum(CutOff, 15)
     Begin = CutOff - 6
     GoTo Input_data_file:
 Input_month_parameters:
@@ -242,30 +250,18 @@ Input_data_file:
         GoTo Input_data_file:
     Else
     End If
-Input_snap_file:
-    File_2 = Application.GetOpenFilename _
-        (Title:="Snapshot File", _
-        filefilter:="Worksheet(*.xlsx),*.xlsx")
-     If MsgBox("File contains snapshots of the past records is " & File_2 & ". Is this correct?", vbYesNo) = vbNo Then
-        GoTo Input_snap_file:
-    Else
-    End If
-    If MsgBox("These are data files that you select:" _
-        & vbCr & File_1 _
-        & vbCr & File_2 _
-        & vbCr & "Please verify if they are correct.", vbYesNo) = vbNo Then
-        GoTo Input_data_file:
+Verification:
+    If MsgBox("The range of report is from " & Begin & " to " & CutOff & ". Is this correct?", vbYesNo) = vbNo Then
+        GoTo Input_report_type:
     Else
     End If
 DataSheet_Name = Mid(File_1, InStrRev(File_1, "\") + 1, (Len(File_1) - InStrRev(File_1, "\") - 4))
-SnapShot_Name = Mid(File_2, InStrRev(File_2, "\") + 1, (Len(File_2) - InStrRev(File_2, "\") - 4))
 Window_1 = DataSheet_Name & ".csv"
-Window_2 = SnapShot_Name & ".xlsx"
 '-------------------------------------------------------------------------------
 'Calculate Record Number and redeclare array for raw data
 '-------------------------------------------------------------------------------
 Workbooks.OpenText Filename:=File_1, local:=True
-Workbooks.Open Filename:=File_2, local:=True
+'Workbooks.Open Filename:=File_2, local:=True
 Windows(Window_1).Activate
 Record_Num = Cells(1, 1).End(xlDown).Row
 ReDim pr_id(Record_Num)
@@ -313,7 +309,7 @@ ReDim pr_state(Record_Num)
 ReDim reason_for_investigation(Record_Num)
 ReDim idc_level_1(Record_Num)
 ReDim idc_level_2(Record_Num)
-ReDim idc_levle_3(Record_Num)
+ReDim idc_level_3(Record_Num)
 For i = 2 To Record_Num
     Cells(i, 1).Activate
     pr_id(i) = ActiveCell.Value
@@ -372,43 +368,76 @@ Next i
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
 For i = 2 To Record_Num
-  If pr_state(i) <> "Closed" Then
-    If pr_state(i) <> "Cancelled" Then
-        If pr_state(i) <> "Awaiting SQL Approval" Then
-            If InStr("OPUQL", pr_state(i)) = 0 Then
-                If discovery_date(i) <= DateValue(CutOff) Then
-                    If qa_final_app_on(i) = "" Then
-                        If site_qa_approval_on(i) = "" Then
-                            OpenRecNum = OpenRecNum + 1
-                            Open_Index(i) = i
-                        Else
-                            OpenRecNum = OpenRecNum
-                            Open_Index(i) = 0
-                        End If
-                    Else
-                        OpenRecNum = OpenRecNum
-                        Open_Index(i) = 0
-                    End If
-                Else
-                    OpenRecNum = OpenRecNum
-                    Open_Index(i) = 0
-                End If
-            Else
-                OpenRecNum = OpenRecNum
-                Open_Index(i) = 0
-            End If
-        Else
-            OpenRecNum = OpenRecNum
-            Open_Index(i) = 0
-        End If
-    Else
-        OpenRecNum = OpenRecNum
-        Open_Index(i) = 0
-    End If
-  Else
+'  If pr_state(i) <> "Closed" Then
+'    If pr_state(i) <> "Cancelled" Then
+'        If pr_state(i) <> "Awaiting SQL Approval" Then
+'            If InStr("OPUQL", pr_state(i)) = 0 Then
+'                If discovery_date(i) <= DateValue(CutOff) Then
+'                    If qa_final_app_on(i) = "" Then
+'                        If site_qa_approval_on(i) = "" Then
+'                            OpenRecNum = OpenRecNum + 1
+'                            Open_Index(i) = i
+'                        Else
+'                            OpenRecNum = OpenRecNum
+'                            Open_Index(i) = 0
+'                        End If
+'                    Else
+'                        OpenRecNum = OpenRecNum
+'                        Open_Index(i) = 0
+'                    End If
+'                Else
+'                    OpenRecNum = OpenRecNum
+'                    Open_Index(i) = 0
+'                End If
+'            Else
+'                OpenRecNum = OpenRecNum
+'                Open_Index(i) = 0
+'            End If
+'        Else
+'            OpenRecNum = OpenRecNum
+'            Open_Index(i) = 0
+'        End If
+'    Else
+'        OpenRecNum = OpenRecNum
+'        Open_Index(i) = 0
+'    End If
+'  Else
+'    OpenRecNum = OpenRecNum
+'    Open_Index(i) = 0
+'  End If
+new_algorithm:
+If pr_state(i) = "Cancelled" Then
     OpenRecNum = OpenRecNum
     Open_Index(i) = 0
-  End If
+Else    'pr_state(i)="Cancelled"
+    If date_open(i) > CutOff Then
+        OpenRecNum = OpenRecNum
+        Open_Index(i) = 0
+    Else    'date_open(i) > cutoff
+        If qa_final_app_on(i) = "" Then
+            If site_qa_approval_on(i) = "" Then
+                OpenRecNum = OpenRecNum + 1
+                Open_Index(i) = i
+            Else 'site_qa_approval_on(i) = ""
+                If site_qa_approval_on(i) > CutOff Then
+                    OpenRecNum = OpenRecNum + 1
+                    Open_Index(i) = i
+                Else 'site_qa_approval_on(i) > CutOff
+                    OpenRecNum = OpenRecNum
+                    Open_Index(i) = 0
+                End If 'site_qa_approval_on(i) > CutOff
+            End If 'site_qa_approval_on(i) = ""
+        Else 'qa_final_app_on(i) = ""
+            If qa_final_app_on(i) > CutOff Then
+                OpenRecNum = OpenRecNum + 1
+                Open_Index(i) = i
+            Else 'qa_final_app_on(i) > CutOff
+                OpenRecNum = OpenRecNum
+                Open_Index(i) = 0
+            End If 'qa_final_app_on(i) > CutOff
+        End If 'qa_final_app_on(i) = ""
+    End If  'date_open(i) >= cutoff
+End If  'pr_state(i)="Cancelled"
 Next i
 '-------------------------------------------------------------------------------
 'Fill the list of Open Records with index numbers of the whole data set
@@ -429,7 +458,7 @@ ReDim OpenAge(OpenRecNum)
 ReDim OpenStage(OpenRecNum)
 ReDim OpenRecType(OpenRecNum)
 For i = 1 To OpenRecNum
-    OpenAge(i) = DateValue(CutOff) - DateValue(discovery_date(OpenList(i)))
+    OpenAge(i) = CutOff - DateValue(discovery_date(OpenList(i)))
     If OpenAge(i) < 23 Then
         OpenStage(i) = 0
     Else
@@ -631,7 +660,7 @@ For i = 1 To OpenRecNum
 Next i
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
-'1. pr_state ="closed", and date_closed >= datevalue(cutoff)-7
+'1. pr_state ="closed", and date_closed >= Begin
 '2. qa_final_app_on is not blank, and qa_final_app_on >= datevalue(cutoff)-7
 '3. site_qa_approval_on is not blank, and site_qa_approval_on >= datevalue(cutoff)-7
 '----------------------------------------------------------------
@@ -639,32 +668,47 @@ ClosedRecNum = 0
 ReDim Closed_Index(Record_Num)
 For i = 2 To Record_Num
     If pr_state(i) = "Closed" Then
-        If DateValue(CutOff) - DateValue(date_closed(i)) <= 7 Then
-            ClosedRecNum = ClosedRecNum + 1
-            Closed_Index(i) = i
-        Else 'date_closed(i) >= DateValue(CutOff) - 7
+        If DateValue(date_closed(i)) >= Begin Then
+            If DateValue(date_closed(i)) <= CutOff Then
+                ClosedRecNum = ClosedRecNum + 1
+                Closed_Index(i) = i
+            Else 'datevalue(date_colsed(i)) <= CutOff
+                ClosedRecNum = ClosedRecNum
+                Closed_Index(i) = 0
+            End If 'Datevalue(date_closed(i)) <= CutOff
+        Else 'DateValue(date_closed(i)) >= Begin
             ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
         End If 'date_closed(i) >= DateValue(CutOff) - 7
     Else 'pr_state(i) = "Closed"
         If qa_final_app_on(i) <> "" Then
-            If DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7 Then
-                ClosedRecNum = ClosedRecNum + 1
-                Closed_Index(i) = i
-            Else 'DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7
+            If DateValue(qa_final_app_on(i)) >= Begin Then
+                If DateValue(qa_final_app_on(i)) <= CutOff Then
+                    ClosedRecNum = ClosedRecNum + 1
+                    Closed_Index(i) = i
+                Else 'DateValue(qa_final_app_on(i)) <= CutOff
+                    ClosedRecNum = ClosedRecNum
+                    Closed_Index(i) = 0
+                End If 'DateValue(qa_final_app_on(i)) <= CutOff
+            Else 'DateValue(qa_final_pp_on(i)) >= Begin
                 If site_qa_approval_on(i) <> "" Then
-                    If DateValue(CutOff) - DateValue(site_qa_approval_on(i)) <= 7 Then
-                        ClosedRecNum = ClosedRecNum + 1
-                        Closed_Index(i) = i
-                    Else 'DateValue(CutOff) - DateValue(site_qa_approval_on(i))
+                    If DateValue(site_qa_approval_on(i)) >= Begin Then
+                        If DateValue(site_qa_approval_on(i)) <= CutOff Then
+                            ClosedRecNum = ClosedRecNum + 1
+                            Closed_Index(i) = i
+                        Else 'DateValue(site_qa_approval_on(i)) <= CutOff
+                            ClosedRecNum = ClosedRecNum
+                            Closed_Index(i) = 0
+                        End If 'DateValue(site_qa_approval_on(i)) <= CutOff
+                    Else 'DateValue(site_qa_approval_on(i)) >= Begin
                         ClosedRecNum = ClosedRecNum
                         Closed_Index(i) = 0
-                    End If 'DateValue(CutOff) - DateValue(site_qa_approval_on(i))
+                    End If 'DateValue(site_qa_approval_on(i)) >= Begin
                 Else 'site_qa_approval_on(i) <> "" Then
                     ClosedRecNum = ClosedRecNum
                     Closed_Index(i) = 0
                 End If 'site_qa_approval_on(i) <> "" Then
-            End If 'DateValue(CutOff) - DateValue(qa_final_app_on(i)) <= 7
+            End If 'DateValue(qa_final_pp_on(i)) >= Begin
         Else 'qa_final_app_on(i) <> ""
             ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
@@ -901,27 +945,39 @@ Next i
 '----------------------------------------------------------------
 Sheets.Add after:=Sheets(DataSheet_Name)
 Sheets(Sheets.Count).Select
-Sheets(Sheets.Count).Name = "Week_" & Week_Num
+Select Case Report_Type
+    Case Is = 1
+        ReportSheet_Name = "Week_" & Week_Num
+    Case Is = 2
+        ReportSheet_Name = "Month_" & Month_Num
+    Case Is = 3
+        ReportSheet_Name = "Quarter_" & Quarter_Num
+    Case Is = 4
+        ReportSheet_Name = "Year_" & Year_Num
+    Case Is = 5
+        ReportSheet_Name = Begin & "_" & CutOff
+End Select
+Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
 Summary_Headers:
-Worksheets("Week_" & Week_Num).Cells(2, 1).Value = "Record Type"
-Worksheets("Week_" & Week_Num).Cells(2, 2).Value = "<23 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 3).Value = "24-30 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 4).Value = "31-60 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 5).Value = "61-90 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 6).Value = "91-120 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 7).Value = "121-150 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 8).Value = "151-180 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 9).Value = ">181 Days"
-Worksheets("Week_" & Week_Num).Cells(2, 10).Value = "On-Time"
-Worksheets("Week_" & Week_Num).Cells(2, 11).Value = "Aged"
-Worksheets("Week_" & Week_Num).Cells(2, 12).Value = "Total"
-Worksheets("Week_" & Week_Num).Cells(3, 1).Value = "LIR"
-Worksheets("Week_" & Week_Num).Cells(4, 1).Value = "RAAC"
-Worksheets("Week_" & Week_Num).Cells(5, 1).Value = "ER"
-Worksheets("Week_" & Week_Num).Cells(6, 1).Value = "QAR"
-Worksheets("Week_" & Week_Num).Cells(7, 1).Value = "INC"
-Worksheets("Week_" & Week_Num).Cells(8, 1).Value = "Total"
+Worksheets(ReportSheet_Name).Cells(2, 1).Value = "Record Type"
+Worksheets(ReportSheet_Name).Cells(2, 2).Value = "<23 Days"
+Worksheets(ReportSheet_Name).Cells(2, 3).Value = "24-30 Days"
+Worksheets(ReportSheet_Name).Cells(2, 4).Value = "31-60 Days"
+Worksheets(ReportSheet_Name).Cells(2, 5).Value = "61-90 Days"
+Worksheets(ReportSheet_Name).Cells(2, 6).Value = "91-120 Days"
+Worksheets(ReportSheet_Name).Cells(2, 7).Value = "121-150 Days"
+Worksheets(ReportSheet_Name).Cells(2, 8).Value = "151-180 Days"
+Worksheets(ReportSheet_Name).Cells(2, 9).Value = ">181 Days"
+Worksheets(ReportSheet_Name).Cells(2, 10).Value = "On-Time"
+Worksheets(ReportSheet_Name).Cells(2, 11).Value = "Aged"
+Worksheets(ReportSheet_Name).Cells(2, 12).Value = "Total"
+Worksheets(ReportSheet_Name).Cells(3, 1).Value = "LIR"
+Worksheets(ReportSheet_Name).Cells(4, 1).Value = "RAAC"
+Worksheets(ReportSheet_Name).Cells(5, 1).Value = "ER"
+Worksheets(ReportSheet_Name).Cells(6, 1).Value = "QAR"
+Worksheets(ReportSheet_Name).Cells(7, 1).Value = "INC"
+Worksheets(ReportSheet_Name).Cells(8, 1).Value = "Total"
 
 '----------------------------------------------------------------
 'Writing Open Record Matrix
