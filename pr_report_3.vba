@@ -103,13 +103,28 @@ Dim ClosedList_Pos As Integer
 Dim ClosedStage() As Integer
 Dim ClosedRecType() As Integer
 Dim ClosedRecCount() As Integer
+'----------------------------------------------------------------
+Dim NewRecNum As Integer
+Dim NewCount() As Integer
+Dim New_Index() As Integer
+Dim NewList() As Integer
+Dim NewRecType() As Integer
+Dim NewList_Pos As Integer
 '-----------------------------------------------------------------
 Dim ReplCol As Long
 Dim ReplRow As Long
-Dim temp() As Integer
-Dim tempval As Long
 Dim OpenRec() As String
 Dim ClosedRec() As String
+Dim NewRec() As String
+Dim CancelRec() As String
+'------------------------------------------------------------------
+Dim CancelRecNum As Integer
+Dim CancelCount() As Integer
+Dim Cancel_Index() As Integer
+Dim CancelList() As Integer
+Dim CancelList_Pos As Integer
+Dim CancelRecType() As Integer
+'------------------------------------------------------------------
 Dim week_range As Long
 Dim month_range As Long
 Dim quarter_range As Long
@@ -361,9 +376,6 @@ For i = 2 To Record_Num
 Next i
 '------------------------------------------------------------------------------
 'Count Number of Open Record
-'1. Count all the pr_state that are opened upto cut-off date
-'2. Remove the recods from 1. that qa_final_app_on has a value
-'3. Remove the records from 2. that site_qa_approval_on has a value
 '------------------------------------------------------------------------------
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
@@ -624,60 +636,32 @@ For i = 1 To OpenRecNum
 Next i
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
-'1. pr_state ="closed", and date_closed >= Period_Begin
-'2. qa_final_app_on is not blank, and qa_final_app_on >= datevalue(Period_End)-7
-'3. site_qa_approval_on is not blank, and site_qa_approval_on >= datevalue(Period_End)-7
 '----------------------------------------------------------------
 ClosedRecNum = 0
 ReDim Closed_Index(Record_Num)
 For i = 2 To Record_Num
-    If pr_state(i) = "Closed" Then
-        If date_closed(i) >= Period_Begin Then
-            If date_closed(i) <= Period_End Then
+    If qa_final_app_on(i) >= Period_Begin Then
+        If qa_final_app_on(i) <= Period_End Then
+            ClosedRecNum = ClosedRecNum + 1
+            Closed_Index(i) = i
+        Else
+            ClosedRecNum = ClosedRecNum
+            Closed_Index(i) = 0
+        End If
+    Else
+        If site_qa_approval_on(i) >= Period_Begin Then
+            If site_qa_approval_on(i) <= Period_End Then
                 ClosedRecNum = ClosedRecNum + 1
                 Closed_Index(i) = i
-            Else 'date_colsed(i) <= Period_End
+            Else
                 ClosedRecNum = ClosedRecNum
                 Closed_Index(i) = 0
-            End If 'date_closed(i) <= Period_End
-        Else 'date_closed(i) >= Period_Begin
+            End If
+        Else
             ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
-        End If 'date_closed(i) >= Period_Begin
-    Else 'pr_state(i) = "Closed"
-        If qa_final_app_on(i) <> 0 Then
-            If qa_final_app_on(i) >= Period_Begin Then
-                If qa_final_app_on(i) <= Period_End Then
-                    ClosedRecNum = ClosedRecNum + 1
-                    Closed_Index(i) = i
-                Else 'qa_final_app_on(i) <= Period_End
-                    ClosedRecNum = ClosedRecNum
-                    Closed_Index(i) = 0
-                End If 'qa_final_app_on(i) <= Period_End
-            Else 'qa_final_pp_on(i) >= Period_Begin
-                If site_qa_approval_on(i) <> 0 Then
-                    If site_qa_approval_on(i) >= Period_Begin Then
-                        If site_qa_approval_on(i) <= Period_End Then
-                            ClosedRecNum = ClosedRecNum + 1
-                            Closed_Index(i) = i
-                        Else 'site_qa_approval_on(i) <= Period_End
-                            ClosedRecNum = ClosedRecNum
-                            Closed_Index(i) = 0
-                        End If 'site_qa_approval_on(i) <= Period_End
-                    Else 'site_qa_approval_on(i) >= Period_Begin
-                        ClosedRecNum = ClosedRecNum
-                        Closed_Index(i) = 0
-                    End If 'site_qa_approval_on(i) >= Period_Begin
-                Else 'site_qa_approval_on(i) <> 0 Then
-                    ClosedRecNum = ClosedRecNum
-                    Closed_Index(i) = 0
-                End If 'site_qa_approval_on(i) <> 0 Then
-            End If 'qa_final_pp_on(i) >= Period_Begin
-        Else 'qa_final_app_on(i) <> 0
-            ClosedRecNum = ClosedRecNum
-            Closed_Index(i) = 0
-        End If 'qa_final_app_on(i) <> 0
-    End If 'pr_state(i) = "Closed"
+        End If
+    End If
 Next i
 '---------------------------------------------------------
 'Writing closed record index into array
@@ -734,7 +718,7 @@ For i = 1 To ClosedRecNum
         End If
     End If
 '----------------------------------------------------------------
-'Closed Recrod Type
+'Closed Record Type
 '----------------------------------------------------------------
     Select Case record_type(ClosedList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
@@ -905,6 +889,123 @@ For i = 1 To ClosedRecNum
     ClosedRec(i, 4) = CloseStage(i)
     ClosedRec(i, 5) = ClosedRecType(i)
 Next i
+'---------------------------------------------------------------
+'Collecting New Record
+'---------------------------------------------------------------
+ReDim New_Index(Record_Num)
+NewRecNum = 0
+For i = 1 To Record_Num
+    If date_open(i) >= Period_Begin Then
+        If date_open(i) <= Period_End Then
+            NewRecNum = NewRecNum + 1
+            New_Index(i) = i
+        Else
+            NewRecNum = NewRecNum
+            New_Index(i) = 0
+        End If
+    Else
+        NewRecNum = NewRecNum
+        New_Index(i) = 0
+    End If
+Next i
+ReDim NewList(NewRecNum)
+ReDim NewRec(NewRecNum, 5)
+NewList_Pos = 1
+For i = 2 To Record_Num
+    If New_Index(i) <> 0 Then
+        NewList(NewList_Pos) = New_Index(i)
+        NewList_Pos = NewList_Pos + 1
+    Else
+    End If
+Next i
+ReDim NewCount(5)
+For i = 0 To 5
+    NewCount(i) = 0
+Next i
+For i = 1 To NewRecNum
+    NewRec(i, 1) = pr_id(NewList(i))
+    NewRec(i, 2) = title_short_description(NewList(i))
+    NewRec(i, 3) = responsible_person(NewList(i))
+    NewRec(i, 4) = ""
+    Select Case record_type(NewList(i))
+        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+            NewRec(i, 5) = 1
+            NewCount(1) = NewCount(1) + 1
+        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+            NewRec(i, 5) = 2
+            NewCount(2) = NewCount(2) + 1
+        Case "Manufacturing Investigations / Event Report"
+            NewRec(i, 5) = 3
+            NewCount(3) = NewCount(3) + 1
+        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+            NewRec(i, 5) = 4
+            NewCount(4) = NewCount(4) + 1
+        Case "Manufacturing Investigations / Incident"
+            NewRec(i, 5) = 5
+            NewCount(5) = NewCount(5) + 1
+    End Select
+Next i
+'----------------------------------------------------------------
+'Collecting Cancelled Records
+'----------------------------------------------------------------
+ReDim Cancel_Index(Record_Num)
+CancelRecNum = 0
+For i = 1 To Record_Num
+    If date_open(i) >= Period_Begin Then
+        If date_open(i) <= Period_End Then
+            If pr_state(i) = "Cancelled" Then
+                CancelRecNum = CancelRecNum + 1
+                Cancel_Index(i) = i
+            Else
+                CancelRecNum = CancelRecNum
+                Cancel_Index(i) = 0
+            End If
+        Else
+            CancelRecNum = CancelRecNum
+            Cancel_Index(i) = 0
+        End If
+    Else
+        CancelRecNum = CancelRecNum
+        Cancel_Index(i) = 0
+    End If
+Next i
+ReDim CancelList(CancelRecNum)
+ReDim CancelRec(CancelRecNum, 5)
+CancelList_Pos = 1
+For i = 2 To Record_Num
+    If Cancel_Index(i) <> 0 Then
+        CancelList(CancelList_Pos) = Cancel_Index(i)
+        CancelList_Pos = CancelList_Pos + 1
+    Else
+    End If
+Next i
+ReDim CancelCount(5)
+For i = 0 To 5
+    CancelCount(i) = 0
+Next i
+For i = 1 To CancelRecNum
+    CancelRec(i, 1) = pr_id(CancelList(i))
+    CancelRec(i, 2) = title_short_description(CancelList(i))
+    CancelRec(i, 3) = responsible_person(CancelList(i))
+    CancelRec(i, 4) = ""
+    Select Case record_type(CancelList(i))
+        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+            CancelRec(i, 5) = 1
+            CancelCount(1) = CancelCount(1) + 1
+        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+            CancelRec(i, 5) = 2
+            CancelCount(2) = CancelCount(2) + 1
+        Case "Manufacturing Investigations / Event Report"
+            CancelRec(i, 5) = 3
+            CancelCount(3) = CancelCount(3) + 1
+        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+            CancelRec(i, 5) = 4
+            CancelCount(4) = CancelCount(4) + 1
+        Case "Manufacturing Investigations / Incident"
+            CancelRec(i, 5) = 5
+            CancelCount(5) = CancelCount(5) + 1
+    End Select
+Next i
 '----------------------------------------------------------------
 'Generate Summary Report
 '----------------------------------------------------------------
@@ -912,11 +1013,11 @@ Sheets.Add after:=Sheets(DataSheet_Name)
 Sheets(Sheets.Count).Select
 Select Case Report_Type
     Case Is = 1
-        ReportSheet_Name = "Week_" & Week_Num
+        ReportSheet_Name = "Week_" & Week_Num & "_" & Year_Num
     Case Is = 2
-        ReportSheet_Name = "Month_" & Month_Num
+        ReportSheet_Name = "Month_" & Month_Num & "_" & Year_Num
     Case Is = 3
-        ReportSheet_Name = "Quarter_" & Quarter_Num
+        ReportSheet_Name = "Quarter_" & Quarter_Num & "_" & Year_Num
     Case Is = 4
         ReportSheet_Name = "Year_" & Year_Num
     Case Is = 5
@@ -946,26 +1047,44 @@ Worksheets(ReportSheet_Name).Cells(7 + i * 8, 1).Value = "INC"
 Worksheets(ReportSheet_Name).Cells(8 + i * 8, 1).Value = "Total"
 Next i
 '----------------------------------------------------------------
-'Writing Record Matrices
+'Writing Record Summary Matrices
 '----------------------------------------------------------------
-Cells(1, 1).Value = "Open Records"
+Cells(1, 1).Value = "Records remain open between " & Period_Begin & "-" & Period_End
 For i = 1 To 6
   For j = 0 To 10
       Cells(i + 2, j + 2).Value = OpenRecCount(i, j)
   Next j
 Next i
-Cells(9, 1).Value = "Closed Records"
+Cells(9, 1).Value = "Records Closed between " & Period_Begin & "-" & Period_End
 For i = 1 To 6
   For j = 0 To 10
       Cells(i + 10, j + 2).Value = ClosedRecCount(i, j)
   Next j
 Next i
+'-------------------------------------------------------------------
+'Writing New Record Summary
+'-------------------------------------------------------------------
+Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
+Cells(18, 1).Value = "Record Type"
+Cells(19, 1).Value = "LIR"
+Cells(20, 1).Value = "RAAC"
+Cells(21, 1).Value = "ER"
+Cells(22, 1).Value = "QAR"
+Cells(23, 1).Value = "INC"
+Cells(24, 1).Value = "Total"
+Cells(18, 2).Value = "Counts"
+Cells(18, 2).Activate
+For i = 1 To 5
+    ActiveCell.Offset(1, 0).Value = NewCount(i)
+    ActiveCell.Offset(1, 0).Activate
+Next i
+Cells(24, 2).Value = NewRecNum
 '----------------------------------------------------------------------------------
 'Writing Detail Information of Open Records from Array into Spreadsheet while
 'Updating Array that Captured Position of each Record in the Spreadsheet
 '----------------------------------------------------------------------------------
 ReplCol = Cells(2, 1).End(xlToRight).Column
-Cells(1, ReplCol).Activate
+Cells(1, ReplCol + 1).Activate
 ActiveCell.Value = "Open Records"
 For j = 1 To 5
     ActiveCell.Offset(1, 0).Value = "Record ID"
@@ -981,6 +1100,27 @@ For j = 1 To 5
             ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
             ActiveCell.Offset(1, 3).Value = OpenRec(i, 4)
             ActiveCell.Offset(1, 4).Value = OpenRec(i, 5)
+            ActiveCell.Offset(1, 0).Activate
+        Else
+        End If
+    Next i
+Next j
+Cells(1, 18).Activate
+ActiveCell.Value = "Closed Records"
+For j = 1 To 5
+    ActiveCell.Offset(1, 0).Value = "Record ID"
+    ActiveCell.Offset(1, 1).Value = "Short Description"
+    ActiveCell.Offset(1, 2).Value = "Responsible Person"
+    ActiveCell.Offset(1, 3).Value = "Record Stage"
+    ActiveCell.Offset(1, 4).Value = "Record Type"
+    ActiveCell.Offset(1, 0).Activate
+For i = 1 To ClosedRecNum
+        If ClosedRec(i, 5) = j Then
+            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
+            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
+            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
+            ActiveCell.Offset(1, 3).Value = ClosedRec(i, 4)
+            ActiveCell.Offset(1, 4).Value = ClosedRec(i, 5)
             ActiveCell.Offset(1, 0).Activate
         Else
         End If
