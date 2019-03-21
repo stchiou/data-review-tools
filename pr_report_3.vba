@@ -32,8 +32,8 @@ Dim Day_Num As Integer
 Dim r_y As Integer
 Dim r_m As Integer
 Dim r_d As Integer
-Dim CutOff As Date
-Dim Begin As Date
+Dim Period_End As Date
+Dim Period_Begin As Date
 Dim Record_Num As Long
 Dim DataSheet_Name As String
 Dim SnapShot_Name As String
@@ -51,13 +51,13 @@ Dim qar_required() As String
 Dim special_or_common_cuase() As String
 Dim capa_effectiveness_bsc_metric() As String
 Dim date_open() As Date
-Dim discovery_date() As String
-Dim date_closed() As String
-Dim due_date() As String
-Dim original_due_date() As String
+Dim discovery_date() As Date
+Dim date_closed() As Date
+Dim due_date() As Date
+Dim original_due_date() As Date
 Dim number_of_approved_extensions() As Integer
-Dim qa_final_app_on() As String
-Dim site_qa_approval_on() As String
+Dim qa_final_app_on() As Date
+Dim site_qa_approval_on() As Date
 Dim material_involved() As String
 Dim bu_area() As String
 Dim operation() As String
@@ -175,9 +175,9 @@ Input_week_parameters:
         & vbCr & "11. November" _
         & vbCr & "12. December", "MONTH NUMBER")
     Day_Num = InputBox("Input numeric value of the day of the month for the Report", "DAY NUMBER")
-    CutOff = DateSerial(Year_Num, Month_Num, Day_Num)
-    Week_Num = WorksheetFunction.WeekNum(CutOff, 15)
-    Begin = CutOff - 6
+    Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
+    Week_Num = WorksheetFunction.WeekNum(Period_End, 15)
+    Period_Begin = Period_End - 6
     GoTo Input_data_file:
 Input_month_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
@@ -194,19 +194,19 @@ Input_month_parameters:
         & vbCr & "10. October" _
         & vbCr & "11. November" _
         & vbCr & "12. December", "MONTH NUMBER")
-    Begin = DateSerial(Year_Num, Month_Num, 1)
-    CutOff = DateSerial(Year_Num, Month_Num + 1, 0)
+    Period_Begin = DateSerial(Year_Num, Month_Num, 1)
+    Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Quarter_Num = InputBox("Input numeric value of the quarter for the report", "QUARTER NUMBER")
-    Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
-    CutOff = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
+    Period_Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
+    Period_End = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
     GoTo Input_data_file:
 Input_year_parameters:
     Year_Num = InputBox("Input numeric value of Year of the Report", "YEAR NUMBER")
-    Begin = DateSerial(Year_Num, 1, 1)
-    CutOff = DateSerial(Year_Num, 12, 31)
+    Period_Begin = DateSerial(Year_Num, 1, 1)
+    Period_End = DateSerial(Year_Num, 12, 31)
     GoTo Input_data_file:
 Input_range_parameters:
     Year_Num = InputBox("Input numeric value of Year that report starts", "START YEAR")
@@ -239,8 +239,8 @@ Input_range_parameters:
         & vbCr & "11. November" _
         & vbCr & "12. December", "END MONTH")
     r_d = InputBox("Input numeric value of day of the month that report ends", "END DAY")
-    Begin = DateSerial(Year_Num, Month_Num, Day_Num)
-    CutOff = DateSerial(r_y, r_m, r_d)
+    Period_Begin = DateSerial(Year_Num, Month_Num, Day_Num)
+    Period_End = DateSerial(r_y, r_m, r_d)
     GoTo Input_data_file:
 Input_data_file:
     File_1 = Application.GetOpenFilename _
@@ -251,7 +251,7 @@ Input_data_file:
     Else
     End If
 Verification:
-    If MsgBox("The range of report is from " & Begin & " to " & CutOff & ". Is this correct?", vbYesNo) = vbNo Then
+    If MsgBox("The range of report is from " & Period_Begin & " to " & Period_End & ". Is this correct?", vbYesNo) = vbNo Then
         GoTo Input_report_type:
     Else
     End If
@@ -368,76 +368,39 @@ Next i
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
 For i = 2 To Record_Num
-'  If pr_state(i) <> "Closed" Then
-'    If pr_state(i) <> "Cancelled" Then
-'        If pr_state(i) <> "Awaiting SQL Approval" Then
-'            If InStr("OPUQL", pr_state(i)) = 0 Then
-'                If discovery_date(i) <= DateValue(CutOff) Then
-'                    If qa_final_app_on(i) = "" Then
-'                        If site_qa_approval_on(i) = "" Then
-'                            OpenRecNum = OpenRecNum + 1
-'                            Open_Index(i) = i
-'                        Else
-'                            OpenRecNum = OpenRecNum
-'                            Open_Index(i) = 0
-'                        End If
-'                    Else
-'                        OpenRecNum = OpenRecNum
-'                        Open_Index(i) = 0
-'                    End If
-'                Else
-'                    OpenRecNum = OpenRecNum
-'                    Open_Index(i) = 0
-'                End If
-'            Else
-'                OpenRecNum = OpenRecNum
-'                Open_Index(i) = 0
-'            End If
-'        Else
-'            OpenRecNum = OpenRecNum
-'            Open_Index(i) = 0
-'        End If
-'    Else
-'        OpenRecNum = OpenRecNum
-'        Open_Index(i) = 0
-'    End If
-'  Else
-'    OpenRecNum = OpenRecNum
-'    Open_Index(i) = 0
-'  End If
 new_algorithm:
-If pr_state(i) = "Cancelled" Then
-    OpenRecNum = OpenRecNum
-    Open_Index(i) = 0
-Else    'pr_state(i)="Cancelled"
-    If date_open(i) > CutOff Then
-        OpenRecNum = OpenRecNum
-        Open_Index(i) = 0
-    Else    'date_open(i) > cutoff
-        If qa_final_app_on(i) = "" Then
-            If site_qa_approval_on(i) = "" Then
+If pr_state(i) <> "Cancelled" Then
+    If date_open(i) <= Period_End Then
+        If qa_final_app_on(i) = 0 Then
+            If site_qa_approval_on(i) = 0 Then
                 OpenRecNum = OpenRecNum + 1
                 Open_Index(i) = i
-            Else 'site_qa_approval_on(i) = ""
-                If site_qa_approval_on(i) > CutOff Then
+            Else
+                If site_qa_approval_on(i) > Period_End Then
                     OpenRecNum = OpenRecNum + 1
                     Open_Index(i) = i
-                Else 'site_qa_approval_on(i) > CutOff
+                Else
                     OpenRecNum = OpenRecNum
                     Open_Index(i) = 0
-                End If 'site_qa_approval_on(i) > CutOff
-            End If 'site_qa_approval_on(i) = ""
-        Else 'qa_final_app_on(i) = ""
-            If qa_final_app_on(i) > CutOff Then
+                End If
+            End If
+        Else
+            If qa_final_app_on(i) > Period_End Then
                 OpenRecNum = OpenRecNum + 1
                 Open_Index(i) = i
-            Else 'qa_final_app_on(i) > CutOff
+            Else
                 OpenRecNum = OpenRecNum
                 Open_Index(i) = 0
-            End If 'qa_final_app_on(i) > CutOff
-        End If 'qa_final_app_on(i) = ""
-    End If  'date_open(i) >= cutoff
-End If  'pr_state(i)="Cancelled"
+            End If
+        End If
+    Else
+        OpenRecNum = OpenRecNum
+        Open_Index(i) = 0
+    End If
+Else
+    OpenRecNum = OpenRecNum
+    Open_Index(i) = 0
+End If
 Next i
 '-------------------------------------------------------------------------------
 'Fill the list of Open Records with index numbers of the whole data set
@@ -458,7 +421,7 @@ ReDim OpenAge(OpenRecNum)
 ReDim OpenStage(OpenRecNum)
 ReDim OpenRecType(OpenRecNum)
 For i = 1 To OpenRecNum
-    OpenAge(i) = CutOff - DateValue(discovery_date(OpenList(i)))
+    OpenAge(i) = Period_End - discovery_date(OpenList(i))
     If OpenAge(i) < 23 Then
         OpenStage(i) = 0
     Else
@@ -660,59 +623,59 @@ For i = 1 To OpenRecNum
 Next i
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
-'1. pr_state ="closed", and date_closed >= Begin
-'2. qa_final_app_on is not blank, and qa_final_app_on >= datevalue(cutoff)-7
-'3. site_qa_approval_on is not blank, and site_qa_approval_on >= datevalue(cutoff)-7
+'1. pr_state ="closed", and date_closed >= Period_Begin
+'2. qa_final_app_on is not blank, and qa_final_app_on >= datevalue(Period_End)-7
+'3. site_qa_approval_on is not blank, and site_qa_approval_on >= datevalue(Period_End)-7
 '----------------------------------------------------------------
 ClosedRecNum = 0
 ReDim Closed_Index(Record_Num)
 For i = 2 To Record_Num
     If pr_state(i) = "Closed" Then
-        If DateValue(date_closed(i)) >= Begin Then
-            If DateValue(date_closed(i)) <= CutOff Then
+        If date_closed(i) >= Period_Begin Then
+            If date_closed(i) <= Period_End Then
                 ClosedRecNum = ClosedRecNum + 1
                 Closed_Index(i) = i
-            Else 'datevalue(date_colsed(i)) <= CutOff
+            Else 'date_colsed(i) <= Period_End
                 ClosedRecNum = ClosedRecNum
                 Closed_Index(i) = 0
-            End If 'Datevalue(date_closed(i)) <= CutOff
-        Else 'DateValue(date_closed(i)) >= Begin
+            End If 'date_closed(i) <= Period_End
+        Else 'date_closed(i) >= Period_Begin
             ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
-        End If 'date_closed(i) >= DateValue(CutOff) - 7
+        End If 'date_closed(i) >= Period_Begin
     Else 'pr_state(i) = "Closed"
-        If qa_final_app_on(i) <> "" Then
-            If DateValue(qa_final_app_on(i)) >= Begin Then
-                If DateValue(qa_final_app_on(i)) <= CutOff Then
+        If qa_final_app_on(i) <> 0 Then
+            If qa_final_app_on(i) >= Period_Begin Then
+                If qa_final_app_on(i) <= Period_End Then
                     ClosedRecNum = ClosedRecNum + 1
                     Closed_Index(i) = i
-                Else 'DateValue(qa_final_app_on(i)) <= CutOff
+                Else 'qa_final_app_on(i) <= Period_End
                     ClosedRecNum = ClosedRecNum
                     Closed_Index(i) = 0
-                End If 'DateValue(qa_final_app_on(i)) <= CutOff
-            Else 'DateValue(qa_final_pp_on(i)) >= Begin
-                If site_qa_approval_on(i) <> "" Then
-                    If DateValue(site_qa_approval_on(i)) >= Begin Then
-                        If DateValue(site_qa_approval_on(i)) <= CutOff Then
+                End If 'qa_final_app_on(i) <= Period_End
+            Else 'qa_final_pp_on(i) >= Period_Begin
+                If site_qa_approval_on(i) <> 0 Then
+                    If site_qa_approval_on(i) >= Period_Begin Then
+                        If site_qa_approval_on(i) <= Period_End Then
                             ClosedRecNum = ClosedRecNum + 1
                             Closed_Index(i) = i
-                        Else 'DateValue(site_qa_approval_on(i)) <= CutOff
+                        Else 'site_qa_approval_on(i) <= Period_End
                             ClosedRecNum = ClosedRecNum
                             Closed_Index(i) = 0
-                        End If 'DateValue(site_qa_approval_on(i)) <= CutOff
-                    Else 'DateValue(site_qa_approval_on(i)) >= Begin
+                        End If 'site_qa_approval_on(i) <= Period_End
+                    Else 'site_qa_approval_on(i) >= Period_Begin
                         ClosedRecNum = ClosedRecNum
                         Closed_Index(i) = 0
-                    End If 'DateValue(site_qa_approval_on(i)) >= Begin
-                Else 'site_qa_approval_on(i) <> "" Then
+                    End If 'site_qa_approval_on(i) >= Period_Begin
+                Else 'site_qa_approval_on(i) <> 0 Then
                     ClosedRecNum = ClosedRecNum
                     Closed_Index(i) = 0
-                End If 'site_qa_approval_on(i) <> "" Then
-            End If 'DateValue(qa_final_pp_on(i)) >= Begin
-        Else 'qa_final_app_on(i) <> ""
+                End If 'site_qa_approval_on(i) <> 0 Then
+            End If 'qa_final_pp_on(i) >= Period_Begin
+        Else 'qa_final_app_on(i) <> 0
             ClosedRecNum = ClosedRecNum
             Closed_Index(i) = 0
-        End If 'qa_final_app_on(i) <> ""
+        End If 'qa_final_app_on(i) <> 0
     End If 'pr_state(i) = "Closed"
 Next i
 '---------------------------------------------------------
@@ -735,10 +698,10 @@ ReDim CloseStage(ClosedRecNum)
 ReDim ClosedRecType(ClosedRecNum)
 ReDim ClosedRecCount(ClosedRecNum)
 For i = 1 To ClosedRecNum
-    If qa_final_app_on(ClosedList(i)) <> "" Then
-        CloseAge(i) = DateValue(qa_final_app_on(ClosedList(i))) - DateValue(discovery_date(ClosedList(i)))
+    If qa_final_app_on(ClosedList(i)) <> 0 Then
+        CloseAge(i) = qa_final_app_on(ClosedList(i)) - discovery_date(ClosedList(i))
     Else
-        CloseAge(i) = DateValue(site_qa_approval_on(ClosedList(i))) - DateValue(discovery_date(ClosedList(i)))
+        CloseAge(i) = site_qa_approval_on(ClosedList(i)) - discovery_date(ClosedList(i))
     End If
     If CloseAge(i) < 23 Then
         CloseStage(i) = 0
@@ -955,7 +918,7 @@ Select Case Report_Type
     Case Is = 4
         ReportSheet_Name = "Year_" & Year_Num
     Case Is = 5
-        ReportSheet_Name = Begin & "_" & CutOff
+        ReportSheet_Name = Period_Begin & "_" & Period_End
 End Select
 Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
