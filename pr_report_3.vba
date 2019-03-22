@@ -34,6 +34,9 @@ Dim r_m As Integer
 Dim r_d As Integer
 Dim Period_End As Date
 Dim Period_Begin As Date
+Dim Per_Start() As Date
+Dim Per_End() As Date
+Dim UnitInPeriod As Integer
 Dim Record_Num As Long
 Dim DataSheet_Name As String
 Dim SnapShot_Name As String
@@ -380,15 +383,30 @@ Next i
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
 For i = 2 To Record_Num
-new_algorithm:
-If pr_state(i) <> "Cancelled" Then
-    If date_open(i) <= Period_End Then
-        If qa_final_app_on(i) = 0 Then
-            If site_qa_approval_on(i) = 0 Then
-                OpenRecNum = OpenRecNum + 1
-                Open_Index(i) = i
+If pr_state(i) = "Closed" Then
+    OpenRecNum = OpenRecNum
+    Open_Index(i) = 0
+Else
+    If pr_state(i) = "Cancelled" Then
+        OpenRecNum = OpenRecNum
+        Open_Index(i) = 0
+    Else
+        If date_open(i) < Period_End + 1 Then
+            If qa_final_app_on(i) = 0 Then
+                If site_qa_approval_on(i) = 0 Then
+                    OpenRecNum = OpenRecNum + 1
+                    Open_Index(i) = i
+                Else
+                    If site_qa_approval_on(i) > Period_End + 1 Then
+                        OpenRecNum = OpenRecNum + 1
+                        Open_Index(i) = i
+                    Else
+                        OpenRecNum = OpenRecNum
+                        Open_Index(i) = 0
+                    End If
+                End If
             Else
-                If site_qa_approval_on(i) > Period_End Then
+                If qa_final_app_on(i) > Period_End + 1 Then
                     OpenRecNum = OpenRecNum + 1
                     Open_Index(i) = i
                 Else
@@ -397,21 +415,10 @@ If pr_state(i) <> "Cancelled" Then
                 End If
             End If
         Else
-            If qa_final_app_on(i) > Period_End Then
-                OpenRecNum = OpenRecNum + 1
-                Open_Index(i) = i
-            Else
-                OpenRecNum = OpenRecNum
-                Open_Index(i) = 0
-            End If
+            OpenRecNum = OpenRecNum
+            Open_Index(i) = 0
         End If
-    Else
-        OpenRecNum = OpenRecNum
-        Open_Index(i) = 0
     End If
-Else
-    OpenRecNum = OpenRecNum
-    Open_Index(i) = 0
 End If
 Next i
 '-------------------------------------------------------------------------------
