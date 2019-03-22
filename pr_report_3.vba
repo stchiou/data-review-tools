@@ -125,6 +125,8 @@ Dim Cancel_Index() As Integer
 Dim CancelList() As Integer
 Dim CancelList_Pos As Integer
 Dim CancelRecType() As Integer
+'----------------------------------------------------------------
+Dim Rep_Headers(30) As String
 '------------------------------------------------------------------
 Dim week_range As Long
 Dim month_range As Long
@@ -1033,30 +1035,54 @@ End Select
 Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
 Summary_Headers:
+'----------------------------------------------------------------
+'Fill Header Values into Header Array
+'----------------------------------------------------------------
+Rep_Headers(1) = "Record Type"
+Rep_Headers(2) = "<23 Days"
+Rep_Headers(3) = "24-30 Days"
+Rep_Headers(4) = "31-60 Days"
+Rep_Headers(5) = "61-90 Days"
+Rep_Headers(6) = "91-120 Days"
+Rep_Headers(7) = "121-150 Days"
+Rep_Headers(8) = "151-180 Days"
+Rep_Headers(9) = ">180 Days"
+Rep_Headers(10) = "On-Time"
+Rep_Headers(11) = "Aged"
+Rep_Headers(12) = "Total"
+Rep_Headers(13) = "Record ID"
+Rep_Headers(14) = "Short Description"
+Rep_Headers(15) = "Responsible Person"
+Rep_Headers(16) = "Record Stage"
+Rep_Headers(17) = "Record Type"
+Rep_Headers(18) = "LIR"
+Rep_Headers(19) = "RAAC"
+Rep_Headers(20) = "ER"
+Rep_Headers(21) = "QAR"
+Rep_Headers(22) = "INC"
+Rep_Headers(23) = "Total"
+Rep_Headers(24) = "Record Type"
+Rep_Headers(25) = "Counts"
+Worksheets(ReportSheet_Name).Cells(2, 1).Activate
 For i = 0 To 1
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 1).Value = "Record Type"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 2).Value = "<23 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 3).Value = "24-30 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 4).Value = "31-60 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 5).Value = "61-90 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 6).Value = "91-120 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 7).Value = "121-150 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 8).Value = "151-180 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 9).Value = ">181 Days"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 10).Value = "On-Time"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 11).Value = "Aged"
-Worksheets(ReportSheet_Name).Cells(2 + i * 8, 12).Value = "Total"
-Worksheets(ReportSheet_Name).Cells(3 + i * 8, 1).Value = "LIR"
-Worksheets(ReportSheet_Name).Cells(4 + i * 8, 1).Value = "RAAC"
-Worksheets(ReportSheet_Name).Cells(5 + i * 8, 1).Value = "ER"
-Worksheets(ReportSheet_Name).Cells(6 + i * 8, 1).Value = "QAR"
-Worksheets(ReportSheet_Name).Cells(7 + i * 8, 1).Value = "INC"
-Worksheets(ReportSheet_Name).Cells(8 + i * 8, 1).Value = "Total"
+    For j = 1 To 12
+        Cells(2 + 8 * i, j).Value = Rep_Headers(j)
+    Next j
+Next i
+For i = 0 To 3
+    For j = 18 To 23
+        Cells(3 + 8 * i + j - 18, 1).Value = Rep_Headers(j)
+    Next j
+Next i
+For i = 0 To 1
+    For j = 24 To 25
+        Cells(18 + 8 * i, j - 23).Value = Rep_Headers(j)
+    Next j
 Next i
 '----------------------------------------------------------------
 'Writing Record Summary Matrices
 '----------------------------------------------------------------
-Cells(1, 1).Value = "Records remain open between " & Period_Begin & "-" & Period_End
+Cells(1, 1).Value = "Records remain opened between " & Period_Begin & "-" & Period_End
 For i = 1 To 6
   For j = 0 To 10
       Cells(i + 2, j + 2).Value = OpenRecCount(i, j)
@@ -1068,18 +1094,12 @@ For i = 1 To 6
       Cells(i + 10, j + 2).Value = ClosedRecCount(i, j)
   Next j
 Next i
+Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
+Cells(25, 1).Value = "Cancelled Records opened between " & Period_Begin & "-" & Period_End
+
 '-------------------------------------------------------------------
 'Writing New Record Summary
 '-------------------------------------------------------------------
-Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
-Cells(18, 1).Value = "Record Type"
-Cells(19, 1).Value = "LIR"
-Cells(20, 1).Value = "RAAC"
-Cells(21, 1).Value = "ER"
-Cells(22, 1).Value = "QAR"
-Cells(23, 1).Value = "INC"
-Cells(24, 1).Value = "Total"
-Cells(18, 2).Value = "Counts"
 Cells(18, 2).Activate
 For i = 1 To 5
     ActiveCell.Offset(1, 0).Value = NewCount(i)
@@ -1089,15 +1109,6 @@ Cells(24, 2).Value = NewRecNum
 '-----------------------------------------------------------------------
 'Writing Cancelled Record Summary
 '-----------------------------------------------------------------------
-Cells(25, 1).Value = "Cancelled Records opened between " & Period_Begin & "-" & Period_End
-Cells(26, 1).Value = "Record Type"
-Cells(27, 1).Value = "LIR"
-Cells(28, 1).Value = "RAAC"
-Cells(29, 1).Value = "ER"
-Cells(30, 1).Value = "QAR"
-Cells(31, 1).Value = "INC"
-Cells(32, 1).Value = "Total"
-Cells(26, 2).Value = "Counts"
 Cells(26, 2).Activate
 For i = 1 To 5
     ActiveCell.Offset(1, 0).Value = CancelCount(i)
@@ -1108,83 +1119,83 @@ Cells(32, 2).Value = CancelRecNum
 'Writing Detail Information of Open Records from Array into Spreadsheet while
 'Updating Array that Captured Position of each Record in the Spreadsheet
 '----------------------------------------------------------------------------------
-ReplCol = Cells(2, 1).End(xlToRight).Column
-Cells(1, ReplCol + 1).Activate
-ActiveCell.Value = "Open Records"
-For j = 1 To 5
-    ActiveCell.Offset(1, 0).Value = "Record ID"
-    ActiveCell.Offset(1, 1).Value = "Short Description"
-    ActiveCell.Offset(1, 2).Value = "Responsible Person"
-    ActiveCell.Offset(1, 3).Value = "Record Stage"
-    ActiveCell.Offset(1, 4).Value = "Record Type"
-    ActiveCell.Offset(1, 0).Activate
-    For i = 1 To OpenRecNum
-        If OpenRec(i, 5) = j Then
-            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
-            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
-            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
-            ActiveCell.Offset(1, 3).Value = OpenRec(i, 4)
-            ActiveCell.Offset(1, 4).Value = OpenRec(i, 5)
-            ActiveCell.Offset(1, 0).Activate
-        Else
-        End If
-    Next i
-Next j
-Cells(1, 18).Activate
-ActiveCell.Value = "Closed Records"
-For j = 1 To 5
-    ActiveCell.Offset(1, 0).Value = "Record ID"
-    ActiveCell.Offset(1, 1).Value = "Short Description"
-    ActiveCell.Offset(1, 2).Value = "Responsible Person"
-    ActiveCell.Offset(1, 3).Value = "Record Stage"
-    ActiveCell.Offset(1, 4).Value = "Record Type"
-    ActiveCell.Offset(1, 0).Activate
-For i = 1 To ClosedRecNum
-        If ClosedRec(i, 5) = j Then
-            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
-            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
-            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
-            ActiveCell.Offset(1, 3).Value = ClosedRec(i, 4)
-            ActiveCell.Offset(1, 4).Value = ClosedRec(i, 5)
-            ActiveCell.Offset(1, 0).Activate
-        Else
-        End If
-    Next i
-Next j
-ChartSheet_Name = ReportSheet_Name & "_Chart"
-Sheets.Add after:=Sheets(ReportSheet_Name)
-Sheets(Sheets.Count).Select
-Sheets(Sheets.Count).Name = ChartSheet_Name
-ActiveSheet.Shapes.AddChart.Select
-ActiveChart.ChartType = xlColumnStacked
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(1).Name = "=""< 23 Days"""
-ActiveChart.SeriesCollection(1).Values = "=Week_" & Week_Num & "!" & "$B$3:$B$7"
-ActiveChart.SeriesCollection(1).XValues = "=Week_" & Week_Num & "!" & "$A$3:$A$7"
-ActiveChart.SeriesCollection(1).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(2).Name = "=""24-30 Days"""
-ActiveChart.SeriesCollection(2).Values = "=Week_" & Week_Num & "!" & "$C$3:$C$7"
-ActiveChart.SeriesCollection(2).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(3).Name = "=""> 30 Days"""
-ActiveChart.SeriesCollection(3).Values = "=Week_" & Week_Num & "!" & "$J$3:$J$7"
-ActiveChart.SeriesCollection(3).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(4).Values = "=Week_" & Week_Num & "!" & "$K$3:$K$7"
-ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
-ActiveChart.SeriesCollection(4).ApplyDataLabels
-ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
-ActiveChart.SeriesCollection(4).MarkerStyle = -4142
-ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
-ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
-ActiveChart.Legend.LegendEntries(4).Delete
-ActiveChart.ChartStyle = 26
-With ActiveChart
-    .HasTitle = True
-    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(cutoff, 4) & ")"
-End With
-ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+'ReplCol = Cells(2, 1).End(xlToRight).Column
+'Cells(1, ReplCol + 1).Activate
+'ActiveCell.Value = "Open Records"
+'ActiveCell.Offset(1, 0).Value = "Record ID"
+'    ActiveCell.Offset(1, 1).Value = "Short Description"
+'    ActiveCell.Offset(1, 2).Value = "Responsible Person"
+'    ActiveCell.Offset(1, 3).Value = "Record Stage"
+'    ActiveCell.Offset(1, 4).Value = "Record Type"
+'    ActiveCell.Offset(1, 0).Activate
+'For j = 1 To 5
+'    For i = 1 To OpenRecNum
+'        If OpenRec(i, 5) = j Then
+'            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
+'            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
+'            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
+'            ActiveCell.Offset(1, 3).Value = OpenRec(i, 4)
+'            ActiveCell.Offset(1, 4).Value = OpenRec(i, 5)
+'            ActiveCell.Offset(1, 0).Activate
+'        Else
+'        End If
+'    Next i
+'Next j
+'Cells(1, 18).Activate
+'ActiveCell.Value = "Closed Records"
+'    ActiveCell.Offset(1, 0).Value = "Record ID"
+'    ActiveCell.Offset(1, 1).Value = "Short Description"
+'    ActiveCell.Offset(1, 2).Value = "Responsible Person"
+'    ActiveCell.Offset(1, 3).Value = "Record Stage"
+'    ActiveCell.Offset(1, 4).Value = "Record Type"
+'    ActiveCell.Offset(1, 0).Activate
+'For j = 1 To 5
+'    For i = 1 To ClosedRecNum
+'        If ClosedRec(i, 5) = j Then
+'            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
+'            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
+'            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
+'            ActiveCell.Offset(1, 3).Value = ClosedRec(i, 4)
+'            ActiveCell.Offset(1, 4).Value = ClosedRec(i, 5)
+'            ActiveCell.Offset(1, 0).Activate
+'        Else
+'        End If
+'    Next i
+'Next j
+'ChartSheet_Name = ReportSheet_Name & "_Chart"
+'Sheets.Add after:=Sheets(ReportSheet_Name)
+'Sheets(Sheets.Count).Select
+'Sheets(Sheets.Count).Name = ChartSheet_Name
+'ActiveSheet.Shapes.AddChart.Select
+'ActiveChart.ChartType = xlColumnStacked
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(1).Name = "=""< 23 Days"""
+'ActiveChart.SeriesCollection(1).Values = "=Week_" & Week_Num & "!" & "$B$3:$B$7"
+'ActiveChart.SeriesCollection(1).XValues = "=Week_" & Week_Num & "!" & "$A$3:$A$7"
+'ActiveChart.SeriesCollection(1).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(2).Name = "=""24-30 Days"""
+'ActiveChart.SeriesCollection(2).Values = "=Week_" & Week_Num & "!" & "$C$3:$C$7"
+'ActiveChart.SeriesCollection(2).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(3).Name = "=""> 30 Days"""
+'ActiveChart.SeriesCollection(3).Values = "=Week_" & Week_Num & "!" & "$J$3:$J$7"
+'ActiveChart.SeriesCollection(3).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(4).Values = "=Week_" & Week_Num & "!" & "$K$3:$K$7"
+'ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
+'ActiveChart.SeriesCollection(4).ApplyDataLabels
+'ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
+'ActiveChart.SeriesCollection(4).MarkerStyle = -4142
+'ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
+'ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
+'ActiveChart.Legend.LegendEntries(4).Delete
+'ActiveChart.ChartStyle = 26
+'With ActiveChart
+'    .HasTitle = True
+'    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(cutoff, 4) & ")"
+'End With
+'ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 'ActiveSheet.Shapes.AddChart.Select
 'ActiveChart.ChartType = xlColumnStacked
 'ActiveChart.SeriesCollection.NewSeries
