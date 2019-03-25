@@ -1209,63 +1209,68 @@ For j = 1 To 5
         End If
     Next i
 Next j
-'ChartSheet_Name = ReportSheet_Name & "_Chart"
-'Sheets.Add after:=Sheets(ReportSheet_Name)
-'Sheets(Sheets.Count).Select
-'Sheets(Sheets.Count).Name = ChartSheet_Name
-'ActiveSheet.Shapes.AddChart.Select
-'ActiveChart.ChartType = xlColumnStacked
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(1).Name = "=""< 23 Days"""
-'ActiveChart.SeriesCollection(1).Values = "=Week_" & Week_Num & "!" & "$B$3:$B$7"
-'ActiveChart.SeriesCollection(1).XValues = "=Week_" & Week_Num & "!" & "$A$3:$A$7"
-'ActiveChart.SeriesCollection(1).ApplyDataLabels
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(2).Name = "=""24-30 Days"""
-'ActiveChart.SeriesCollection(2).Values = "=Week_" & Week_Num & "!" & "$C$3:$C$7"
-'ActiveChart.SeriesCollection(2).ApplyDataLabels
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(3).Name = "=""> 30 Days"""
-'ActiveChart.SeriesCollection(3).Values = "=Week_" & Week_Num & "!" & "$J$3:$J$7"
-'ActiveChart.SeriesCollection(3).ApplyDataLabels
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(4).Values = "=Week_" & Week_Num & "!" & "$K$3:$K$7"
-'ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
-'ActiveChart.SeriesCollection(4).ApplyDataLabels
-'ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
-'ActiveChart.SeriesCollection(4).MarkerStyle = -4142
-'ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
-'ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
-'ActiveChart.Legend.LegendEntries(4).Delete
+ChartSheet_Name = ReportSheet_Name & "_Chart"
+Sheets.Add after:=Sheets(ReportSheet_Name)
+Sheets(Sheets.Count).Select
+Sheets(Sheets.Count).Name = ChartSheet_Name
+ActiveSheet.Shapes.AddChart.Select
+ActiveChart.ChartType = xlColumnStacked
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(1).Name = Rep_Headers(2)
+ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$B$3:$B$7"
+ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$3:$A$7"
+ActiveChart.SeriesCollection(1).Interior.Color = RGB(79, 129, 189)
+ActiveChart.SeriesCollection(1).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(2).Name = Rep_Headers(3)
+ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$C$3:$C$7"
+ActiveChart.SeriesCollection(2).Interior.Color = RGB(255, 192, 0)
+ActiveChart.SeriesCollection(2).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(3).Name = Rep_Headers(11)
+ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$K$3:$K$7"
+ActiveChart.SeriesCollection(3).ApplyDataLabels
+ActiveChart.SeriesCollection(3).Interior.Color = RGB(192, 80, 77)
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(4).Values = ReportSheet_Name & "!" & "$L$3:$L$7"
+ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
+ActiveChart.SeriesCollection(4).ApplyDataLabels
+ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
+ActiveChart.SeriesCollection(4).MarkerStyle = -4142
+ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
+ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
+ActiveChart.Legend.LegendEntries(4).Delete
 'ActiveChart.ChartStyle = 26
-'With ActiveChart
-'    .HasTitle = True
-'    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(cutoff, 4) & ")"
-'End With
-'ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
-'ActiveSheet.Shapes.AddChart.Select
-'ActiveChart.ChartType = xlColumnStacked
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(1).Name = "=""On Time"""
-'ActiveChart.SeriesCollection(1).Values = "=Week_" & Week_Num & "!" & "$AG$3:$AG$7"
-'ActiveChart.SeriesCollection(1).XValues = "=Week_" & Week_Num & "!" & "$A$3:$A$7"
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(2).Name = "=""Aged"""
-'ActiveChart.SeriesCollection(2).Values = "=Week_" & Week_Num & "!" & "$AH$3:$AH$7"
-'ActiveChart.SeriesCollection.NewSeries
-'ActiveChart.SeriesCollection(3).Name = "=""Total"""
-'ActiveChart.SeriesCollection(3).Values = "=Week_" & Week_Num & "!" & "$AI$3:$AI$7"
-'ActiveChart.SeriesCollection(3).ChartType = xlLineMarkers
-'ActiveChart.SeriesCollection(3).ApplyDataLabels
-'ActiveChart.SeriesCollection(3).DataLabels.Position = xlLabelPositionAbove
-'ActiveChart.SeriesCollection(3).MarkerStyle = -4142
-'ActiveChart.SeriesCollection(3).Format.Fill.Visible = msoFalse
-'ActiveChart.SeriesCollection(3).Format.Line.Visible = msoFalse
-'ActiveChart.Legend.LegendEntries(3).Delete
+With ActiveChart
+    .HasTitle = True
+    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(cutoff, 4) & ")"
+End With
+ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+ActiveSheet.Shapes.AddChart.Select
+ActiveChart.ChartType = xlColumnStacked
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(1).Name = Rep_Headers(10)
+ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$J$11:$J$15"
+ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$11:$A$15"
+ActiveChart.SeriesCollection(1).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(2).Name = Rep_Headers(11)
+ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$K$11:$K$15"
+ActiveChart.SeriesCollection(2).ApplyDataLabels
+ActiveChart.SeriesCollection.NewSeries
+ActiveChart.SeriesCollection(3).Name = Rep_Headers(13)
+ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$L$11:$L$15"
+ActiveChart.SeriesCollection(3).ChartType = xlLineMarkers
+ActiveChart.SeriesCollection(3).ApplyDataLabels
+ActiveChart.SeriesCollection(3).DataLabels.Position = xlLabelPositionAbove
+ActiveChart.SeriesCollection(3).MarkerStyle = -4142
+ActiveChart.SeriesCollection(3).Format.Fill.Visible = msoFalse
+ActiveChart.SeriesCollection(3).Format.Line.Visible = msoFalse
+ActiveChart.Legend.LegendEntries(3).Delete
 'ActiveChart.ChartStyle = 26
-'With ActiveChart
-'    .HasTitle = True
-'    .ChartTitle.Text = "CQ Number of Records Closed on Week " & Week_Num & ", " & Right(cutoff, 4)
-'End With
-'ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+With ActiveChart
+    .HasTitle = True
+    .ChartTitle.Text = "CQ Number of Records Closed on Week " & Week_Num & ", " & Right(cutoff, 4)
+End With
+ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 End Sub
