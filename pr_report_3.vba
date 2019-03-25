@@ -385,28 +385,18 @@ Next i
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
 For i = 2 To Record_Num
-If pr_state(i) = "Closed" Then
-    OpenRecNum = OpenRecNum
-    Open_Index(i) = 0
+If pr_state(i) = "Cancelled" Then
+        OpenRecNum = OpenRecNum
+        Open_Index(i) = 0
 Else
-    If pr_state(i) = "Cancelled" Then
+    If date_open(i) > Period_End + 1 Then
         OpenRecNum = OpenRecNum
         Open_Index(i) = 0
     Else
-        If date_open(i) < Period_End + 1 Then
+        If site_qa_approval_on(i) = 0 Then
             If qa_final_app_on(i) = 0 Then
-                If site_qa_approval_on(i) = 0 Then
-                    OpenRecNum = OpenRecNum + 1
-                    Open_Index(i) = i
-                Else
-                    If site_qa_approval_on(i) > Period_End + 1 Then
-                        OpenRecNum = OpenRecNum + 1
-                        Open_Index(i) = i
-                    Else
-                        OpenRecNum = OpenRecNum
-                        Open_Index(i) = 0
-                    End If
-                End If
+                OpenRecNum = OpenRecNum + 1
+                Open_Index(i) = i
             Else
                 If qa_final_app_on(i) > Period_End + 1 Then
                     OpenRecNum = OpenRecNum + 1
@@ -417,8 +407,13 @@ Else
                 End If
             End If
         Else
-            OpenRecNum = OpenRecNum
-            Open_Index(i) = 0
+            If site_qa_approval_on(i) > Period_End + 1 Then
+                OpenRecNum = OpenRecNum + 1
+                Open_Index(i) = i
+            Else
+                OpenRecNum = OpenRecNum
+                Open_Index(i) = 0
+            End If
         End If
     End If
 End If
@@ -1119,49 +1114,101 @@ Cells(32, 2).Value = CancelRecNum
 'Writing Detail Information of Open Records from Array into Spreadsheet while
 'Updating Array that Captured Position of each Record in the Spreadsheet
 '----------------------------------------------------------------------------------
-'ReplCol = Cells(2, 1).End(xlToRight).Column
-'Cells(1, ReplCol + 1).Activate
-'ActiveCell.Value = "Open Records"
-'ActiveCell.Offset(1, 0).Value = "Record ID"
-'    ActiveCell.Offset(1, 1).Value = "Short Description"
-'    ActiveCell.Offset(1, 2).Value = "Responsible Person"
-'    ActiveCell.Offset(1, 3).Value = "Record Stage"
-'    ActiveCell.Offset(1, 4).Value = "Record Type"
-'    ActiveCell.Offset(1, 0).Activate
-'For j = 1 To 5
-'    For i = 1 To OpenRecNum
-'        If OpenRec(i, 5) = j Then
-'            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
-'            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
-'            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
-'            ActiveCell.Offset(1, 3).Value = OpenRec(i, 4)
-'            ActiveCell.Offset(1, 4).Value = OpenRec(i, 5)
-'            ActiveCell.Offset(1, 0).Activate
-'        Else
-'        End If
-'    Next i
-'Next j
-'Cells(1, 18).Activate
-'ActiveCell.Value = "Closed Records"
-'    ActiveCell.Offset(1, 0).Value = "Record ID"
-'    ActiveCell.Offset(1, 1).Value = "Short Description"
-'    ActiveCell.Offset(1, 2).Value = "Responsible Person"
-'    ActiveCell.Offset(1, 3).Value = "Record Stage"
-'    ActiveCell.Offset(1, 4).Value = "Record Type"
-'    ActiveCell.Offset(1, 0).Activate
-'For j = 1 To 5
-'    For i = 1 To ClosedRecNum
-'        If ClosedRec(i, 5) = j Then
-'            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
-'            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
-'            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
-'            ActiveCell.Offset(1, 3).Value = ClosedRec(i, 4)
-'            ActiveCell.Offset(1, 4).Value = ClosedRec(i, 5)
-'            ActiveCell.Offset(1, 0).Activate
-'        Else
-'        End If
-'    Next i
-'Next j
+ReplCol = Cells(2, 1).End(xlToRight).Column
+Cells(1, ReplCol + 1).Activate
+ActiveCell.Value = "Open Records"
+For i = 1 To 5
+ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
+Next i
+ActiveCell.Offset(1, 0).Activate
+For j = 1 To 5
+    For i = 1 To OpenRecNum
+        If OpenRec(i, 5) = j Then
+            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
+            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
+            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
+            Select Case OpenRec(i, 4)
+                Case Is = 0
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
+                Case Is = 1
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
+                Case Is = 2
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
+                Case Is = 3
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
+                Case Is = 4
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
+                Case Is = 5
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
+                Case Is = 6
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
+                Case Is = 7
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
+            End Select
+            Select Case OpenRec(i, 5)
+                Case Is = 1
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
+                Case Is = 2
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+                Case Is = 3
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+                Case Is = 4
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+                Case Is = 5
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+            End Select
+            ActiveCell.Offset(1, 0).Activate
+        Else
+        End If
+    Next i
+Next j
+Cells(1, 18).Activate
+ActiveCell.Value = "Closed Records"
+For i = 1 To 5
+ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
+Next i
+ActiveCell.Offset(1, 0).Activate
+For j = 1 To 5
+    For i = 1 To ClosedRecNum
+        If ClosedRec(i, 5) = j Then
+            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
+            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
+            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
+            Select Case ClosedRec(i, 4)
+                Case Is = 0
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
+                Case Is = 1
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
+                Case Is = 2
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
+                Case Is = 3
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
+                Case Is = 4
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
+                Case Is = 5
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
+                Case Is = 6
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
+                Case Is = 7
+                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
+            End Select
+            Select Case ClosedRec(i, 5)
+                Case Is = 1
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
+                Case Is = 2
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+                Case Is = 3
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+                Case Is = 4
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+                Case Is = 5
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+            End Select
+            ActiveCell.Offset(1, 0).Activate
+        Else
+        End If
+    Next i
+Next j
 'ChartSheet_Name = ReportSheet_Name & "_Chart"
 'Sheets.Add after:=Sheets(ReportSheet_Name)
 'Sheets(Sheets.Count).Select
