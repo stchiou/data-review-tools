@@ -11,9 +11,13 @@ Sub PR_Report()
 '4. aging up (age > 23 days)
 '5. committed to close this week
 '6. aged that will close
-'7. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
+'7. PRs Opened by week LIR, RAAC, QAR, ER)
+'8. PRs opened by month (LIR, RAAC, QAR, ER)
 '8. PRs by writer
 '9. PRs opened (CQ vs IM)
+'10. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
+'11. PRs by writer
+'12. PRs opened (CQ vs IM)
 
 '-------------------------------------------------------------------------------------------------------------------
 'Features:
@@ -895,7 +899,7 @@ For i = 1 To ClosedRecNum
     ClosedRec(i, 3) = responsible_person(ClosedList(i))
     ClosedRec(i, 4) = CloseStage(i)
     ClosedRec(i, 5) = ClosedRecType(i)
-    ClosedRec(i, 6) = area_affected(ClosedList(i))
+    ClosedRec(i, 6) = areas_affected(ClosedList(i))
 Next i
 '---------------------------------------------------------------
 'Collecting New Record
@@ -934,7 +938,7 @@ For i = 1 To NewRecNum
     NewRec(i, 1) = pr_id(NewList(i))
     NewRec(i, 2) = title_short_description(NewList(i))
     NewRec(i, 3) = responsible_person(NewList(i))
-    NewRec(i, 4) = area_affected(NewList(i))
+    NewRec(i, 4) = areas_affected(NewList(i))
     Select Case record_type(NewList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             NewRec(i, 5) = 1
@@ -1063,7 +1067,7 @@ Rep_Headers(23) = "Total"
 Rep_Headers(24) = "Record Type"
 Rep_Headers(25) = "Counts"
 Rep_Headers(26) = "CQ (Chemistry)"
-Rep_Headers(27) = "IQ (Material)"
+Rep_Headers(27) = "IQ (Comm7odity)"
 Worksheets(ReportSheet_Name).Cells(2, 1).Activate
 For i = 0 To 1
     For j = 1 To 12
