@@ -13,11 +13,9 @@ Sub PR_Report()
 '6. aged that will close
 '7. PRs Opened by week LIR, RAAC, QAR, ER)
 '8. PRs opened by month (LIR, RAAC, QAR, ER)
-'8. PRs by writer
-'9. PRs opened (CQ vs IM)
-'10. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
-'11. PRs by writer
-'12. PRs opened (CQ vs IM)
+'9. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
+'10. PRs by writer
+'11. PRs opened (CQ vs IM)
 
 '-------------------------------------------------------------------------------------------------------------------
 'Features:
