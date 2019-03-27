@@ -15,7 +15,7 @@ Sub PR_Report()
 '8. PRs by writer
 '9. PRs opened (CQ vs IM)
 
-'------------------------------------------------------7------------------------------------------------------------
+'-------------------------------------------------------------------------------------------------------------------
 'Features:
 '1. Combine output records with corresponding short description
 '2. Computes age of the records
@@ -34,10 +34,11 @@ Dim r_m As Integer
 Dim r_d As Integer
 Dim Period_End As Date
 Dim Period_Begin As Date
-Dim Per_Start() As Date
-Dim Per_End() As Date
+Dim Sub_Per_Start() As Date
+Dim Sub_Per_End() As Date
 Dim UnitInPeriod As Integer
 Dim Record_Num As Long
+Dim FirstWeekDay As Integer
 '-------------------------------------------------------
 'Fields in raw data
 '-------------------------------------------------------
@@ -196,7 +197,8 @@ Input_week_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Day_Num = InputBox("Input numeric value of the day of the month for the Report", "DAY NUMBER")
     Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
-    Week_Num = WorksheetFunction.WeekNum(Period_End, 15)
+    FirstWeekDay = Weekday(Period_End) + 10
+    Week_Num = WorksheetFunction.WeekNum(Period_End, FirstWeekDay)
     Period_Begin = Period_End - 6
     GoTo Input_data_file:
 Input_month_parameters:
@@ -216,6 +218,7 @@ Input_month_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Period_Begin = DateSerial(Year_Num, Month_Num, 1)
     Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
+    
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
@@ -876,7 +879,7 @@ Next i
 '----------------------------------------------------------------
 'Write Closed Record Description into Array
 '----------------------------------------------------------------
-ReDim ClosedRec(ClosedRecNum, 5)
+ReDim ClosedRec(ClosedRecNum, 6)
 '--------------------------------------
 'First Dimension
 '---------------
@@ -892,6 +895,7 @@ For i = 1 To ClosedRecNum
     ClosedRec(i, 3) = responsible_person(ClosedList(i))
     ClosedRec(i, 4) = CloseStage(i)
     ClosedRec(i, 5) = ClosedRecType(i)
+    ClosedRec(i, 6) = area_affected(ClosedList(i))
 Next i
 '---------------------------------------------------------------
 'Collecting New Record
@@ -930,7 +934,7 @@ For i = 1 To NewRecNum
     NewRec(i, 1) = pr_id(NewList(i))
     NewRec(i, 2) = title_short_description(NewList(i))
     NewRec(i, 3) = responsible_person(NewList(i))
-    NewRec(i, 4) = ""
+    NewRec(i, 4) = area_affected(NewList(i))
     Select Case record_type(NewList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             NewRec(i, 5) = 1
@@ -1025,7 +1029,7 @@ Select Case Report_Type
     Case Is = 4
         ReportSheet_Name = "Year_" & Year_Num
     Case Is = 5
-        ReportSheet_Name = Period_Begin & "_" & Period_End
+        ReportSheet_Name = Year_Num & "_" & Month_Num & "_" & Day_Num & "_" & r_y & "_" & r_m & "_" & r_d
 End Select
 Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
@@ -1058,6 +1062,8 @@ Rep_Headers(22) = "INC"
 Rep_Headers(23) = "Total"
 Rep_Headers(24) = "Record Type"
 Rep_Headers(25) = "Counts"
+Rep_Headers(26) = "CQ (Chemistry)"
+Rep_Headers(27) = "IQ (Material)"
 Worksheets(ReportSheet_Name).Cells(2, 1).Activate
 For i = 0 To 1
     For j = 1 To 12
@@ -1209,6 +1215,10 @@ For j = 1 To 5
         End If
     Next i
 Next j
+
+'------------------------------------------------------------------
+'Charting
+'------------------------------------------------------------------
 ChartSheet_Name = ReportSheet_Name & "_Chart"
 Sheets.Add after:=Sheets(ReportSheet_Name)
 Sheets(Sheets.Count).Select
@@ -1243,7 +1253,7 @@ ActiveChart.Legend.LegendEntries(4).Delete
 'ActiveChart.ChartStyle = 26
 With ActiveChart
     .HasTitle = True
-    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(cutoff, 4) & ")"
+    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(Period_End, 4) & ")"
 End With
 ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 ActiveSheet.Shapes.AddChart.Select
@@ -1270,7 +1280,7 @@ ActiveChart.Legend.LegendEntries(3).Delete
 'ActiveChart.ChartStyle = 26
 With ActiveChart
     .HasTitle = True
-    .ChartTitle.Text = "CQ Number of Records Closed on Week " & Week_Num & ", " & Right(cutoff, 4)
+    .ChartTitle.Text = "CQ Number of Records Closed on Week " & Week_Num & ", " & Right(Period_End, 4)
 End With
 ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 End Sub
