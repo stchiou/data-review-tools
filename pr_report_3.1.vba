@@ -1,4 +1,4 @@
-Attribute VB_Name = "PR_Status_Report_v3"
+Attribute VB_Name = "PR_Status_Report_v3.1"
 Sub PR_Report()
 '-----------------------------------------------------------------
 'Macro for computing weekly PR Status
@@ -222,7 +222,7 @@ Input_month_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Period_Begin = DateSerial(Year_Num, Month_Num, 1)
     Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
-    
+
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
