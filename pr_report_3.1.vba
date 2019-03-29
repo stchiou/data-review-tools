@@ -611,17 +611,17 @@ For j = 1 To PeriodNum
                 End If
             End If
         End If
-        Select Case record_type(OpenList(i), j)
+        Select Case record_type(OpenList(i, j))
             Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
-                OpenRecType(i) = 1
+                OpenRecType(i, j) = 1
             Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
-                OpenRecType(i) = 2
+                OpenRecType(i, j) = 2
             Case "Manufacturing Investigations / Event Report"
-                OpenRecType(i) = 3
+                OpenRecType(i, j) = 3
             Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
-                OpenRecType(i) = 4
+                OpenRecType(i, j) = 4
             Case "Manufacturing Investigations / Incident"
-                OpenRecType(i) = 5
+                OpenRecType(i, j) = 5
         End Select
     Next i
 Next j
@@ -820,7 +820,7 @@ For j = 1 To PeriodNum
         Else
             If site_qa_approval_on(i) >= SubPerBegin(j) Then
                 If site_qa_approval_on(i) < SubPerEnd(j) + 1 Then
-                    ClosedRecNum(i, j) = ClosedRecNum(i, j) + 1
+                    ClosedRecNum(j) = ClosedRecNum(j) + 1
                     Closed_Index(i, j) = i
                 Else
                     ClosedRecNum(j) = ClosedRecNum(j)
@@ -846,50 +846,53 @@ For i = 1 To PeriodNum
     End If
 Next i
 ReDim ClosedList(MaxClosedRecNum, PeriodNum)
+For j = 1 To PeriodNum
 ClosedList_Pos = 1
-For i = 2 To Record_Num
-    If Closed_Index(i) <> 0 Then
-        ClosedList(ClosedList_Pos) = Closed_Index(i)
-        ClosedList_Pos = ClosedList_Pos + 1
-    Else
-    End If
-Next i
+    For i = 2 To Record_Num
+        If Closed_Index(i, j) <> 0 Then
+            ClosedList(ClosedList_Pos, j) = Closed_Index(i, j)
+            ClosedList_Pos = ClosedList_Pos + 1
+        Else
+            ClosedList_Pos = ClosedList_Pos
+        End If
+    Next i
+Next j
 '--------------------------------------------------------------------------
 'Compute Age and Stage of closed record
 '--------------------------------------------------------------------------
-ReDim CloseAge(MaxClosedRecNum)
-ReDim CloseStage(MaxClosedRecNum)
-ReDim ClosedRecType(MaxClosedRecNum)
-ReDim ClosedRecCount(MaxClosedRecNum)
+ReDim CloseAge(MaxClosedRecNum, PeriodNum)
+ReDim CloseStage(MaxClosedRecNum, PeriodNum)
+ReDim ClosedRecType(MaxClosedRecNum, PeriodNum)
+ReDim ClosedRecCount(MaxClosedRecNum, PeriodNum)
 For j = 1 To PeriodNum
 For i = 1 To ClosedRecNum(j)
-    If qa_final_app_on(ClosedList(i)) <> 0 Then
-        CloseAge(i) = qa_final_app_on(ClosedList(i)) - discovery_date(ClosedList(i))
+    If qa_final_app_on(ClosedList(i, j)) <> 0 Then
+        CloseAge(i, j) = qa_final_app_on(ClosedList(i, j)) - discovery_date(ClosedList(i, j))
     Else
-        CloseAge(i) = site_qa_approval_on(ClosedList(i)) - discovery_date(ClosedList(i))
+        CloseAge(i, j) = site_qa_approval_on(ClosedList(i, j)) - discovery_date(ClosedList(i, j))
     End If
-    If CloseAge(i) < 23 Then
-        CloseStage(i) = 0
+    If CloseAge(i, j) < 23 Then
+        CloseStage(i, j) = 0
     Else
-        If CloseAge(i) < 30 Then
-            CloseStage(i) = 1
+        If CloseAge(i, j) < 30 Then
+            CloseStage(i, j) = 1
         Else
-            If CloseAge(i) < 60 Then
-                CloseStage(i) = 2
+            If CloseAge(i, j) < 60 Then
+                CloseStage(i, j) = 2
             Else
-                If CloseAge(i) < 90 Then
-                    CloseStage(i) = 3
+                If CloseAge(i, j) < 90 Then
+                    CloseStage(i, j) = 3
                 Else
-                    If CloseAge(i) < 120 Then
-                        CloseStage(i) = 4
+                    If CloseAge(i, j) < 120 Then
+                        CloseStage(i, j) = 4
                     Else
-                        If CloseAge(i) < 150 Then
-                            CloseStage(i) = 5
+                        If CloseAge(i, j) < 150 Then
+                            CloseStage(i, j) = 5
                         Else
-                            If CloseAge(i) < 180 Then
-                                CloseStage(i) = 6
+                            If CloseAge(i, j) < 180 Then
+                                CloseStage(i, j) = 6
                             Else
-                                CloseStage(i) = 7
+                                CloseStage(i, j) = 7
                             End If
                         End If
                     End If
@@ -900,17 +903,17 @@ For i = 1 To ClosedRecNum(j)
 '----------------------------------------------------------------
 'Closed Record Type
 '----------------------------------------------------------------
-    Select Case record_type(ClosedList(i))
+    Select Case record_type(ClosedList(i, j))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
-            ClosedRecType(i) = 1
+            ClosedRecType(i, j) = 1
         Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
-            ClosedRecType(i) = 2
+            ClosedRecType(i, j) = 2
         Case "Manufacturing Investigations / Event Report"
-            ClosedRecType(i) = 3
+            ClosedRecType(i, j) = 3
         Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
-            ClosedRecType(i) = 4
+            ClosedRecType(i, j) = 4
         Case "Manufacturing Investigations / Incident"
-            ClosedRecType(i) = 5
+            ClosedRecType(i, j) = 5
     End Select
 Next i
 Next j
@@ -1065,7 +1068,7 @@ Next j
 '----------------------------------------------------------------
 'Write Closed Record Description into Array
 '----------------------------------------------------------------
-ReDim ClosedRec(MaxClosedRecNum, 6)
+ReDim ClosedRec(MaxClosedRecNum, 6, PeriodNum)
 '--------------------------------------
 'First Dimension
 '---------------
@@ -1088,6 +1091,7 @@ Next j
 '---------------------------------------------------------------
 'Collecting New Record
 '---------------------------------------------------------------
+ReDim NewRecNum(PeriodNum)
 ReDim New_Index(Record_Num, PeriodNum)
 For j = 1 To PeriodNum
     NewRecNum(j) = 0
@@ -1117,16 +1121,18 @@ For i = 1 To PeriodNum
         MaxNewRecNum = MaxNewRecNum
     End If
 Next i
-ReDim NewList(MaxNewRecNum)
+ReDim NewList(MaxNewRecNum, PeriodNum)
 ReDim NewRec(MaxNewRecNum, 5)
+For j = 1 To PeriodNum
 NewList_Pos = 1
 For i = 2 To Record_Num
-    If New_Index(i) <> 0 Then
-        NewList(NewList_Pos) = New_Index(i)
+    If New_Index(i, j) <> 0 Then
+        NewList(NewList_Pos, j) = New_Index(i, j)
         NewList_Pos = NewList_Pos + 1
     Else
     End If
 Next i
+Next j
 ReDim NewCount(5)
 For i = 0 To 5
     NewCount(i) = 0
