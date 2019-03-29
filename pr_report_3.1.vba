@@ -28,7 +28,7 @@ Sub PR_Report()
 '------------------------------------------------------------------------------------------------------------------
 Dim File_1 As String
 Dim Report_Type As Integer
-Dim Week_Num As Long
+Dim PeriodNum As Long
 Dim Month_Num As Integer
 Dim Quarter_Num As Integer
 Dim Year_Num As Integer
@@ -36,7 +36,6 @@ Dim Day_Num As Integer
 Dim r_y As Integer
 Dim r_m As Integer
 Dim r_d As Integer
-Dim PastWkCount As Integer
 Dim Period_End As Date
 Dim Period_Begin As Date
 Dim SubPerBegin() As Date
@@ -111,7 +110,7 @@ Dim ClosedStage() As Integer
 Dim ClosedRecType() As Integer
 Dim ClosedRecCount() As Integer
 '----------------------------------------------------------------
-Dim NewRecNum As Integer
+Dim NewRecNum() As Integer
 Dim NewCount() As Integer
 Dim New_Index() As Integer
 Dim NewList() As Integer
@@ -125,7 +124,7 @@ Dim ClosedRec() As String
 Dim NewRec() As String
 Dim CancelRec() As String
 '------------------------------------------------------------------
-Dim CancelRecNum As Integer
+Dim CancelRecNum() As Integer
 Dim CancelCount() As Integer
 Dim Cancel_Index() As Integer
 Dim CancelList() As Integer
@@ -204,20 +203,10 @@ Input_week_parameters:
         & vbCr & "11. November" _
         & vbCr & "12. December", "MONTH NUMBER")
     Day_Num = InputBox("Input numeric value of the day of the month for the Report", "DAY NUMBER")
-    
     Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
-    FirstWeekDay = Weekday(Period_End) + 10
-    Week_Num = WorksheetFunction.WeekNum(Period_End, FirstWeekDay)
     Period_Begin = Period_End - 6
-    ReDim SubPerBegin(Week_Num)
-    ReDim SubPerEnd(Week_Num)
-    For i = 1 To Week_Num
-        SubPerEnd(i) = Period_End - 7 * (Week_Num - i)
-        SubPerBegin = Period_Begin - 7 * (Week_Num - i)
-    Next i
-    GoTo Input_data_file:
+    GoTo Compute_Sub_Period:
 Input_month_parameters:
-    
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Month_Num = InputBox("Input numeric value the Month for the Report" _
         & vbCr & "1. January" _
@@ -234,19 +223,90 @@ Input_month_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Period_Begin = DateSerial(Year_Num, Month_Num, 1)
     Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
-    
-    GoTo Input_data_file:
+    FirstWeekDay = InputBox("What is the first day of the week?" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST WEEK DAY")
+        Select Case FirstWeekDay
+            Case Is = 1
+                FirstWeekDay = 11
+            Case Is = 2
+                FirstWeekDay = 12
+            Case Is = 3
+                FirstWeekDay = 13
+            Case Is = 4
+                FirstWeekDay = 14
+            Case Is = 5
+                FirstWeekDay = 15
+            Case Is = 6
+                FirstWeekDay = 16
+            Case Is = 7
+                FirstWeekDay = 17
+        End Select
+    GoTo Compute_Sub_Period:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Quarter_Num = InputBox("Input numeric value of the quarter for the report", "QUARTER NUMBER")
     Period_Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
     Period_End = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
-    GoTo Input_data_file:
+    FirstWeekDay = InputBox("What is the first day of the week?" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST WEEK DAY")
+        Select Case FirstWeekDay
+            Case Is = 1
+                FirstWeekDay = 11
+            Case Is = 2
+                FirstWeekDay = 12
+            Case Is = 3
+                FirstWeekDay = 13
+            Case Is = 4
+                FirstWeekDay = 14
+            Case Is = 5
+                FirstWeekDay = 15
+            Case Is = 6
+                FirstWeekDay = 16
+            Case Is = 7
+                FirstWeekDay = 17
+        End Select
+    GoTo Compute_Sub_Period:
 Input_year_parameters:
     Year_Num = InputBox("Input numeric value of Year of the Report", "YEAR NUMBER")
     Period_Begin = DateSerial(Year_Num, 1, 1)
     Period_End = DateSerial(Year_Num, 12, 31)
-    GoTo Input_data_file:
+    FirstWeekDay = InputBox("What is the first day of the week?" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST WEEK DAY")
+        Select Case FirstWeekDay
+            Case Is = 1
+                FirstWeekDay = 11
+            Case Is = 2
+                FirstWeekDay = 12
+            Case Is = 3
+                FirstWeekDay = 13
+            Case Is = 4
+                FirstWeekDay = 14
+            Case Is = 5
+                FirstWeekDay = 15
+            Case Is = 6
+                FirstWeekDay = 16
+            Case Is = 7
+                FirstWeekDay = 17
+        End Select
+    GoTo Compute_Sub_Period:
 Input_range_parameters:
     Year_Num = InputBox("Input numeric value of Year that report starts", "START YEAR")
     Month_Num = InputBox("Input numeric value of month that report starts" _
@@ -280,6 +340,56 @@ Input_range_parameters:
     r_d = InputBox("Input numeric value of day of the month that report ends", "END DAY")
     Period_Begin = DateSerial(Year_Num, Month_Num, Day_Num)
     Period_End = DateSerial(r_y, r_m, r_d)
+    FirstWeekDay = InputBox("What is the first day of the week?" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST WEEK DAY")
+        Select Case FirstWeekDay
+            Case Is = 1
+                FirstWeekDay = 11
+            Case Is = 2
+                FirstWeekDay = 12
+            Case Is = 3
+                FirstWeekDay = 13
+            Case Is = 4
+                FirstWeekDay = 14
+            Case Is = 5
+                FirstWeekDay = 15
+            Case Is = 6
+                FirstWeekDay = 16
+            Case Is = 7
+                FirstWeekDay = 17
+        End Select
+    GoTo Compute_Sub_Period:
+Compute_Sub_Period:
+    If FirstWeekDay < 10 Then
+        FirstWeekDay = Weekday(Period_End) + 10
+    Else
+        FirstWeekDay = FirstWeekDay
+    End If
+    PeriodNum = WorksheetFunction.WeekNum(Period_End, FirstWeekDay)
+    ReDim SubPerBegin(PeriodNum)
+    ReDim SubPerEnd(PeriodNum)
+    Dim BeginWkDay As Integer
+    Dim EndWkDay As Integer
+    EndWkDay = WorksheetFunction.Weekday(Period_End, FirstWeekDay)
+    If EndWkDay = 7 Then
+        For i = 1 To PeriodNum
+            SubPerEnd(i) = Period_End - 7 * (PeriodNum - i)
+            SubPerBegin(i) = (Period_End - 6) - 7 * (PeriodNum - i)
+        Next i
+    Else
+        SubPerEnd(PeriodNum) = Period_End
+        SubPerBegin(PeriodNum) = Period_End - EndWkDay + 1
+        For i = 1 To PeriodNum - 1
+            SubPerEnd(i) = SubPerBegin(PeriodNum) - 1 - 7 * (PeriodNum - 1 - i)
+            SubPerBegin(i) = SubPerEnd(i) - 6
+        Next i
+    End If
     GoTo Input_data_file:
 Input_data_file:
     File_1 = Application.GetOpenFilename _
@@ -401,9 +511,9 @@ Next i
 '------------------------------------------------------------------------------
 'Count Number of Open Record
 '------------------------------------------------------------------------------
-ReDim Open_Index(Record_Num, Week_Num)
-ReDim OpenRecNum(Week_Num)
-For j = 1 To Week_Num
+ReDim Open_Index(Record_Num, PeriodNum)
+ReDim OpenRecNum(PeriodNum)
+For j = 1 To PeriodNum
     OpenRecNum(j) = 0
         For i = 2 To Record_Num
             If pr_state(i) = "Cancelled" Then
@@ -445,15 +555,15 @@ Next j
 '-------------------------------------------------------------------------------
 Dim MaxOpenRecNum As Integer
 MaxOpenRecNum = 0
-For i = 1 To Week_Num
+For i = 1 To PeriodNum
     If MaxOpenRecNum < OpenRecNum(i) Then
         MaxOpenRecNum = OpenRecNum(i)
     Else
         MaxOpenRecNum = MaxOpenRecNum
     End If
 Next i
-ReDim OpenList(MaxOpenRecNum, Week_Num)
-For j = 1 To Week_Num
+ReDim OpenList(MaxOpenRecNum, PeriodNum)
+For j = 1 To PeriodNum
     OpenList_Pos = 1
     For i = 1 To Record_Num
         If Open_Index(i, j) <> 0 Then
@@ -466,10 +576,10 @@ Next j
 '---------------------------------------------------------------------------------
 'Calculate Age , Stage and Type of Open Records
 '---------------------------------------------------------------------------------
-ReDim OpenAge(OpenRecNum, Week_Num)
-ReDim OpenStage(OpenRecNum, Week_Num)
-ReDim OpenRecType(OpenRecNum, Week_Num)
-For j = 1 To Week_Num
+ReDim OpenAge(MaxOpenRecNum, PeriodNum)
+ReDim OpenStage(MaxOpenRecNum, PeriodNum)
+ReDim OpenRecType(MaxOpenRecNum, PeriodNum)
+For j = 1 To PeriodNum
     For i = 1 To OpenRecNum(j)
         OpenAge(i, j) = SubPerEnd(j) - discovery_date(OpenList(i, j))
         If OpenAge(i, j) < 23 Then
@@ -518,8 +628,8 @@ Next j
 '--------------------------------------------------------------
 'Compute Subtotal and Grand Total of the Open Records Matrix
 '--------------------------------------------------------------
-ReDim OpenRecCount(6, 10, Week_Num)
-For k = 1 To Week_Num
+ReDim OpenRecCount(6, 10, PeriodNum)
+For k = 1 To PeriodNum
     For i = 0 To 6
         For j = 0 To 10
             OpenRecCount(i, j, k) = 0
@@ -536,7 +646,7 @@ Next k
 '0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(on-time);
 '9(aged); 10(total)
 '-----------------------------------------------------------------------------
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To OpenRecNum(j)
         Select Case OpenRecType(i, j)
         Case Is = 1
@@ -640,26 +750,26 @@ Next j
 '--------------------------------------------------------------
 'Calculate Summary of the Opened Records
 '--------------------------------------------------------------
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         OpenRecCount(i, 8, j) = OpenRecCount(i, 0, j) + OpenRecCount(i, 1, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         OpenRecCount(i, 9, j) = OpenRecCount(i, 2, j) + OpenRecCount(i, 3, j) _
         + OpenRecCount(i, 4, j) + OpenRecCount(i, 5, j) + OpenRecCount(i, 6, j) _
         + OpenRecCount(i, 7, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         OpenRecCount(i, 10, j) = OpenRecCount(i, 0, j) + OpenRecCount(i, 1, j) _
         + OpenRecCount(i, 2, j) + OpenRecCount(i, 3, j) + OpenRecCount(i, 4, j) _
         + OpenRecCount(i, 5, j) + OpenRecCount(i, 6, j) + OpenRecCount(i, 7, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 0 To 10
         OpenRecCount(6, i, j) = OpenRecCount(1, i, j) + OpenRecCount(2, i, j) + OpenRecCount(3, i, j) _
         + OpenRecCount(4, i, j) + OpenRecCount(5, i, j)
@@ -679,8 +789,8 @@ Next j
 '1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType)
 '--------------------------------------
 
-ReDim OpenRec(MaxOpenRecNum, 5, Week_Num)
-For j = 1 To Week_Num
+ReDim OpenRec(MaxOpenRecNum, 5, PeriodNum)
+For j = 1 To PeriodNum
     For i = 1 To OpenRecNum(j)
         OpenRec(i, 1, j) = pr_id(OpenList(i, j))
         OpenRec(i, 2, j) = title_short_description(OpenList(i, j))
@@ -692,13 +802,13 @@ Next j
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
 '----------------------------------------------------------------
-ReDim ClosedRecNum(Week_Num)
-For i = 1 To Week_Num
+ReDim ClosedRecNum(PeriodNum)
+For i = 1 To PeriodNum
     ClosedRecNum(i) = 0
 Next i
-ReDim Closed_Index(Record_Num, Week_Num)
-For j = 1 To Week_Num
-    For i = 2 To Record_Num(j)
+ReDim Closed_Index(Record_Num, PeriodNum)
+For j = 1 To PeriodNum
+    For i = 2 To Record_Num
         If qa_final_app_on(i) >= SubPerBegin(j) Then
             If qa_final_app_on(i) < SubPerEnd(j) + 1 Then
                 ClosedRecNum(j) = ClosedRecNum(j) + 1
@@ -728,14 +838,14 @@ Next j
 '---------------------------------------------------------
 Dim MaxClosedRecNum As Integer
 MaxClosedRecNum = 0
-For i = 1 To Week_Num
+For i = 1 To PeriodNum
     If MaxClosedRecNum < ClosedRecNum(i) Then
         MaxClosedRecNum = ClosedRecNum(i)
     Else
         MaxClosedRecNum = MaxClosedRecNum
     End If
 Next i
-ReDim ClosedList(MaxClosedRecNum, Week_Num)
+ReDim ClosedList(MaxClosedRecNum, PeriodNum)
 ClosedList_Pos = 1
 For i = 2 To Record_Num
     If Closed_Index(i) <> 0 Then
@@ -747,11 +857,12 @@ Next i
 '--------------------------------------------------------------------------
 'Compute Age and Stage of closed record
 '--------------------------------------------------------------------------
-ReDim CloseAge(ClosedRecNum)
-ReDim CloseStage(ClosedRecNum)
-ReDim ClosedRecType(ClosedRecNum)
-ReDim ClosedRecCount(ClosedRecNum)
-For i = 1 To ClosedRecNum
+ReDim CloseAge(MaxClosedRecNum)
+ReDim CloseStage(MaxClosedRecNum)
+ReDim ClosedRecType(MaxClosedRecNum)
+ReDim ClosedRecCount(MaxClosedRecNum)
+For j = 1 To PeriodNum
+For i = 1 To ClosedRecNum(j)
     If qa_final_app_on(ClosedList(i)) <> 0 Then
         CloseAge(i) = qa_final_app_on(ClosedList(i)) - discovery_date(ClosedList(i))
     Else
@@ -802,13 +913,16 @@ For i = 1 To ClosedRecNum
             ClosedRecType(i) = 5
     End Select
 Next i
+Next j
 '----------------------------------------------------------------
 'Computing Summary of the Closed Records
 '----------------------------------------------------------------
-ReDim ClosedRecCount(6, 10)
+ReDim ClosedRecCount(6, 10, PeriodNum)
 For i = 0 To 6
-    For j = 0 To 2
-        ClosedRecCount(i, j) = 0
+    For j = 0 To 10
+        For k = 1 To PeriodNum
+            ClosedRecCount(i, j, k) = 0
+        Next k
     Next j
 Next i
 '---------------------------------------------------------------
@@ -821,7 +935,7 @@ Next i
 '0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(on-time)
 '9(aged); 10(total)
 '----------------------------------------------------------------
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To ClosedRecNum(j)
         Select Case ClosedRecType(i, j)
             Case Is = 1
@@ -923,26 +1037,26 @@ For j = 1 To Week_Num
     Next i
 Next j
 '-------------------------------------------------------------------------------------
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         ClosedRecCount(i, 8, j) = ClosedRecCount(i, 0, j) + ClosedRecCount(i, 1, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         ClosedRecCount(i, 9, j) = ClosedRecCount(i, 2, j) + ClosedRecCount(i, 3, j) _
         + ClosedRecCount(i, 4, j) + ClosedRecCount(i, 5, j) + ClosedRecCount(i, 6, j) _
         + ClosedRecCount(i, 7, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 1 To 6
         ClosedRecCount(i, 10, j) = ClosedRecCount(i, 0, j) + ClosedRecCount(i, 1, j) _
         + ClosedRecCount(i, 2, j) + ClosedRecCount(i, 3, j) + ClosedRecCount(i, 4, j) _
         + ClosedRecCount(i, 5, j) + ClosedRecCount(i, 6, j) + ClosedRecCount(i, 7, j)
     Next i
 Next j
-For j = 1 To Week_Num
+For j = 1 To PeriodNum
     For i = 0 To 10
         ClosedRecCount(6, i, j) = ClosedRecCount(1, i, j) + ClosedRecCount(2, i, j) + ClosedRecCount(3, i, j) _
         + ClosedRecCount(4, i, j) + ClosedRecCount(5, i, j)
@@ -961,8 +1075,8 @@ ReDim ClosedRec(MaxClosedRecNum, 6)
 '---------------
 '1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType)
 '--------------------------------------
-For j = 1 To Week_Num
-    For i = 1 To ClosedRecNum
+For j = 1 To PeriodNum
+    For i = 1 To ClosedRecNum(j)
         ClosedRec(i, 1, j) = pr_id(ClosedList(i, j))
         ClosedRec(i, 2, j) = title_short_description(ClosedList(i, j))
         ClosedRec(i, 3, j) = responsible_person(ClosedList(i, j))
@@ -974,12 +1088,12 @@ Next j
 '---------------------------------------------------------------
 'Collecting New Record
 '---------------------------------------------------------------
-ReDim New_Index(Record_Num, Week_Num)
-For j = 1 To Week_Num
+ReDim New_Index(Record_Num, PeriodNum)
+For j = 1 To PeriodNum
     NewRecNum(j) = 0
     For i = 1 To Record_Num
         If date_open(i) >= SubPerBegin(j) Then
-            If date_open(i) < superend(j) + 1 Then
+            If date_open(i) < SubPerEnd(j) + 1 Then
                 NewRecNum(j) = NewRecNum(j) + 1
                 New_Index(i, j) = i
             Else
@@ -993,9 +1107,18 @@ For j = 1 To Week_Num
     Next i
 Next j
 '---------------------------------3/28/2019----------------------
-
-ReDim NewList(NewRecNum)
-ReDim NewRec(NewRecNum, 5)
+Dim MaxNewRecNum As Integer
+ReDim NewRecNum(PeriodNum)
+MaxNewRecNum = 0
+For i = 1 To PeriodNum
+    If MaxNewRecNum < NewRecNum(i) Then
+        MaxNewRecNum = NewRecNum(i)
+    Else
+        MaxNewRecNum = MaxNewRecNum
+    End If
+Next i
+ReDim NewList(MaxNewRecNum)
+ReDim NewRec(MaxNewRecNum, 5)
 NewList_Pos = 1
 For i = 2 To Record_Num
     If New_Index(i) <> 0 Then
@@ -1008,357 +1131,377 @@ ReDim NewCount(5)
 For i = 0 To 5
     NewCount(i) = 0
 Next i
-For i = 1 To NewRecNum
-    NewRec(i, 1) = pr_id(NewList(i))
-    NewRec(i, 2) = title_short_description(NewList(i))
-    NewRec(i, 3) = responsible_person(NewList(i))
-    NewRec(i, 4) = areas_affected(NewList(i))
-    Select Case record_type(NewList(i))
-        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
-            NewRec(i, 5) = 1
-            NewCount(1) = NewCount(1) + 1
-        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
-            NewRec(i, 5) = 2
-            NewCount(2) = NewCount(2) + 1
-        Case "Manufacturing Investigations / Event Report"
-            NewRec(i, 5) = 3
-            NewCount(3) = NewCount(3) + 1
-        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
-            NewRec(i, 5) = 4
-            NewCount(4) = NewCount(4) + 1
-        Case "Manufacturing Investigations / Incident"
-            NewRec(i, 5) = 5
-            NewCount(5) = NewCount(5) + 1
-    End Select
-Next i
+For j = 1 To PeriodNum
+    For i = 1 To NewRecNum(j)
+        NewRec(i, 1) = pr_id(NewList(i))
+        NewRec(i, 2) = title_short_description(NewList(i))
+        NewRec(i, 3) = responsible_person(NewList(i))
+        NewRec(i, 4) = areas_affected(NewList(i))
+        Select Case record_type(NewList(i))
+            Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+                NewRec(i, 5) = 1
+                NewCount(1) = NewCount(1) + 1
+            Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+                NewRec(i, 5) = 2
+                NewCount(2) = NewCount(2) + 1
+            Case "Manufacturing Investigations / Event Report"
+                NewRec(i, 5) = 3
+                NewCount(3) = NewCount(3) + 1
+            Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+                NewRec(i, 5) = 4
+                NewCount(4) = NewCount(4) + 1
+            Case "Manufacturing Investigations / Incident"
+                NewRec(i, 5) = 5
+                NewCount(5) = NewCount(5) + 1
+        End Select
+    Next i
+Next j
 '----------------------------------------------------------------
 'Collecting Cancelled Records
 '----------------------------------------------------------------
 ReDim Cancel_Index(Record_Num)
-CancelRecNum = 0
-For i = 1 To Record_Num
-    If date_open(i) >= Period_Begin Then
-        If date_open(i) <= Period_End Then
-            If pr_state(i) = "Cancelled" Then
-                CancelRecNum = CancelRecNum + 1
-                Cancel_Index(i) = i
+ReDim CancelRecNum(PeriodNum)
+For j = 1 To PeriodNum
+    For i = 1 To Record_Num
+        If date_open(i) >= SubPerBegin(j) Then
+            If date_open(i) <= SubPerEnd(j) Then
+                If pr_state(i) = "Cancelled" Then
+                    CancelRecNum(j) = CancelRecNum(j) + 1
+                    Cancel_Index(i, j) = i
+                Else
+                    CancelRecNum(j) = CancelRecNum(j)
+                    Cancel_Index(i, j) = 0
+                End If
             Else
-                CancelRecNum = CancelRecNum
-                Cancel_Index(i) = 0
+                CancelRecNum(j) = CancelRecNum(j)
+                Cancel_Index(i, j) = 0
             End If
         Else
-            CancelRecNum = CancelRecNum
-            Cancel_Index(i) = 0
+            CancelRecNum(j) = CancelRecNum(j)
+            Cancel_Index(i, j) = 0
         End If
+    Next i
+Next j
+ReDim CancelRecNum(PeriodNum)
+Dim MaxCancelRecNum As Integer
+MaxCancelRecNum = 0
+For i = 1 To PeriodNum
+    If MaxCancelRecNum < CancelRecNum(i) Then
+        MaxCancelRecNum = CancelRecNum(i)
     Else
-        CancelRecNum = CancelRecNum
-        Cancel_Index(i) = 0
+        maccancelrecnum = MaxCancelRecNum
     End If
 Next i
-ReDim CancelList(CancelRecNum)
-ReDim CancelRec(CancelRecNum, 5)
+ReDim CancelList(MaxCancelRecNum, PeriodNum)
+ReDim CancelRec(MaxCancelRecNum, 5, PeriodNum)
 CancelList_Pos = 1
-For i = 2 To Record_Num
-    If Cancel_Index(i) <> 0 Then
-        CancelList(CancelList_Pos) = Cancel_Index(i)
-        CancelList_Pos = CancelList_Pos + 1
-    Else
-    End If
-Next i
-ReDim CancelCount(5)
-For i = 0 To 5
-    CancelCount(i) = 0
-Next i
-For i = 1 To CancelRecNum
-    CancelRec(i, 1) = pr_id(CancelList(i))
-    CancelRec(i, 2) = title_short_description(CancelList(i))
-    CancelRec(i, 3) = responsible_person(CancelList(i))
-    CancelRec(i, 4) = ""
-    Select Case record_type(CancelList(i))
-        Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
-            CancelRec(i, 5) = 1
-            CancelCount(1) = CancelCount(1) + 1
-        Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
-            CancelRec(i, 5) = 2
-            CancelCount(2) = CancelCount(2) + 1
-        Case "Manufacturing Investigations / Event Report"
-            CancelRec(i, 5) = 3
-            CancelCount(3) = CancelCount(3) + 1
-        Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
-            CancelRec(i, 5) = 4
-            CancelCount(4) = CancelCount(4) + 1
-        Case "Manufacturing Investigations / Incident"
-            CancelRec(i, 5) = 5
-            CancelCount(5) = CancelCount(5) + 1
-    End Select
-Next i
+For j = 1 To PeriodNum
+    For i = 2 To Record_Num
+        If Cancel_Index(i, j) <> 0 Then
+            CancelList(CancelList_Pos) = Cancel_Index(i, j)
+            CancelList_Pos = CancelList_Pos + 1
+        Else
+        End If
+    Next i
+Next j
+ReDim CancelCount(5, PeriodNum)
+For j = 1 To PeriodNum
+    For i = 0 To 5
+        CancelCount(i, j) = 0
+    Next i
+Next j
+For j = 1 To PeriodNum
+    For i = 1 To CancelRecNum(j)
+        CancelRec(i, 1) = pr_id(CancelList(i))
+        CancelRec(i, 2) = title_short_description(CancelList(i))
+        CancelRec(i, 3) = responsible_person(CancelList(i))
+        CancelRec(i, 4) = ""
+        Select Case record_type(CancelList(i))
+            Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
+                CancelRec(i, 5) = 1
+                CancelCount(1) = CancelCount(1) + 1
+            Case "Laboratory Investigations / Readily Apparent Assignable Cause (RAAC)"
+                CancelRec(i, 5) = 2
+                CancelCount(2) = CancelCount(2) + 1
+            Case "Manufacturing Investigations / Event Report"
+                CancelRec(i, 5) = 3
+                CancelCount(3) = CancelCount(3) + 1
+            Case "Manufacturing Investigations / Quality Assurance Report (QAR)"
+                CancelRec(i, 5) = 4
+                CancelCount(4) = CancelCount(4) + 1
+            Case "Manufacturing Investigations / Incident"
+                CancelRec(i, 5) = 5
+                CancelCount(5) = CancelCount(5) + 1
+        End Select
+    Next i
+Next j
 '----------------------------------------------------------------
 'Generate Summary Report
 '----------------------------------------------------------------
 Sheets.Add after:=Sheets(DataSheet_Name)
-Sheets(Sheets.Count).Select
-Select Case Report_Type
-    Case Is = 1
-        ReportSheet_Name = "Week_" & Week_Num & "_" & Year_Num
-    Case Is = 2
-        ReportSheet_Name = "Month_" & Month_Num & "_" & Year_Num
-    Case Is = 3
-        ReportSheet_Name = "Quarter_" & Quarter_Num & "_" & Year_Num
-    Case Is = 4
-        ReportSheet_Name = "Year_" & Year_Num
-    Case Is = 5
-        ReportSheet_Name = Year_Num & "_" & Month_Num & "_" & Day_Num & "_" & r_y & "_" & r_m & "_" & r_d
-End Select
-Sheets(Sheets.Count).Name = ReportSheet_Name
-'----------------------------------------------------------------
-Summary_Headers:
-'----------------------------------------------------------------
-'Fill Header Values into Header Array
-'----------------------------------------------------------------
-Rep_Headers(1) = "Record Type"
-Rep_Headers(2) = "<23 Days"
-Rep_Headers(3) = "24-30 Days"
-Rep_Headers(4) = "31-60 Days"
-Rep_Headers(5) = "61-90 Days"
-Rep_Headers(6) = "91-120 Days"
-Rep_Headers(7) = "121-150 Days"
-Rep_Headers(8) = "151-180 Days"
-Rep_Headers(9) = ">180 Days"
-Rep_Headers(10) = "On-Time"
-Rep_Headers(11) = "Aged"
-Rep_Headers(12) = "Total"
-Rep_Headers(13) = "Record ID"
-Rep_Headers(14) = "Short Description"
-Rep_Headers(15) = "Responsible Person"
-Rep_Headers(16) = "Record Stage"
-Rep_Headers(17) = "Record Type"
-Rep_Headers(18) = "LIR"
-Rep_Headers(19) = "RAAC"
-Rep_Headers(20) = "ER"
-Rep_Headers(21) = "QAR"
-Rep_Headers(22) = "INC"
-Rep_Headers(23) = "Total"
-Rep_Headers(24) = "Record Type"
-Rep_Headers(25) = "Counts"
-Rep_Headers(26) = "CQ (Chemistry)"
-Rep_Headers(27) = "IQ (Comm7odity)"
-Worksheets(ReportSheet_Name).Cells(2, 1).Activate
-For i = 0 To 1
-    For j = 1 To 12
-        Cells(2 + 8 * i, j).Value = Rep_Headers(j)
-    Next j
-Next i
-For i = 0 To 3
-    For j = 18 To 23
-        Cells(3 + 8 * i + j - 18, 1).Value = Rep_Headers(j)
-    Next j
-Next i
-For i = 0 To 1
-    For j = 24 To 25
-        Cells(18 + 8 * i, j - 23).Value = Rep_Headers(j)
-    Next j
-Next i
-'----------------------------------------------------------------
-'Writing Record Summary Matrices
-'----------------------------------------------------------------
-Cells(1, 1).Value = "Records remain opened between " & Period_Begin & "-" & Period_End
-For i = 1 To 6
-  For j = 0 To 10
-      Cells(i + 2, j + 2).Value = OpenRecCount(i, j)
-  Next j
-Next i
-Cells(9, 1).Value = "Records Closed between " & Period_Begin & "-" & Period_End
-For i = 1 To 6
-  For j = 0 To 10
-      Cells(i + 10, j + 2).Value = ClosedRecCount(i, j)
-  Next j
-Next i
-Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
-Cells(25, 1).Value = "Cancelled Records opened between " & Period_Begin & "-" & Period_End
-
-'-------------------------------------------------------------------
-'Writing New Record Summary
-'-------------------------------------------------------------------
-Cells(18, 2).Activate
-For i = 1 To 5
-    ActiveCell.Offset(1, 0).Value = NewCount(i)
-    ActiveCell.Offset(1, 0).Activate
-Next i
-Cells(24, 2).Value = NewRecNum
-'-----------------------------------------------------------------------
-'Writing Cancelled Record Summary
-'-----------------------------------------------------------------------
-Cells(26, 2).Activate
-For i = 1 To 5
-    ActiveCell.Offset(1, 0).Value = CancelCount(i)
-    ActiveCell.Offset(1, 0).Activate
-Next i
-Cells(32, 2).Value = CancelRecNum
-'----------------------------------------------------------------------------------
-'Writing Detail Information of Open Records from Array into Spreadsheet while
-'Updating Array that Captured Position of each Record in the Spreadsheet
-'----------------------------------------------------------------------------------
-ReplCol = Cells(2, 1).End(xlToRight).Column
-Cells(1, ReplCol + 1).Activate
-ActiveCell.Value = "Open Records"
-For i = 1 To 5
-ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
-Next i
-ActiveCell.Offset(1, 0).Activate
-For j = 1 To 5
-    For i = 1 To OpenRecNum
-        If OpenRec(i, 5) = j Then
-            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
-            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
-            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
-            Select Case OpenRec(i, 4)
-                Case Is = 0
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
-                Case Is = 1
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
-                Case Is = 2
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
-                Case Is = 3
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
-                Case Is = 4
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
-                Case Is = 5
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
-                Case Is = 6
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
-                Case Is = 7
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
-            End Select
-            Select Case OpenRec(i, 5)
-                Case Is = 1
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
-                Case Is = 2
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
-                Case Is = 3
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
-                Case Is = 4
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
-                Case Is = 5
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
-            End Select
-            ActiveCell.Offset(1, 0).Activate
-        Else
-        End If
-    Next i
-Next j
-Cells(1, 18).Activate
-ActiveCell.Value = "Closed Records"
-For i = 1 To 5
-ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
-Next i
-ActiveCell.Offset(1, 0).Activate
-For j = 1 To 5
-    For i = 1 To ClosedRecNum
-        If ClosedRec(i, 5) = j Then
-            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
-            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
-            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
-            Select Case ClosedRec(i, 4)
-                Case Is = 0
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
-                Case Is = 1
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
-                Case Is = 2
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
-                Case Is = 3
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
-                Case Is = 4
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
-                Case Is = 5
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
-                Case Is = 6
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
-                Case Is = 7
-                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
-            End Select
-            Select Case ClosedRec(i, 5)
-                Case Is = 1
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
-                Case Is = 2
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
-                Case Is = 3
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
-                Case Is = 4
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
-                Case Is = 5
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
-            End Select
-            ActiveCell.Offset(1, 0).Activate
-        Else
-        End If
-    Next i
-Next j
-
-'------------------------------------------------------------------
-'Charting
-'------------------------------------------------------------------
-ChartSheet_Name = ReportSheet_Name & "_Chart"
-Sheets.Add after:=Sheets(ReportSheet_Name)
-Sheets(Sheets.Count).Select
-Sheets(Sheets.Count).Name = ChartSheet_Name
-ActiveSheet.Shapes.AddChart.Select
-ActiveChart.ChartType = xlColumnStacked
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(1).Name = Rep_Headers(2)
-ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$B$3:$B$7"
-ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$3:$A$7"
-ActiveChart.SeriesCollection(1).Interior.Color = RGB(79, 129, 189)
-ActiveChart.SeriesCollection(1).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(2).Name = Rep_Headers(3)
-ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$C$3:$C$7"
-ActiveChart.SeriesCollection(2).Interior.Color = RGB(255, 192, 0)
-ActiveChart.SeriesCollection(2).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(3).Name = Rep_Headers(11)
-ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$K$3:$K$7"
-ActiveChart.SeriesCollection(3).ApplyDataLabels
-ActiveChart.SeriesCollection(3).Interior.Color = RGB(192, 80, 77)
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(4).Values = ReportSheet_Name & "!" & "$L$3:$L$7"
-ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
-ActiveChart.SeriesCollection(4).ApplyDataLabels
-ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
-ActiveChart.SeriesCollection(4).MarkerStyle = -4142
-ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
-ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
-ActiveChart.Legend.LegendEntries(4).Delete
-'ActiveChart.ChartStyle = 26
-With ActiveChart
-    .HasTitle = True
-    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(Period_End, 4) & ")"
-End With
-ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
-ActiveSheet.Shapes.AddChart.Select
-ActiveChart.ChartType = xlColumnStacked
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(1).Name = Rep_Headers(10)
-ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$J$11:$J$15"
-ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$11:$A$15"
-ActiveChart.SeriesCollection(1).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(2).Name = Rep_Headers(11)
-ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$K$11:$K$15"
-ActiveChart.SeriesCollection(2).ApplyDataLabels
-ActiveChart.SeriesCollection.NewSeries
-ActiveChart.SeriesCollection(3).Name = Rep_Headers(13)
-ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$L$11:$L$15"
-ActiveChart.SeriesCollection(3).ChartType = xlLineMarkers
-ActiveChart.SeriesCollection(3).ApplyDataLabels
-ActiveChart.SeriesCollection(3).DataLabels.Position = xlLabelPositionAbove
-ActiveChart.SeriesCollection(3).MarkerStyle = -4142
-ActiveChart.SeriesCollection(3).Format.Fill.Visible = msoFalse
-ActiveChart.SeriesCollection(3).Format.Line.Visible = msoFalse
-ActiveChart.Legend.LegendEntries(3).Delete
-'ActiveChart.ChartStyle = 26
-With ActiveChart
-    .HasTitle = True
-    .ChartTitle.Text = "CQ Number of Records Closed on Week " & Week_Num & ", " & Right(Period_End, 4)
-End With
-ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+'Sheets(Sheets.Count).Select
+'Select Case Report_Type
+'    Case Is = 1
+'        ReportSheet_Name = "Week_" & PeriodNum & "_" & Year_Num
+'    Case Is = 2
+'        ReportSheet_Name = "Month_" & Month_Num & "_" & Year_Num
+'    Case Is = 3
+'        ReportSheet_Name = "Quarter_" & Quarter_Num & "_" & Year_Num
+'    Case Is = 4
+'        ReportSheet_Name = "Year_" & Year_Num
+'    Case Is = 5
+'        ReportSheet_Name = Year_Num & "_" & Month_Num & "_" & Day_Num & "_" & r_y & "_" & r_m & "_" & r_d
+'End Select
+'Sheets(Sheets.Count).Name = ReportSheet_Name
+''----------------------------------------------------------------
+'Summary_Headers:
+''----------------------------------------------------------------
+''Fill Header Values into Header Array
+''----------------------------------------------------------------
+'Rep_Headers(1) = "Record Type"
+'Rep_Headers(2) = "<23 Days"
+'Rep_Headers(3) = "24-30 Days"
+'Rep_Headers(4) = "31-60 Days"
+'Rep_Headers(5) = "61-90 Days"
+'Rep_Headers(6) = "91-120 Days"
+'Rep_Headers(7) = "121-150 Days"
+'Rep_Headers(8) = "151-180 Days"
+'Rep_Headers(9) = ">180 Days"
+'Rep_Headers(10) = "On-Time"
+'Rep_Headers(11) = "Aged"
+'Rep_Headers(12) = "Total"
+'Rep_Headers(13) = "Record ID"
+'Rep_Headers(14) = "Short Description"
+'Rep_Headers(15) = "Responsible Person"
+'Rep_Headers(16) = "Record Stage"
+'Rep_Headers(17) = "Record Type"
+'Rep_Headers(18) = "LIR"
+'Rep_Headers(19) = "RAAC"
+'Rep_Headers(20) = "ER"
+'Rep_Headers(21) = "QAR"
+'Rep_Headers(22) = "INC"
+'Rep_Headers(23) = "Total"
+'Rep_Headers(24) = "Record Type"
+'Rep_Headers(25) = "Counts"
+'Rep_Headers(26) = "CQ (Chemistry)"
+'Rep_Headers(27) = "IQ (Comm7odity)"
+'Worksheets(ReportSheet_Name).Cells(2, 1).Activate
+'For i = 0 To 1
+'    For j = 1 To 12
+'        Cells(2 + 8 * i, j).Value = Rep_Headers(j)
+'    Next j
+'Next i
+'For i = 0 To 3
+'    For j = 18 To 23
+'        Cells(3 + 8 * i + j - 18, 1).Value = Rep_Headers(j)
+'    Next j
+'Next i
+'For i = 0 To 1
+'    For j = 24 To 25
+'        Cells(18 + 8 * i, j - 23).Value = Rep_Headers(j)
+'    Next j
+'Next i
+''----------------------------------------------------------------
+''Writing Record Summary Matrices
+''----------------------------------------------------------------
+'Cells(1, 1).Value = "Records remain opened between " & Period_Begin & "-" & Period_End
+'For i = 1 To 6
+'  For j = 0 To 10
+'      Cells(i + 2, j + 2).Value = OpenRecCount(i, j)
+'  Next j
+'Next i
+'Cells(9, 1).Value = "Records Closed between " & Period_Begin & "-" & Period_End
+'For i = 1 To 6
+'  For j = 0 To 10
+'      Cells(i + 10, j + 2).Value = ClosedRecCount(i, j)
+'  Next j
+'Next i
+'Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
+'Cells(25, 1).Value = "Cancelled Records opened between " & Period_Begin & "-" & Period_End
+'
+''-------------------------------------------------------------------
+''Writing New Record Summary
+''-------------------------------------------------------------------
+'Cells(18, 2).Activate
+'For i = 1 To 5
+'    ActiveCell.Offset(1, 0).Value = NewCount(i)
+'    ActiveCell.Offset(1, 0).Activate
+'Next i
+'Cells(24, 2).Value = NewRecNum
+''-----------------------------------------------------------------------
+''Writing Cancelled Record Summary
+''-----------------------------------------------------------------------
+'Cells(26, 2).Activate
+'For i = 1 To 5
+'    ActiveCell.Offset(1, 0).Value = CancelCount(i)
+'    ActiveCell.Offset(1, 0).Activate
+'Next i
+'Cells(32, 2).Value = CancelRecNum
+''----------------------------------------------------------------------------------
+''Writing Detail Information of Open Records from Array into Spreadsheet while
+''Updating Array that Captured Position of each Record in the Spreadsheet
+''----------------------------------------------------------------------------------
+'ReplCol = Cells(2, 1).End(xlToRight).Column
+'Cells(1, ReplCol + 1).Activate
+'ActiveCell.Value = "Open Records"
+'For i = 1 To 5
+'ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
+'Next i
+'ActiveCell.Offset(1, 0).Activate
+'For j = 1 To 5
+'    For i = 1 To OpenRecNum
+'        If OpenRec(i, 5) = j Then
+'            ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
+'            ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
+'            ActiveCell.Offset(1, 2).Value = OpenRec(i, 3)
+'            Select Case OpenRec(i, 4)
+'                Case Is = 0
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
+'                Case Is = 1
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
+'                Case Is = 2
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
+'                Case Is = 3
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
+'                Case Is = 4
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
+'                Case Is = 5
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
+'                Case Is = 6
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
+'                Case Is = 7
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
+'            End Select
+'            Select Case OpenRec(i, 5)
+'                Case Is = 1
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
+'                Case Is = 2
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+'                Case Is = 3
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+'                Case Is = 4
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+'                Case Is = 5
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+'            End Select
+'            ActiveCell.Offset(1, 0).Activate
+'        Else
+'        End If
+'    Next i
+'Next j
+'Cells(1, 18).Activate
+'ActiveCell.Value = "Closed Records"
+'For i = 1 To 5
+'ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
+'Next i
+'ActiveCell.Offset(1, 0).Activate
+'For j = 1 To 5
+'    For i = 1 To ClosedRecNum
+'        If ClosedRec(i, 5) = j Then
+'            ActiveCell.Offset(1, 0).Value = ClosedRec(i, 1)
+'            ActiveCell.Offset(1, 1).Value = ClosedRec(i, 2)
+'            ActiveCell.Offset(1, 2).Value = ClosedRec(i, 3)
+'            Select Case ClosedRec(i, 4)
+'                Case Is = 0
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
+'                Case Is = 1
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(3)
+'                Case Is = 2
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(4)
+'                Case Is = 3
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(5)
+'                Case Is = 4
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(6)
+'                Case Is = 5
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(7)
+'                Case Is = 6
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(8)
+'                Case Is = 7
+'                    ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
+'            End Select
+'            Select Case ClosedRec(i, 5)
+'                Case Is = 1
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
+'                Case Is = 2
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+'                Case Is = 3
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+'                Case Is = 4
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+'                Case Is = 5
+'                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+'            End Select
+'            ActiveCell.Offset(1, 0).Activate
+'        Else
+'        End If
+'    Next i
+'Next j
+'
+''------------------------------------------------------------------
+''Charting
+''------------------------------------------------------------------
+'ChartSheet_Name = ReportSheet_Name & "_Chart"
+'Sheets.Add after:=Sheets(ReportSheet_Name)
+'Sheets(Sheets.Count).Select
+'Sheets(Sheets.Count).Name = ChartSheet_Name
+'ActiveSheet.Shapes.AddChart.Select
+'ActiveChart.ChartType = xlColumnStacked
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(1).Name = Rep_Headers(2)
+'ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$B$3:$B$7"
+'ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$3:$A$7"
+'ActiveChart.SeriesCollection(1).Interior.Color = RGB(79, 129, 189)
+'ActiveChart.SeriesCollection(1).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(2).Name = Rep_Headers(3)
+'ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$C$3:$C$7"
+'ActiveChart.SeriesCollection(2).Interior.Color = RGB(255, 192, 0)
+'ActiveChart.SeriesCollection(2).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(3).Name = Rep_Headers(11)
+'ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$K$3:$K$7"
+'ActiveChart.SeriesCollection(3).ApplyDataLabels
+'ActiveChart.SeriesCollection(3).Interior.Color = RGB(192, 80, 77)
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(4).Values = ReportSheet_Name & "!" & "$L$3:$L$7"
+'ActiveChart.SeriesCollection(4).ChartType = xlLineMarkers
+'ActiveChart.SeriesCollection(4).ApplyDataLabels
+'ActiveChart.SeriesCollection(4).DataLabels.Position = xlLabelPositionAbove
+'ActiveChart.SeriesCollection(4).MarkerStyle = -4142
+'ActiveChart.SeriesCollection(4).Format.Fill.Visible = msoFalse
+'ActiveChart.SeriesCollection(4).Format.Line.Visible = msoFalse
+'ActiveChart.Legend.LegendEntries(4).Delete
+''ActiveChart.ChartStyle = 26
+'With ActiveChart
+'    .HasTitle = True
+'    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & PeriodNum & ", " & Right(Period_End, 4) & ")"
+'End With
+'ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
+'ActiveSheet.Shapes.AddChart.Select
+'ActiveChart.ChartType = xlColumnStacked
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(1).Name = Rep_Headers(10)
+'ActiveChart.SeriesCollection(1).Values = ReportSheet_Name & "!" & "$J$11:$J$15"
+'ActiveChart.SeriesCollection(1).XValues = ReportSheet_Name & "!" & "$A$11:$A$15"
+'ActiveChart.SeriesCollection(1).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(2).Name = Rep_Headers(11)
+'ActiveChart.SeriesCollection(2).Values = ReportSheet_Name & "!" & "$K$11:$K$15"
+'ActiveChart.SeriesCollection(2).ApplyDataLabels
+'ActiveChart.SeriesCollection.NewSeries
+'ActiveChart.SeriesCollection(3).Name = Rep_Headers(13)
+'ActiveChart.SeriesCollection(3).Values = ReportSheet_Name & "!" & "$L$11:$L$15"
+'ActiveChart.SeriesCollection(3).ChartType = xlLineMarkers
+'ActiveChart.SeriesCollection(3).ApplyDataLabels
+'ActiveChart.SeriesCollection(3).DataLabels.Position = xlLabelPositionAbove
+'ActiveChart.SeriesCollection(3).MarkerStyle = -4142
+'ActiveChart.SeriesCollection(3).Format.Fill.Visible = msoFalse
+'ActiveChart.SeriesCollection(3).Format.Line.Visible = msoFalse
+'ActiveChart.Legend.LegendEntries(3).Delete
+''ActiveChart.ChartStyle = 26
+'With ActiveChart
+'    .HasTitle = True
+'    .ChartTitle.Text = "CQ Number of Records Closed on Week " & PeriodNum & ", " & Right(Period_End, 4)
+'End With
+'ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 End Sub
