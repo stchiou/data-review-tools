@@ -140,6 +140,7 @@ Dim Range_Monthly_Rec() As Long
 Dim Range_Quarterly_Rec() As Long
 Dim Range_Annual_Rec() As Long
 Dim New_record() As String
+Dim Division() As String
 Dim committed() As String
 '-----------------------------------------------------------------
 Dim ReportSheet_Name As String
@@ -1124,7 +1125,7 @@ Cells(32, 2).Value = CancelRecNum
 '----------------------------------------------------------------------------------
 ReplCol = Cells(2, 1).End(xlToRight).Column
 Cells(1, ReplCol + 1).Activate
-ActiveCell.Value = "Open Records"
+ActiveCell.Value = "Opened Records"
 For i = 1 To 5
 ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
@@ -1224,7 +1225,30 @@ For i = 1 To 5
 ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
 ActiveCell.Offset(1, 0).Activate
-
+For j = 1 To 5
+    For i = 1 To NewRecNum
+        If NewRec(i, 5) = j Then
+            ActiveCell.Offset(1, 0).Value = NewRec(i, 1)
+            ActiveCell.Offset(1, 1).Value = NewRec(i, 2)
+            ActiveCell.Offset(1, 2).Value = NewRec(i, 3)
+            ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
+            Select Case NewRec(i, 5)
+                Case Is = 1
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
+                Case Is = 2
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+                Case Is = 3
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+                Case Is = 4
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+                Case Is = 5
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+            End Select
+            ActiveCell.Offset(1, 0).Activate
+        Else
+        End If
+    Next i
+Next j
 '------------------------------------------------------------------
 'Charting
 '------------------------------------------------------------------
