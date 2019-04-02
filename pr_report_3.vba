@@ -140,7 +140,7 @@ Dim Range_Monthly_Rec() As Long
 Dim Range_Quarterly_Rec() As Long
 Dim Range_Annual_Rec() As Long
 Dim New_record() As String
-Dim Division() As String
+Dim DivCount() As Integer
 Dim committed() As String
 '-----------------------------------------------------------------
 Dim ReportSheet_Name As String
@@ -1249,6 +1249,154 @@ For j = 1 To 5
         End If
     Next i
 Next j
+ReDim DivCount(30) As Integer
+'-----------------------------------------------------------------
+'Count Records by Division and Types
+'---------------
+'Array Dimension
+'---------------
+'1: CQ Opened LIR
+'2: CQ Opened RAAC
+'3: CQ Opened ER
+'4: CQ Opened QAR
+'5: CQ Opened INC
+'6: IM Opened LIR
+'7: IM Opened RAAC
+'8: IM Opened ER
+'9: IM Opened QAR
+'10:IM Opened INC
+'11:CQ Closed LIR
+'12:CQ Closed RAAC
+'13:CQ Closed ER
+'14:CQ Closed QAR
+'15:CQ Closed INC
+'16:IM Closed LIR
+'17:IM Closed RAAC
+'18:IM Closed ER
+'19:IM Closed QAR
+'20:IM Closed INC
+'21:Other Opened LIR
+'22:Other Opened RAAC
+'23:Other Opened ER
+'24:Other Opened QAR
+'25:Other Opened INC
+'26:Other Closed LIR
+'27:Other Closed RAAC
+'28:Other Closed ER
+'29:Other Closed QAR
+'30:Other Closed INC
+'------------------------------------------------------------------
+For i = 0 To 30
+    DivCount(i) = 0
+Next i
+For i = 1 To OpenRecNum
+    Select Case OpenRecType(i)
+        Case Is = 1
+            If InStr("CQ", areas_affected(OpenList(i))) > 0 Then
+                DivCount(1) = DivCount(1) + 1
+            Else
+                If InStr("SQ", areas_affected(OpenList(i))) > 0 Then
+                    DivCount(6) = DivCount(6) + 1
+                Else
+                    DivCount(21) = DivCount(21) + 1
+                End If
+            End If
+        Case Is = 2
+            If InStr("CQ", areas_affected(OpenList(i))) > 0 Then
+                DivCount(2) = DivCount(2) + 1
+            Else
+                If InStr("SQ", areas_affected(OpenList(i))) > 0 Then
+                    DivCount(7) = DivCount(7) + 1
+                Else
+                    DivCount(22) = DivCount(22) + 1
+                End If
+            End If
+        Case Is = 3
+            If InStr("CQ", areas_affected(OpenList(i))) > 0 Then
+                DivCount(3) = DivCount(3) + 1
+            Else
+                If InStr("SQ", areas_affected(OpenList(i))) > 0 Then
+                    DivCount(8) = DivCount(8) + 1
+                Else
+                    DivCount(23) = DivCount(23) + 1
+                End If
+            End If
+        Case Is = 4
+            If InStr("CQ", areas_affected(OpenList(i))) > 0 Then
+                DivCount(4) = DivCount(4) + 1
+            Else
+                If InStr("SQ", areas_affected(OpenList(i))) > 0 Then
+                    DivCount(9) = DivCount(9) + 1
+                Else
+                    DivCount(24) = DivCount(24) + 1
+                End If
+            End If
+        Case Is = 5
+            If InStr("CQ", areas_affected(OpenList(i))) > 0 Then
+                DivCount(5) = DivCount(5) + 1
+            Else
+                If InStr("SQ", areas_affected(OpenList(i))) > 0 Then
+                    DivCount(10) = DivCount(10) + 1
+                Else
+                    DivCount(25) = DivCount(25) + 1
+                End If
+            End If
+    End Select
+Next i
+For i = 1 To ClosedRecNum
+    Select Case ClosedRecType(i)
+        Case Is = 1
+            If InStr("CQ", areas_affected(ClosedList(i))) > 0 Then
+                DivCount(11) = DivCount(11) + 1
+            Else
+                If InStr("SQ", areas_affected(ClosedList(i))) > 0 Then
+                    DivCount(16) = DivCount(16) + 1
+                Else
+                    DivCount(26) = DivCount(26) + 1
+                End If
+            End If
+        Case Is = 2
+            If InStr("CQ", areas_affected(ClosedList(i))) > 0 Then
+                DivCount(12) = DivCount(12) + 1
+            Else
+                If InStr("SQ", areas_affected(ClosedList(i))) > 0 Then
+                    DivCount(17) = DivCount(17) + 1
+                Else
+                    DivCount(27) = DivCount(27) + 1
+                End If
+            End If
+        Case Is = 3
+            If InStr("CQ", areas_affected(ClosedList(i))) > 0 Then
+                DivCount(13) = DivCount(13) + 1
+            Else
+                If InStr("SQ", areas_affected(ClosedList(i))) > 0 Then
+                    DivCount(18) = DivCount(18) + 1
+                Else
+                    DivCount(28) = DivCount(28) + 1
+                End If
+            End If
+        Case Is = 4
+            If InStr("CQ", areas_affected(ClosedList(i))) > 0 Then
+                DivCount(14) = DivCount(14) + 1
+            Else
+                If InStr("SQ", areas_affected(ClosedList(i))) > 0 Then
+                    DivCount(19) = DivCount(19) + 1
+                Else
+                    DivCount(29) = DivCount(29) + 1
+                End If
+            End If
+        Case Is = 5
+            If InStr("CQ", areas_affected(ClosedList(i))) > 0 Then
+                DivCount(15) = DivCount(15) + 1
+            Else
+                If InStr("SQ", areas_affected(ClosedList(i))) > 0 Then
+                    DivCount(20) = DivCount(20) + 1
+                Else
+                    DivCount(30) = DivCount(30) + 1
+                End If
+            End If
+    End Select
+Next i
 '------------------------------------------------------------------
 'Charting
 '------------------------------------------------------------------
