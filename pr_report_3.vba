@@ -1217,6 +1217,13 @@ For j = 1 To 5
         End If
     Next i
 Next j
+ReplCol = ActiveCell.End(xlToRight).Column
+Cells(1, ReplCol + 1).Activate
+ActiveCell.Value = "New Records"
+For i = 1 To 5
+ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
+Next i
+ActiveCell.Offset(1, 0).Activate
 
 '------------------------------------------------------------------
 'Charting
