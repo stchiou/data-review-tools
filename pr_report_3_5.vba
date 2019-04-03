@@ -42,7 +42,7 @@ Dim UnitInPeriod As Integer
 Dim Record_Num As Long
 Dim FirstWeekDay As Integer
 '-------------------------------------------------------
-'Fields in raw data
+'Arrays for fields in raw data
 '-------------------------------------------------------
 Dim pr_id() As String
 Dim title_short_description() As String
@@ -82,7 +82,7 @@ Dim final_comments() As String
 Dim assignable_cause_class() As String
 Dim assignable_cause() As String
 Dim supplier_name_lot_no() As String
-Dim area_disocovered() As String
+Dim area_discovered() As String
 Dim areas_affected() As String
 Dim analyst_personnel_sub_category() As String
 Dim pr_state() As String
@@ -94,7 +94,8 @@ Dim root_cause_lev_1() As String
 Dim root_cause_lev_2() As String
 Dim root_cause_lev_3() As String
 '-----------------------------------------------------------------
-Dim OpenArea() As Integer
+'Array/variables for processing open records
+'-----------------------------------------------------------------
 Dim OpenRecNum As Integer
 Dim Open_Index() As Integer
 Dim OpenList() As Integer
@@ -103,7 +104,11 @@ Dim OpenAge() As Integer
 Dim OpenStage() As Integer
 Dim OpenRecType() As Integer
 Dim OpenRecCount() As Integer
+Dim OpenArea() As Integer
+Dim OpenRec() As String
 '---------------------------------------------------------------
+'Arrays/variables for processing closed records
+'----------------------------------------------------------------
 Dim ClosedRecNum As Integer
 Dim Closed_Index() As Integer
 Dim ClosedList() As Integer
@@ -112,6 +117,9 @@ Dim ClosedStage() As Integer
 Dim ClosedRecType() As Integer
 Dim ClosedRecCount() As Integer
 Dim ClosedArea() As Integer
+Dim ClosedRec() As String
+'----------------------------------------------------------------
+'Arrays/variables for processing new records
 '----------------------------------------------------------------
 Dim NewRecNum As Integer
 Dim NewCount() As Integer
@@ -119,23 +127,23 @@ Dim New_Index() As Integer
 Dim NewList() As Integer
 Dim NewRecType() As Integer
 Dim NewList_Pos As Integer
-'-----------------------------------------------------------------
-Dim ReplCol As Long
-Dim ReplRow As Long
-Dim OpenRec() As String
-Dim ClosedRec() As String
 Dim NewRec() As String
-Dim CancelRec() As String
-'------------------------------------------------------------------
+'----------------------------------------------------------------
+'Arrays/variables for processing cancelled records
+'----------------------------------------------------------------
 Dim CancelRecNum As Integer
 Dim CancelCount() As Integer
 Dim Cancel_Index() As Integer
 Dim CancelList() As Integer
 Dim CancelList_Pos As Integer
 Dim CancelRecType() As Integer
+Dim CancelRec() As String
+'----------------------------------------------------------------
+'Arrays/variables for processing report
 '----------------------------------------------------------------
 Dim Rep_Headers(32) As String
-'------------------------------------------------------------------
+Dim ReplCol As Long
+Dim ReplRow As Long
 Dim week_range As Long
 Dim month_range As Long
 Dim quarter_range As Long
@@ -153,6 +161,7 @@ Dim DataSheet_Name As String
 Dim ChartSheet_Name As String
 Dim i As Integer
 Dim j As Integer
+Dim k As Integer
 Dim age As Integer
 Dim stage As Integer
 Dim address_1 As String
@@ -376,9 +385,9 @@ For i = 2 To Record_Num
     hp_root_cause_categ_1(i) = ActiveCell.Offset(0, 27).Value
     hp_root_cause_categ_2(i) = ActiveCell.Offset(0, 28).Value
     hp_root_cause_categ_3(i) = ActiveCell.Offset(0, 29).Value
-    root_cause_1(i) = ActiveCell.Offset(0, 30).Value
-    root_cause_2(i) = ActiveCell.Offset(0, 31).Value
-    root_cause_3(i) = ActiveCell.Offset(0, 32).Value
+    root_cause_cat_1(i) = ActiveCell.Offset(0, 30).Value
+    root_cause_cat_2(i) = ActiveCell.Offset(0, 31).Value
+    root_cause_cat_3(i) = ActiveCell.Offset(0, 32).Value
     recom_diposition_comments(i) = ActiveCell.Offset(0, 33).Value
     final_comments(i) = ActiveCell.Offset(0, 34).Value
     assignable_cause_class(i) = ActiveCell.Offset(0, 35).Value
@@ -397,7 +406,7 @@ For i = 2 To Record_Num
     root_cause_lev_3(i) = ActiveCell.Offset(0, 48).Value
 Next i
 '------------------------------------------------------------------------------
-'Count Number of Open Record
+'Count Number of Opened Record
 '------------------------------------------------------------------------------
 OpenRecNum = 0
 ReDim Open_Index(Record_Num)
@@ -436,7 +445,7 @@ Else
 End If
 Next i
 '-------------------------------------------------------------------------------
-'Fill the list of Open Records with index numbers of the whole data set
+'Fill the list of Opened Records with index numbers of the whole data set
 '-------------------------------------------------------------------------------
 ReDim OpenList(OpenRecNum)
 OpenList_Pos = 1
@@ -448,7 +457,7 @@ For i = 1 To Record_Num
         End If
 Next i
 '---------------------------------------------------------------------------------
-'Calculate Age , Stage and Type of Open Records
+'Calculate Age , Stage and Type of Opened Records
 '---------------------------------------------------------------------------------
 ReDim OpenAge(OpenRecNum)
 ReDim OpenStage(OpenRecNum)
@@ -497,16 +506,39 @@ For i = 1 To OpenRecNum
             OpenRecType(i) = 5
     End Select
 Next i
+'-------------------------------------------------------------
+'Compute Area Affected/Area Originated
+'-------------------------------------------------------------
+ReDim OpenArea(OpenRecNum)
+For i = 1 To OpenRecNum
+    If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
+        OpenArea(i) = 1
+    Else
+        If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
+            OpenArea(i) = 2
+        Else
+            If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
+                OpenArea(i) = 1
+            Else
+                OpenArea(i) = 0
+            End If
+        End If
+    End If
+Next i
 '--------------------------------------------------------------
-'Compute Subtotal and Grand Total of the Open Records Matrix
+'Compute Subtotal and Grand Total of the Opened Records Matrix
 '--------------------------------------------------------------
-ReDim OpenRecCount(6, 10)
+ReDim OpenRecCount(6, 10, 3)
 For i = 0 To 6
     For j = 0 To 10
-        OpenRecCount(i, j) = 0
+        For k = 0 To 3
+            OpenRecCount(i, j, k) = 0
+        Next k
     Next j
 Next i
 '----------------------------------------------------------------------------
+'Capturing record counts with OpenRecCount()
+'---------------
 'First dimension
 '---------------
 '0(n/a); 1(LIR); 2(RAAC); 3(ER); 4(QAR); 5(INC); 6(Total)
@@ -515,126 +547,400 @@ Next i
 '----------------
 '0(<23); 1(<30); 2(<60); 3(<90); 4(<120); 5(<150); 6(<180); 7(>=180); 8(on-time);
 '9(aged); 10(total)
+'----------------
+'Third Dimension
+'----------------
+'0(others); 1(Chemistry); 2(Commodity); 3(Total)
 '-----------------------------------------------------------------------------
+'Count stage and type of records
+'-------------------------------
 For i = 1 To OpenRecNum
     Select Case OpenRecType(i)
         Case Is = 1
             Select Case OpenStage(i)
                 Case Is = 0
-                    OpenRecCount(1, 0) = OpenRecCount(1, 0) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 0, 0) = OpenRecCount(1, 0, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 0, 1) = OpenRecCount(1, 0, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 0, 2) = OpenRecCount(1, 0, 2) + 1
+                    End Select
                 Case Is = 1
-                    OpenRecCount(1, 1) = OpenRecCount(1, 1) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 1, 0) = OpenRecCount(1, 1, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 1, 1) = OpenRecCount(1, 1, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 1, 2) = OpenRecCount(1, 1, 2) + 1
+                    End Select
                 Case Is = 2
-                    OpenRecCount(1, 2) = OpenRecCount(1, 2) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 2, 0) = OpenRecCount(1, 2, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 2, 1) = OpenRecCount(1, 2, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 2, 2) = OpenRecCount(1, 2, 2) + 1
+                    End Select
                 Case Is = 3
-                    OpenRecCount(1, 3) = OpenRecCount(1, 3) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 3, 0) = OpenRecCount(1, 3, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 3, 1) = OpenRecCount(1, 3, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 3, 2) = OpenRecCount(1, 3, 2) + 1
+                    End Select
                 Case Is = 4
-                    OpenRecCount(1, 4) = OpenRecCount(1, 4) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 4, 0) = OpenRecCount(1, 4, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 4, 1) = OpenRecCount(1, 4, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 4, 2) = OpenRecCount(1, 4, 2) + 1
+                    End Select
                 Case Is = 5
-                    OpenRecCount(1, 5) = OpenRecCount(1, 5) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 5, 0) = OpenRecCount(1, 5, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 5, 1) = OpenRecCount(1, 5, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 5, 2) = OpenRecCount(1, 5, 2) + 1
+                    End Select
                 Case Is = 6
-                    OpenRecCount(1, 6) = OpenRecCount(1, 6) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 6, 0) = OpenRecCount(1, 6, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 6, 1) = OpenRecCount(1, 6, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 6, 2) = OpenRecCount(1, 6, 2) + 1
+                    End Select
                 Case Is = 7
-                    OpenRecCount(1, 7) = OpenRecCount(1, 7) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(1, 7, 0) = OpenRecCount(1, 7, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(1, 7, 1) = OpenRecCount(1, 7, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(1, 7, 2) = OpenRecCount(1, 7, 2) + 1
+                    End Select
             End Select
         Case Is = 2
             Select Case OpenStage(i)
                 Case Is = 0
-                    OpenRecCount(2, 0) = OpenRecCount(2, 0) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 0, 0) = OpenRecCount(2, 0, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 0, 1) = OpenRecCount(2, 0, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 0, 2) = OpenRecCount(2, 0, 2) + 1
+                    End Select
                 Case Is = 1
-                    OpenRecCount(2, 1) = OpenRecCount(2, 1) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 1, 0) = OpenRecCount(2, 1, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 1, 1) = OpenRecCount(2, 1, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 1, 2) = OpenRecCount(2, 1, 2) + 1
+                    End Select
                 Case Is = 2
-                    OpenRecCount(2, 2) = OpenRecCount(2, 2) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 2, 0) = OpenRecCount(2, 2, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 2, 1) = OpenRecCount(2, 2, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 2, 2) = OpenRecCount(2, 2, 2) + 1
+                    End Select
                 Case Is = 3
-                    OpenRecCount(2, 3) = OpenRecCount(2, 3) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 3, 0) = OpenRecCount(2, 3, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 3, 1) = OpenRecCount(2, 3, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 3, 2) = OpenRecCount(2, 3, 2) + 1
+                    End Select
                 Case Is = 4
-                    OpenRecCount(2, 4) = OpenRecCount(2, 4) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 4, 0) = OpenRecCount(2, 4, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 4, 1) = OpenRecCount(2, 4, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 4, 2) = OpenRecCount(2, 4, 2) + 1
+                    End Select
                 Case Is = 5
-                    OpenRecCount(2, 5) = OpenRecCount(2, 5) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 5, 0) = OpenRecCount(2, 5, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 5, 1) = OpenRecCount(2, 5, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 5, 2) = OpenRecCount(2, 5, 2) + 1
+                    End Select
                 Case Is = 6
-                    OpenRecCount(2, 6) = OpenRecCount(2, 6) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 6, 0) = OpenRecCount(2, 6, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 6, 1) = OpenRecCount(2, 6, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 6, 2) = OpenRecCount(2, 6, 2) + 1
+                    End Select
                 Case Is = 7
-                    OpenRecCount(2, 7) = OpenRecCount(2, 7) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(2, 7, 0) = OpenRecCount(2, 7, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(2, 7, 1) = OpenRecCount(2, 7, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(2, 7, 2) = OpenRecCount(2, 7, 2) + 1
+                    End Select
             End Select
         Case Is = 3
             Select Case OpenStage(i)
                 Case Is = 0
-                    OpenRecCount(3, 0) = OpenRecCount(3, 0) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 0, 0) = OpenRecCount(3, 0, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 0, 1) = OpenRecCount(3, 0, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 0, 2) = OpenRecCount(3, 0, 2) + 1
+                    End Select
                 Case Is = 1
-                    OpenRecCount(3, 1) = OpenRecCount(3, 1) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 1, 0) = OpenRecCount(3, 1, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 1, 1) = OpenRecCount(3, 1, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 1, 2) = OpenRecCount(3, 1, 2) + 1
+                    End Select
                 Case Is = 2
-                    OpenRecCount(3, 2) = OpenRecCount(3, 2) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 2, 0) = OpenRecCount(3, 2, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 2, 1) = OpenRecCount(3, 2, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 2, 2) = OpenRecCount(3, 2, 2) + 1
+                    End Select
                 Case Is = 3
-                    OpenRecCount(3, 3) = OpenRecCount(3, 3) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 3, 0) = OpenRecCount(3, 3, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 3, 1) = OpenRecCount(3, 3, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 3, 2) = OpenRecCount(3, 3, 2) + 1
+                    End Select
                 Case Is = 4
-                    OpenRecCount(3, 4) = OpenRecCount(3, 4) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 4, 0) = OpenRecCount(3, 4, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 4, 1) = OpenRecCount(3, 4, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 4, 2) = OpenRecCount(3, 4, 2) + 1
+                    End Select
                 Case Is = 5
-                    OpenRecCount(3, 5) = OpenRecCount(3, 5) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 5, 0) = OpenRecCount(3, 5, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 5, 1) = OpenRecCount(3, 5, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 5, 2) = OpenRecCount(3, 5, 2) + 1
+                    End Select
                 Case Is = 6
-                    OpenRecCount(3, 6) = OpenRecCount(3, 6) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 6, 0) = OpenRecCount(3, 6, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 6, 1) = OpenRecCount(3, 6, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 6, 2) = OpenRecCount(3, 6, 2) + 1
+                    End Select
                 Case Is = 7
-                    OpenRecCount(3, 7) = OpenRecCount(3, 7) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(3, 7, 0) = OpenRecCount(3, 7, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(3, 7, 1) = OpenRecCount(3, 7, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(3, 7, 2) = OpenRecCount(3, 7, 2) + 1
+                    End Select
             End Select
         Case Is = 4
             Select Case OpenStage(i)
                 Case Is = 0
-                    OpenRecCount(4, 0) = OpenRecCount(4, 0) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 0, 0) = OpenRecCount(4, 0, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 0, 1) = OpenRecCount(4, 0, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 0, 2) = OpenRecCount(4, 0, 2) + 1
+                    End Select
                 Case Is = 1
-                    OpenRecCount(4, 1) = OpenRecCount(4, 1) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 1, 0) = OpenRecCount(4, 1, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 1, 1) = OpenRecCount(4, 1, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 1, 2) = OpenRecCount(4, 1, 2) + 1
+                    End Select
                 Case Is = 2
-                    OpenRecCount(4, 2) = OpenRecCount(4, 2) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 2, 0) = OpenRecCount(4, 2, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 2, 1) = OpenRecCount(4, 2, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 2, 2) = OpenRecCount(4, 2, 2) + 1
+                    End Select
                 Case Is = 3
-                    OpenRecCount(4, 3) = OpenRecCount(4, 3) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 3, 0) = OpenRecCount(4, 3, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 3, 1) = OpenRecCount(4, 3, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 3, 2) = OpenRecCount(4, 3, 2) + 1
+                    End Select
                 Case Is = 4
-                    OpenRecCount(4, 4) = OpenRecCount(4, 4) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 4, 0) = OpenRecCount(4, 4, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 4, 1) = OpenRecCount(4, 4, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 4, 2) = OpenRecCount(4, 4, 2) + 1
+                    End Select
                 Case Is = 5
-                    OpenRecCount(4, 5) = OpenRecCount(4, 5) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 5, 0) = OpenRecCount(4, 5, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 5, 1) = OpenRecCount(4, 5, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 5, 2) = OpenRecCount(4, 5, 2) + 1
+                    End Select
                 Case Is = 6
-                    OpenRecCount(4, 6) = OpenRecCount(4, 6) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 6, 0) = OpenRecCount(4, 6, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 6, 1) = OpenRecCount(4, 6, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 6, 2) = OpenRecCount(4, 6, 2) + 1
+                    End Select
                 Case Is = 7
-                    OpenRecCount(4, 7) = OpenRecCount(4, 7) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(4, 7, 0) = OpenRecCount(4, 7, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(4, 7, 1) = OpenRecCount(4, 7, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(4, 7, 2) = OpenRecCount(4, 7, 2) + 1
+                    End Select
             End Select
         Case Is = 5
             Select Case OpenStage(i)
                 Case Is = 0
-                    OpenRecCount(5, 0) = OpenRecCount(5, 0) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 0, 0) = OpenRecCount(5, 0, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 0, 1) = OpenRecCount(5, 0, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 0, 2) = OpenRecCount(5, 0, 2) + 1
+                    End Select
+            
                 Case Is = 1
-                    OpenRecCount(5, 1) = OpenRecCount(5, 1) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 1, 0) = OpenRecCount(5, 1, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 1, 1) = OpenRecCount(5, 1, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 1, 2) = OpenRecCount(5, 1, 2) + 1
+                    End Select
                 Case Is = 2
-                    OpenRecCount(5, 2) = OpenRecCount(5, 2) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 2, 0) = OpenRecCount(5, 2, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 2, 1) = OpenRecCount(5, 2, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 2, 2) = OpenRecCount(5, 2, 2) + 1
+                    End Select
                 Case Is = 3
-                    OpenRecCount(5, 3) = OpenRecCount(5, 3) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 3, 0) = OpenRecCount(5, 3, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 3, 1) = OpenRecCount(5, 3, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 3, 2) = OpenRecCount(5, 3, 2) + 1
+                    End Select
                 Case Is = 4
-                    OpenRecCount(5, 4) = OpenRecCount(5, 4) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 4, 0) = OpenRecCount(5, 4, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 4, 1) = OpenRecCount(5, 4, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 4, 2) = OpenRecCount(5, 4, 2) + 1
+                    End Select
                 Case Is = 5
-                    OpenRecCount(5, 5) = OpenRecCount(5, 5) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 5, 0) = OpenRecCount(5, 5, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 5, 1) = OpenRecCount(5, 5, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 5, 2) = OpenRecCount(5, 5, 2) + 1
+                    End Select
                 Case Is = 6
-                    OpenRecCount(5, 6) = OpenRecCount(5, 6) + 1
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 6, 0) = OpenRecCount(5, 6, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 6, 1) = OpenRecCount(5, 6, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 6, 2) = OpenRecCount(5, 6, 2) + 1
+                    End Select
                 Case Is = 7
-                    OpenRecCount(5, 7) = OpenRecCount(5, 7) + 1
-            End Select
+                    Select Case OpenArea(i)
+                        Case Is = 0
+                            OpenRecCount(5, 7, 0) = OpenRecCount(5, 7, 0) + 1
+                        Case Is = 1
+                            OpenRecCount(5, 7, 1) = OpenRecCount(5, 7, 1) + 1
+                        Case Is = 2
+                            OpenRecCount(5, 7, 2) = OpenRecCount(5, 7, 2) + 1
+                    End Select
+                End Select
     End Select
 Next i
 '--------------------------------------------------------------
 'Calculate Summary of the Opened Records
 '--------------------------------------------------------------
-For i = 1 To 6
-    OpenRecCount(i, 8) = OpenRecCount(i, 0) + OpenRecCount(i, 1)
-Next i
-For i = 1 To 6
-    OpenRecCount(i, 9) = OpenRecCount(i, 2) + OpenRecCount(i, 3) _
-    + OpenRecCount(i, 4) + OpenRecCount(i, 5) + OpenRecCount(i, 6) _
-    + OpenRecCount(i, 7)
-Next i
-For i = 1 To 6
-    OpenRecCount(i, 10) = OpenRecCount(i, 0) + OpenRecCount(i, 1) _
-    + OpenRecCount(i, 2) + OpenRecCount(i, 3) + OpenRecCount(i, 4) _
-    + OpenRecCount(i, 5) + OpenRecCount(i, 6) + OpenRecCount(i, 7)
-Next i
-For i = 0 To 10
-    OpenRecCount(6, i) = OpenRecCount(1, i) + OpenRecCount(2, i) + OpenRecCount(3, i) _
-    + OpenRecCount(4, i) + OpenRecCount(5, i)
-Next i
+
+
+
+
 '----------------------------------------------------------------
 'Write Open Record Description into Array
 '----------------------------------------------------------------
@@ -1049,214 +1355,7 @@ Select Case Report_Type
 End Select
 ReDim DivCount(6, 6) As Integer
 '-----------------------------------------------------------------
-'Count Records by Division and Types
-'---------------
-'Array Dimension
-'---------------
-'1st Dimension
-'-------------
-'1: LIR; 2: RAAC; 3: ER; 4: QAR; 5: INC; 6: Total
-'------------------------------------------------
-'2nd Dimension
-'-------------
-'1: CQ Opened; 2: IM Opened; 3: CQ Closed; 4: IM Closed; 5: Other Open; 6:Other Closed
-'------------------------------------------------------------------
-For i = 0 To 6
-    For j = 0 To 6
-        DivCount(i, j) = 0
-    Next j
-Next i
-For i = 1 To OpenRecNum
-    Select Case OpenRecType(i)
-        Case Is = 1
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(1, 1) = DivCount(1, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(1, 2) = DivCount(1, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(1, 2) = DivCount(1, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(1, 1) = DivCount(1, 1) + 1
-                        Else
-                            DivCount(1, 5) = DivCount(1, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 2
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(2, 1) = DivCount(2, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(2, 2) = DivCount(2, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(2, 2) = DivCount(2, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(2, 1) = DivCount(2, 1) + 1
-                        Else
-                            DivCount(2, 5) = DivCount(2, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 3
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(3, 1) = DivCount(3, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(3, 2) = DivCount(3, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(3, 2) = DivCount(3, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(3, 1) = DivCount(3, 1) + 1
-                        Else
-                            DivCount(3, 5) = DivCount(3, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 4
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(4, 1) = DivCount(4, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(4, 2) = DivCount(4, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(4, 2) = DivCount(4, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(4, 1) = DivCount(4, 1) + 1
-                        Else
-                            DivCount(4, 5) = DivCount(4, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 5
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(5, 1) = DivCount(5, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(5, 2) = DivCount(5, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(5, 2) = DivCount(5, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(5, 1) = DivCount(5, 1) + 1
-                        Else
-                            DivCount(5, 5) = DivCount(5, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-    End Select
-Next i
-For i = 1 To ClosedRecNum
-    Select Case ClosedRecType(i)
-        Case Is = 1
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(1, 3) = DivCount(1, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(1, 4) = DivCount(1, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(1, 4) = DivCount(1, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(1, 3) = DivCount(1, 3) + 1
-                        Else
-                            DivCount(1, 6) = DivCount(1, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 2
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(2, 3) = DivCount(2, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(2, 4) = DivCount(2, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(2, 4) = DivCount(2, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(2, 3) = DivCount(2, 3) + 1
-                        Else
-                            DivCount(2, 6) = DivCount(2, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 3
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(3, 3) = DivCount(3, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(3, 4) = DivCount(3, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(3, 4) = DivCount(3, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(3, 3) = DivCount(3, 3) + 1
-                        Else
-                            DivCount(3, 6) = DivCount(3, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 4
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(4, 3) = DivCount(4, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(4, 4) = DivCount(4, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(4, 4) = DivCount(4, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(4, 3) = DivCount(4, 3) + 1
-                        Else
-                            DivCount(4, 6) = DivCount(4, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 5
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(5, 3) = DivCount(5, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(5, 4) = DivCount(5, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(5, 4) = DivCount(5, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(5, 3) = DivCount(5, 3) + 1
-                        Else
-                            DivCount(5, 6) = DivCount(5, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-    End Select
-Next i
-For i = 1 To 6
-    DivCount(6, i) = DivCount(1, i) + DivCount(2, i) + DivCount(3, i) + DivCount(4, i) + DivCount(5, i)
-Next i
+
 Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
 Summary_Headers:
