@@ -91,7 +91,6 @@ Dim idc_level_1() As String
 Dim idc_level_2() As String
 Dim idc_level_3() As String
 '-----------------------------------------------------------------
-Dim OpenArea() As Integer
 Dim OpenRecNum As Integer
 Dim Open_Index() As Integer
 Dim OpenList() As Integer
@@ -108,7 +107,6 @@ Dim ClosedList_Pos As Integer
 Dim ClosedStage() As Integer
 Dim ClosedRecType() As Integer
 Dim ClosedRecCount() As Integer
-Dim ClosedArea() As Integer
 '----------------------------------------------------------------
 Dim NewRecNum As Integer
 Dim NewCount() As Integer
@@ -131,7 +129,7 @@ Dim CancelList() As Integer
 Dim CancelList_Pos As Integer
 Dim CancelRecType() As Integer
 '----------------------------------------------------------------
-Dim Rep_Headers(32) As String
+Dim Rep_Headers(30) As String
 '------------------------------------------------------------------
 Dim week_range As Long
 Dim month_range As Long
@@ -142,7 +140,6 @@ Dim Range_Monthly_Rec() As Long
 Dim Range_Quarterly_Rec() As Long
 Dim Range_Annual_Rec() As Long
 Dim New_record() As String
-Dim DivCount() As Integer
 Dim committed() As String
 '-----------------------------------------------------------------
 Dim ReportSheet_Name As String
@@ -330,7 +327,7 @@ ReDim final_comments(Record_Num)
 ReDim assignable_cause_class(Record_Num)
 ReDim assignable_cause(Record_Num)
 ReDim supplier_name_lot_no(Record_Num)
-ReDim area_discovered(Record_Num)
+ReDim area_disocovered(Record_Num)
 ReDim areas_affected(Record_Num)
 ReDim analyst_personnel_sub_category(Record_Num)
 ReDim pr_state(Record_Num)
@@ -378,7 +375,7 @@ For i = 2 To Record_Num
     assignable_cause_class(i) = ActiveCell.Offset(0, 35).Value
     assignable_cause(i) = ActiveCell.Offset(0, 36).Value
     supplier_name_lot_no(i) = ActiveCell.Offset(0, 37).Value
-    area_discovered(i) = ActiveCell.Offset(0, 38).Value
+    area_disocovered(i) = ActiveCell.Offset(0, 38).Value
     areas_affected(i) = ActiveCell.Offset(0, 39).Value
     analyst_personnel_sub_category(i) = ActiveCell.Offset(0, 40).Value
     pr_state(i) = ActiveCell.Offset(0, 41).Value
@@ -629,7 +626,7 @@ Next i
 '----------------------------------------------------------------
 'Write Open Record Description into Array
 '----------------------------------------------------------------
-ReDim OpenRec(OpenRecNum, 6)
+ReDim OpenRec(OpenRecNum, 5)
 '--------------------------------------
 'First Dimension
 '---------------
@@ -637,7 +634,7 @@ ReDim OpenRec(OpenRecNum, 6)
 '----------------
 'Second Dimension
 '---------------
-'1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType); 6(OpenArea)
+'1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType)
 '--------------------------------------
 For i = 1 To OpenRecNum
     OpenRec(i, 1) = pr_id(OpenList(i))
@@ -645,7 +642,6 @@ For i = 1 To OpenRecNum
     OpenRec(i, 3) = responsible_person(OpenList(i))
     OpenRec(i, 4) = OpenStage(i)
     OpenRec(i, 5) = OpenRecType(i)
-    OpenRec(i, 6) = OpenArea(i)
 Next i
 '----------------------------------------------------------------
 'Identify Closed Record within Specified Time Range
@@ -893,7 +889,7 @@ ReDim ClosedRec(ClosedRecNum, 6)
 '----------------
 'Second Dimension
 '---------------
-'1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType); 6(OpenRecArea)
+'1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType)
 '--------------------------------------
 For i = 1 To ClosedRecNum
     ClosedRec(i, 1) = pr_id(ClosedList(i))
@@ -1037,216 +1033,6 @@ Select Case Report_Type
     Case Is = 5
         ReportSheet_Name = Year_Num & "_" & Month_Num & "_" & Day_Num & "_" & r_y & "_" & r_m & "_" & r_d
 End Select
-ReDim DivCount(6, 6) As Integer
-'-----------------------------------------------------------------
-'Count Records by Division and Types
-'---------------
-'Array Dimension
-'---------------
-'1st Dimension
-'-------------
-'1: LIR; 2: RAAC; 3: ER; 4: QAR; 5: INC; 6: Total
-'------------------------------------------------
-'2nd Dimension
-'-------------
-'1: CQ Opened; 2: IM Opened; 3: CQ Closed; 4: IM Closed; 5: Other Open; 6:Other Closed
-'------------------------------------------------------------------
-For i = 0 To 6
-    For j = 0 To 6
-        DivCount(i, j) = 0
-    Next j
-Next i
-For i = 1 To OpenRecNum
-    Select Case OpenRecType(i)
-        Case Is = 1
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(1, 1) = DivCount(1, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(1, 2) = DivCount(1, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(1, 2) = DivCount(1, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(1, 1) = DivCount(1, 1) + 1
-                        Else
-                            DivCount(1, 5) = DivCount(1, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 2
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(2, 1) = DivCount(2, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(2, 2) = DivCount(2, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(2, 2) = DivCount(2, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(2, 1) = DivCount(2, 1) + 1
-                        Else
-                            DivCount(2, 5) = DivCount(2, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 3
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(3, 1) = DivCount(3, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(3, 2) = DivCount(3, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(3, 2) = DivCount(3, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(3, 1) = DivCount(3, 1) + 1
-                        Else
-                            DivCount(3, 5) = DivCount(3, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 4
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(4, 1) = DivCount(4, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(4, 2) = DivCount(4, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(4, 2) = DivCount(4, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(4, 1) = DivCount(4, 1) + 1
-                        Else
-                            DivCount(4, 5) = DivCount(4, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 5
-            If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
-                DivCount(5, 1) = DivCount(5, 1) + 1
-            Else
-                If Left(areas_affected(OpenList(i)), 8) = "RMT - SQ" Then
-                    DivCount(5, 2) = DivCount(5, 2) + 1
-                Else
-                    If area_discovered(OpenList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(5, 2) = DivCount(5, 2) + 1
-                    Else
-                        If Left(area_discovered(OpenList(i)), 8) = "RMT - CQ" Then
-                            DivCount(5, 1) = DivCount(5, 1) + 1
-                        Else
-                            DivCount(5, 5) = DivCount(5, 5) + 1
-                        End If
-                    End If
-                End If
-            End If
-    End Select
-Next i
-For i = 1 To ClosedRecNum
-    Select Case ClosedRecType(i)
-        Case Is = 1
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(1, 3) = DivCount(1, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(1, 4) = DivCount(1, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(1, 4) = DivCount(1, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(1, 3) = DivCount(1, 3) + 1
-                        Else
-                            DivCount(1, 6) = DivCount(1, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 2
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(2, 3) = DivCount(2, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(2, 4) = DivCount(2, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(2, 4) = DivCount(2, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(2, 3) = DivCount(2, 3) + 1
-                        Else
-                            DivCount(2, 6) = DivCount(2, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 3
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(3, 3) = DivCount(3, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(3, 4) = DivCount(3, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(3, 4) = DivCount(3, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(3, 3) = DivCount(3, 3) + 1
-                        Else
-                            DivCount(3, 6) = DivCount(3, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 4
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(4, 3) = DivCount(4, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(4, 4) = DivCount(4, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(4, 4) = DivCount(4, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(4, 3) = DivCount(4, 3) + 1
-                        Else
-                            DivCount(4, 6) = DivCount(4, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-        Case Is = 5
-            If Left(areas_affected(ClosedList(i)), 8) = "RMT - CQ" Then
-                DivCount(5, 3) = DivCount(5, 3) + 1
-            Else
-                If Left(areas_affected(ClosedList(i)), 8) = "RMT - SQ" Then
-                    DivCount(5, 4) = DivCount(5, 4) + 1
-                Else
-                    If area_discovered(ClosedList(i)) = "RMT - CQ - Incoming Materials" Then
-                        DivCount(5, 4) = DivCount(5, 4) + 1
-                    Else
-                        If Left(area_discovered(ClosedList(i)), 8) = "RMT - CQ" Then
-                            DivCount(5, 3) = DivCount(5, 3) + 1
-                        Else
-                            DivCount(5, 6) = DivCount(5, 6) + 1
-                        End If
-                    End If
-                End If
-            End If
-    End Select
-Next i
-For i = 1 To 6
-    DivCount(6, i) = DivCount(1, i) + DivCount(2, i) + DivCount(3, i) + DivCount(4, i) + DivCount(5, i)
-Next i
 Sheets(Sheets.Count).Name = ReportSheet_Name
 '----------------------------------------------------------------
 Summary_Headers:
@@ -1270,28 +1056,23 @@ Rep_Headers(14) = "Short Description"
 Rep_Headers(15) = "Responsible Person"
 Rep_Headers(16) = "Record Stage"
 Rep_Headers(17) = "Record Type"
-Rep_Headers(18) = "Area"
-Rep_Headers(19) = "LIR"
-Rep_Headers(20) = "RAAC"
-Rep_Headers(21) = "ER"
-Rep_Headers(22) = "QAR"
-Rep_Headers(23) = "INC"
-Rep_Headers(24) = "Total"
-Rep_Headers(25) = "Record Type"
-Rep_Headers(26) = "Counts"
-Rep_Headers(27) = "Opened, Chemistry"
-Rep_Headers(28) = "Opened, Commodity"
-Rep_Headers(29) = "Closed, Chemistry"
-Rep_Headers(30) = "Closed, Commodity"
-Rep_Headers(31) = "Opened, Others"
-Rep_Headers(32) = "Closed, Others"
+Rep_Headers(18) = "LIR"
+Rep_Headers(19) = "RAAC"
+Rep_Headers(20) = "ER"
+Rep_Headers(21) = "QAR"
+Rep_Headers(22) = "INC"
+Rep_Headers(23) = "Total"
+Rep_Headers(24) = "Record Type"
+Rep_Headers(25) = "Counts"
+Rep_Headers(26) = "CQ (Chemistry)"
+Rep_Headers(27) = "IQ (Comm7odity)"
 Worksheets(ReportSheet_Name).Cells(2, 1).Activate
 For i = 0 To 1
     For j = 1 To 12
         Cells(2 + 8 * i, j).Value = Rep_Headers(j)
     Next j
 Next i
-For i = 0 To 4
+For i = 0 To 3
     For j = 18 To 23
         Cells(3 + 8 * i + j - 18, 1).Value = Rep_Headers(j)
     Next j
@@ -1300,11 +1081,6 @@ For i = 0 To 1
     For j = 24 To 25
         Cells(18 + 8 * i, j - 23).Value = Rep_Headers(j)
     Next j
-Next i
-Cells(34, 1).Activate
-ActiveCell.Value = Rep_Headers(17)
-For i = 1 To 6
-    ActiveCell.Offset(0, i).Value = Rep_Headers(25 + i)
 Next i
 '----------------------------------------------------------------
 'Writing Record Summary Matrices
@@ -1323,7 +1099,7 @@ For i = 1 To 6
 Next i
 Cells(17, 1).Value = "New Records opened between " & Period_Begin & "-" & Period_End
 Cells(25, 1).Value = "Cancelled Records opened between " & Period_Begin & "-" & Period_End
-Cells(33, 1).Value = "Records by Type and Area between " & Period_Begin & "-" & Period_End
+
 '-------------------------------------------------------------------
 'Writing New Record Summary
 '-------------------------------------------------------------------
@@ -1342,25 +1118,14 @@ For i = 1 To 5
     ActiveCell.Offset(1, 0).Activate
 Next i
 Cells(32, 2).Value = CancelRecNum
-'-----------------------------------------------------------------------
-'Writing Division Summary
-'-----------------------------------------------------------------------
-Cells(35, 2).Activate
-For j = 1 To 6
-    For i = 1 To 6
-        ActiveCell.Value = DivCount(i, j)
-        ActiveCell.Offset(1, 0).Activate
-    Next i
-    ActiveCell.Offset(-6, 1).Activate
-Next j
 '----------------------------------------------------------------------------------
 'Writing Detail Information of Open Records from Array into Spreadsheet while
 'Updating Array that Captured Position of each Record in the Spreadsheet
 '----------------------------------------------------------------------------------
 ReplCol = Cells(2, 1).End(xlToRight).Column
 Cells(1, ReplCol + 1).Activate
-ActiveCell.Value = "Opened Records"
-For i = 1 To 6
+ActiveCell.Value = "Open Records"
+For i = 1 To 5
 ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
 ActiveCell.Offset(1, 0).Activate
@@ -1390,25 +1155,24 @@ For j = 1 To 5
             End Select
             Select Case OpenRec(i, 5)
                 Case Is = 1
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
                 Case Is = 2
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
                 Case Is = 3
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
                 Case Is = 4
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
                 Case Is = 5
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(23)
+                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
             End Select
-            ActiveCell.Offset(1, 5).Value = areas_affected(OpenList(i))
             ActiveCell.Offset(1, 0).Activate
         Else
         End If
     Next i
 Next j
-Cells(1, 19).Activate
+Cells(1, 18).Activate
 ActiveCell.Value = "Closed Records"
-For i = 1 To 6
+For i = 1 To 5
 ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
 ActiveCell.Offset(1, 0).Activate
@@ -1437,38 +1201,6 @@ For j = 1 To 5
                     ActiveCell.Offset(1, 3).Value = Rep_Headers(9)
             End Select
             Select Case ClosedRec(i, 5)
-                Case Is = 1
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
-                Case Is = 2
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(19)
-                Case Is = 3
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(20)
-                Case Is = 4
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(21)
-                Case Is = 5
-                    ActiveCell.Offset(1, 4).Value = Rep_Headers(22)
-            End Select
-            ActiveCell.Offset(1, 5).Value = areas_affected(ClosedList(i))
-            ActiveCell.Offset(1, 0).Activate
-        Else
-        End If
-    Next i
-Next j
-ReplCol = ActiveCell.End(xlToRight).Column
-Cells(1, ReplCol + 1).Activate
-ActiveCell.Value = "New Records"
-For i = 1 To 5
-ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
-Next i
-ActiveCell.Offset(1, 0).Activate
-For j = 1 To 5
-    For i = 1 To NewRecNum
-        If NewRec(i, 5) = j Then
-            ActiveCell.Offset(1, 0).Value = NewRec(i, 1)
-            ActiveCell.Offset(1, 1).Value = NewRec(i, 2)
-            ActiveCell.Offset(1, 2).Value = NewRec(i, 3)
-            ActiveCell.Offset(1, 3).Value = Rep_Headers(2)
-            Select Case NewRec(i, 5)
                 Case Is = 1
                     ActiveCell.Offset(1, 4).Value = Rep_Headers(18)
                 Case Is = 2
