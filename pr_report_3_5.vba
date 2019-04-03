@@ -937,6 +937,27 @@ Next i
 '--------------------------------------------------------------
 'Calculate Summary of the Opened Records
 '--------------------------------------------------------------
+For i = 1 To 6
+    For j = 0 To 2
+        OpenRecCount(i, 8, j) = OpenRecCount(i, 0, j) + OpenRecCount(i, 1, j)
+        OpenRecCount(i, 9, j) = OpenRecCount(i, 2, j) + OpenRecCount(i, 3, j) _
+        + OpenRecCount(i, 4, j) + OpenRecCount(i, 5, j) + OpenRecCount(i, 6, j)
+        OpenRecCount(i, 10, j) = OpenRecCount(i, 8, j) + OpenRecCount(i, 9, j)
+    Next j
+Next i
+For i = 0 To 10
+    OpenRecCount(6, i, 0) = OpenRecCount(1, i, 0) + OpenRecCount(2, i, 0) _
+    + OpenRecCount(3, i, 0) + OpenRecCount(4, i, 0) + OpenRecCount(5, i, 0)
+    OpenRecCount(6, i, 1) = OpenRecCount(1, i, 1) + OpenRecCount(2, i, 1) _
+    + OpenRecCount(3, i, 1) + OpenRecCount(4, i, 1) + OpenRecCount(5, i, 1)
+    OpenRecCount(6, i, 2) = OpenRecCount(1, i, 2) + OpenRecCount(2, i, 2) _
+    + OpenRecCount(3, i, 2) + OpenRecCount(4, i, 2) + OpenRecCount(5, i, 2)
+Next i
+For i = 1 To 6
+    For j = 0 To 10
+        OpenRecCount(i, j, 3) = OpenRecCount(i, j, 0) + OpenRecCount(i, j, 1) + OpenRecCount(i, j, 2)
+    Next j
+Next i
 
 
 
