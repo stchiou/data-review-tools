@@ -1,4 +1,4 @@
-Attribute VB_Name = "PR_Status_Report_v3"
+Attribute VB_Name = "PR_Status_Report_v3_5"
 Sub PR_Report()
 '-----------------------------------------------------------------
 'Macro for computing weekly PR Status
@@ -235,7 +235,7 @@ Input_month_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Period_Begin = DateSerial(Year_Num, Month_Num, 1)
     Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
-    
+
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
@@ -867,7 +867,7 @@ For i = 1 To OpenRecNum
                         Case Is = 2
                             OpenRecCount(5, 0, 2) = OpenRecCount(5, 0, 2) + 1
                     End Select
-            
+
                 Case Is = 1
                     Select Case OpenArea(i)
                         Case Is = 0
@@ -958,15 +958,10 @@ For i = 1 To 6
         OpenRecCount(i, j, 3) = OpenRecCount(i, j, 0) + OpenRecCount(i, j, 1) + OpenRecCount(i, j, 2)
     Next j
 Next i
-
-
-
-
 '----------------------------------------------------------------
 'Write Open Record Description into Array
 '----------------------------------------------------------------
 ReDim OpenRec(OpenRecNum, 6)
-ReDim OpenArea(OpenRecNum)
 '--------------------------------------
 'First Dimension
 '---------------
