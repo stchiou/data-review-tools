@@ -1,4 +1,4 @@
-Attribute VB_Name = "PR_Status_Report_v3_05"
+Attribute VB_Name = "PR_Status_Report_v3"
 Sub PR_Report()
 '-----------------------------------------------------------------
 'Macro for computing weekly PR Status
@@ -74,9 +74,9 @@ Dim initial_inv_analyst() As String
 Dim hp_root_cause_categ_1() As String
 Dim hp_root_cause_categ_2() As String
 Dim hp_root_cause_categ_3() As String
-Dim root_cause_1() As String
-Dim root_cause_2() As String
-Dim root_cause_3() As String
+Dim root_cause_cat_1() As String
+Dim root_cause_cat_2() As String
+Dim root_cause_cat_3() As String
 Dim recom_diposition_comments() As String
 Dim final_comments() As String
 Dim assignable_cause_class() As String
@@ -90,6 +90,9 @@ Dim reason_for_investigating() As String
 Dim idc_level_1() As String
 Dim idc_level_2() As String
 Dim idc_level_3() As String
+Dim root_cause_lev_1() As String
+Dim root_cause_lev_2() As String
+Dim root_cause_lev_3() As String
 '-----------------------------------------------------------------
 Dim OpenArea() As Integer
 Dim OpenRecNum As Integer
@@ -223,7 +226,7 @@ Input_month_parameters:
         & vbCr & "12. December", "MONTH NUMBER")
     Period_Begin = DateSerial(Year_Num, Month_Num, 1)
     Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
-
+    
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
@@ -298,8 +301,8 @@ ReDim responsible_person(Record_Num)
 ReDim record_type(Record_Num)
 ReDim investigation_type(Record_Num)
 ReDim related_records(Record_Num)
-ReDim event_code(Record_Num)
 ReDim qar_required(Record_Num)
+ReDim event_code(Record_Num)
 ReDim special_or_common_cuase(Record_Num)
 ReDim capa_effectiveness_bsc_metric(Record_Num)
 ReDim date_open(Record_Num)
@@ -322,9 +325,9 @@ ReDim initial_inv_analyst(Record_Num)
 ReDim hp_root_cause_categ_1(Record_Num)
 ReDim hp_root_cause_categ_2(Record_Num)
 ReDim hp_root_cause_categ_3(Record_Num)
-ReDim root_cause_1(Record_Num)
-ReDim root_cause_2(Record_Num)
-ReDim root_cause_3(Record_Num)
+ReDim root_cause_cat_1(Record_Num)
+ReDim root_cause_cat_2(Record_Num)
+ReDim root_cause_cat_3(Record_Num)
 ReDim recom_diposition_comments(Record_Num)
 ReDim final_comments(Record_Num)
 ReDim assignable_cause_class(Record_Num)
@@ -338,6 +341,9 @@ ReDim reason_for_investigation(Record_Num)
 ReDim idc_level_1(Record_Num)
 ReDim idc_level_2(Record_Num)
 ReDim idc_level_3(Record_Num)
+ReDim root_cause_lev_1(Record_Num)
+ReDim root_cause_lev_2(Record_Num)
+ReDim root_cause_lev_3(Record_Num)
 For i = 2 To Record_Num
     Cells(i, 1).Activate
     pr_id(i) = ActiveCell.Value
@@ -346,9 +352,9 @@ For i = 2 To Record_Num
     record_type(i) = ActiveCell.Offset(0, 3).Value
     investigation_type(i) = ActiveCell.Offset(0, 4).Value
     related_records(i) = ActiveCell.Offset(0, 5).Value
-    event_code(i) = ActiveCell.Offset(0, 6).Value
-    qar_required(i) = ActiveCell.Offset(0, 7).Value
-    special_or_common_cuase(i) = ActiveCell.Offset(0, 8).Value
+    qar_required(i) = ActiveCell.Offset(0, 6).Value
+    special_or_common_cuase(i) = ActiveCell.Offset(0, 7).Value
+    event_code(i) = ActiveCell.Offset(0, 8).Value
     capa_effectiveness_bsc_metric(i) = ActiveCell.Offset(0, 9).Value
     date_open(i) = ActiveCell.Offset(0, 10).Value
     discovery_date(i) = ActiveCell.Offset(0, 11).Value
@@ -386,6 +392,9 @@ For i = 2 To Record_Num
     idc_level_1(i) = ActiveCell.Offset(0, 43).Value
     idc_level_2(i) = ActiveCell.Offset(0, 44).Value
     idc_level_3(i) = ActiveCell.Offset(0, 45).Value
+    root_cause_lev_1(i) = ActiveCell.Offset(0, 46).Value
+    root_cause_lev_2(i) = ActiveCell.Offset(0, 47).Value
+    root_cause_lev_3(i) = ActiveCell.Offset(0, 48).Value
 Next i
 '------------------------------------------------------------------------------
 'Count Number of Open Record
@@ -630,6 +639,7 @@ Next i
 'Write Open Record Description into Array
 '----------------------------------------------------------------
 ReDim OpenRec(OpenRecNum, 6)
+ReDim OpenArea(OpenRecNum)
 '--------------------------------------
 'First Dimension
 '---------------
