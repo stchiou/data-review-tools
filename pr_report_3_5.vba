@@ -4,25 +4,27 @@ Sub PR_Report()
 'Macro for computing weekly PR Status
 'Sean Chiou, version 3.5, 04/03/2019
 '-----------------------------------------------------------------
-'Items required:
-'1. total opein-categorized by type of records
-'2. closed last week
-'3. aged > 30 days (bar chart, including data from previous 5 weeks, categorized by types:ER, QAR, LIR, RACAC, INC)
-'4. aging up (age > 23 days)
+'to do list:
+'-------------------------
 '5. committed to close this week
-'6. aged that will close
-'7. PRs Opened by week LIR, RAAC, QAR, ER)
 '8. PRs opened by month (LIR, RAAC, QAR, ER)
 '9. PRs Opened by week and by month (LIR, RAAC, QAR, ER)
 '10. PRs by writer
+'---------------------------
+'Items completed:
+'---------------------------
+'1. total opened recordcategorized by type of records
+'2. closed last week
+'3. aged > 30 days (bar chart, including data from previous 5 weeks, categorized by types:ER, QAR, LIR, RACAC, INC)
+'4. aging up (age > 23 days)
+'7. PRs Opened by week LIR, RAAC, QAR, ER)
 '11. PRs opened (CQ vs IM)
-
 '-------------------------------------------------------------------------------------------------------------------
 'Features:
 '1. Combine output records with corresponding short description
 '2. Computes age of the records
 '3. Computes stage of the records based on age
-'4. Generate reports
+'4. Generates reports
 '------------------------------------------------------------------------------------------------------------------
 Dim File_1 As String
 Dim Report_Type As Integer
