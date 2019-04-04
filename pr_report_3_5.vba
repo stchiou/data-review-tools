@@ -1573,7 +1573,19 @@ For i = 1 To NewRecNum
     NewRec(i, 1) = pr_id(NewList(i))
     NewRec(i, 2) = title_short_description(NewList(i))
     NewRec(i, 3) = responsible_person(NewList(i))
-    NewRec(i, 4) = areas_affected(NewList(i))
+    If Left(areas_affected(NewList(i)), 8) = "RMT - CQ" Then
+        NewRec(i, 4) = "CQ"
+    Else
+        If Left(areas_affected(NewList(i)), 8) = "RMT - SQ" Then
+            NewRec(i, 4) = "IM"
+        Else
+            If Left(area_discovered(NewList(i)), 8) = "RMT - CQ" Then
+                NewRec(i, 4) = "CQ"
+            Else
+                NewRec(i, 4) = "Others"
+            End If
+        End If
+    End If
     Select Case record_type(NewList(i))
         Case "Laboratory Investigations / Laboratory Investigation Report (LIR)"
             NewRec(i, 5) = 1
@@ -1893,7 +1905,14 @@ For j = 1 To 5
                 Case Is = 5
                     ActiveCell.Offset(1, 4).Value = Rep_Headers(23)
             End Select
-            ActiveCell.Offset(1, 5).Value = ClosedArea(i)
+            Select Case ClosedArea(i)
+                Case Is = 0
+                    ActiveCell.Offset(1, 5).Value = "Others"
+                Case Is = 1
+                    ActiveCell.Offset(1, 5).Value = "CQ"
+                Case Is = 2
+                    ActiveCell.Offset(1, 5).Value = "IM"
+            End Select
             ActiveCell.Offset(1, 0).Activate
         Else
         End If
@@ -1902,7 +1921,7 @@ Next j
 ReplCol = ActiveCell.End(xlToRight).Column
 Cells(1, ReplCol + 1).Activate
 ActiveCell.Value = "New Records"
-For i = 1 To 5
+For i = 1 To 6
 ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
 ActiveCell.Offset(1, 0).Activate
@@ -1925,6 +1944,7 @@ For j = 1 To 5
                 Case Is = 5
                     ActiveCell.Offset(1, 4).Value = Rep_Headers(23)
             End Select
+            ActiveCell.Offset(1, 5).Value = NewRec(i, 4)
             ActiveCell.Offset(1, 0).Activate
         Else
         End If
