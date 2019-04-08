@@ -942,7 +942,7 @@ For i = 1 To 6
     For j = 0 To 2
         OpenRecCount(i, 8, j) = OpenRecCount(i, 0, j) + OpenRecCount(i, 1, j)
         OpenRecCount(i, 9, j) = OpenRecCount(i, 2, j) + OpenRecCount(i, 3, j) _
-        + OpenRecCount(i, 4, j) + OpenRecCount(i, 5, j) + OpenRecCount(i, 6, j)
+        + OpenRecCount(i, 4, j) + OpenRecCount(i, 5, j) + OpenRecCount(i, 6, j) + OpenRecCount(i, 7, j)
         OpenRecCount(i, 10, j) = OpenRecCount(i, 8, j) + OpenRecCount(i, 9, j)
     Next j
 Next i
@@ -1218,7 +1218,7 @@ For i = 1 To ClosedRecNum
                         Case Is = 1
                             ClosedRecCount(2, 2, 1) = ClosedRecCount(2, 2, 1) + 1
                         Case Is = 2
-                            ClosedRecCount(2, 0, 2) = ClosedRecCount(2, 0, 2) + 1
+                            ClosedRecCount(2, 2, 2) = ClosedRecCount(2, 2, 2) + 1
                     End Select
                 Case Is = 3
                     Select Case ClosedArea(i)
@@ -1236,7 +1236,7 @@ For i = 1 To ClosedRecNum
                         Case Is = 1
                             ClosedRecCount(2, 4, 1) = ClosedRecCount(2, 4, 1) + 1
                         Case Is = 2
-                            ClosedRecCount(2, 4, 2) = ClosedRecCount(2, 0, 2) + 1
+                            ClosedRecCount(2, 4, 2) = ClosedRecCount(2, 4, 2) + 1
                     End Select
                 Case Is = 5
                     Select Case ClosedArea(i)
@@ -1245,7 +1245,7 @@ For i = 1 To ClosedRecNum
                         Case Is = 1
                             ClosedRecCount(2, 5, 1) = ClosedRecCount(2, 5, 1) + 1
                         Case Is = 2
-                            ClosedRecCount(2, 0, 2) = ClosedRecCount(2, 5, 2) + 1
+                            ClosedRecCount(2, 5, 2) = ClosedRecCount(2, 5, 2) + 1
                     End Select
                 Case Is = 6
                     Select Case ClosedArea(i)
@@ -1500,7 +1500,7 @@ For i = 1 To 6
     For j = 0 To 2
         ClosedRecCount(i, 8, j) = ClosedRecCount(i, 0, j) + ClosedRecCount(i, 1, j)
         ClosedRecCount(i, 9, j) = ClosedRecCount(i, 2, j) + ClosedRecCount(i, 3, j) _
-        + ClosedRecCount(i, 4, j) + ClosedRecCount(i, 5, j) + ClosedRecCount(i, 6, j)
+        + ClosedRecCount(i, 4, j) + ClosedRecCount(i, 5, j) + ClosedRecCount(i, 6, j) + ClosedRecCount(i, 7, j)
         ClosedRecCount(i, 10, j) = ClosedRecCount(i, 8, j) + ClosedRecCount(i, 9, j)
     Next j
 Next i
