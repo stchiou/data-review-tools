@@ -36,6 +36,8 @@ Dim Day_Num As Integer
 Dim r_y As Integer
 Dim r_m As Integer
 Dim r_d As Integer
+Dim Week_Begin() As Date
+Dim Week_End() As Date
 Dim Period_End As Date
 Dim Period_Begin As Date
 Dim Sub_Per_Start() As Date
@@ -43,6 +45,9 @@ Dim Sub_Per_End() As Date
 Dim UnitInPeriod As Integer
 Dim Record_Num As Long
 Dim FirstWeekDay As Integer
+Dim Month_Begin As Date
+Dim Month_End As Date
+Dim EndDay As Date
 '-------------------------------------------------------
 'Arrays for fields in raw data
 '-------------------------------------------------------
@@ -98,7 +103,7 @@ Dim root_cause_lev_3() As String
 '-----------------------------------------------------------------
 'Array/variables for processing open records
 '-----------------------------------------------------------------
-Dim OpenRecNum As Integer
+Dim OpenRecNum() As Integer
 Dim Open_Index() As Integer
 Dim OpenList() As Integer
 Dim OpenList_Pos As Integer
@@ -163,6 +168,7 @@ Dim ChartSheet_Name As String
 Dim i As Integer
 Dim j As Integer
 Dim k As Integer
+Dim w As Integer
 Dim age As Integer
 Dim stage As Integer
 Dim address_1 As String
@@ -234,9 +240,24 @@ Input_month_parameters:
         & vbCr & "10. October" _
         & vbCr & "11. November" _
         & vbCr & "12. December", "MONTH NUMBER")
-    Period_Begin = DateSerial(Year_Num, Month_Num, 1)
-    Period_End = DateSerial(Year_Num, Month_Num + 1, 0)
-
+    FirstWeekDay = InputBox("Provide the first day of the week" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST DAY OF THE WEEK") + 10
+    Month_Begin = DateSerial(Year_Num, Month_Num, 1)
+    Month_End = DateSerial(Year_Num, Month_Num + 1, 0)
+    Week_Num = WorksheetFunction.WeekNum(Month_End, FirstWeekDay)
+    EndDay = 7 - DatePart("w", Month_End, vbFriday, vbFirstJan1) + Month_End
+    ReDim Week_Begin(Week_Num)
+    ReDim Week_End(Week_Num)
+    For w = 0 To Week_Num
+      Week_End(w) = EndDay - (Week_Num - w) * 7
+      Week_Begin(w) = Week_End(w) - 6
+    Next w
     GoTo Input_data_file:
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
@@ -409,46 +430,49 @@ Next i
 '------------------------------------------------------------------------------
 'Count Number of Opened Record
 '------------------------------------------------------------------------------
-OpenRecNum = 0
-ReDim Open_Index(Record_Num)
-For i = 2 To Record_Num
-If pr_state(i) = "Cancelled" Then
-        OpenRecNum = OpenRecNum
-        Open_Index(i) = 0
-Else
-    If date_open(i) > Period_End + 1 Then
-        OpenRecNum = OpenRecNum
-        Open_Index(i) = 0
+ReDim OpenRecNum(Week_Num)
+For w = 1 To Week_Num
+    OpenRecNum(w) = 0
+    ReDim Open_Index(Record_Num, Week_Num)
+    For i = 2 To Record_Num
+    If pr_state(i) = "Cancelled" Then
+        OpenRecNum(w) = OpenRecNum(w)
+        Open_Index(i, w) = 0
     Else
-        If site_qa_approval_on(i) = 0 Then
-            If qa_final_app_on(i) = 0 Then
-                OpenRecNum = OpenRecNum + 1
-                Open_Index(i) = i
-            Else
-                If qa_final_app_on(i) > Period_End + 1 Then
-                    OpenRecNum = OpenRecNum + 1
-                    Open_Index(i) = i
+        If date_open(i) > Period_End + 1 Then
+            OpenRecNum(w) = OpenRecNum(w)
+            Open_Index(i, w) = 0
+        Else
+            If site_qa_approval_on(i) = 0 Then
+                If qa_final_app_on(i) = 0 Then
+                    OpenRecNum(w) = OpenRecNum(w) + 1
+                    Open_Index(i, w) = i
                 Else
-                    OpenRecNum = OpenRecNum
-                    Open_Index(i) = 0
+                    If qa_final_app_on(i) > Period_End + 1 Then
+                    OpenRecNum(w) = OpenRecNum(w) + 1
+                    Open_Index(i, w) = i
+                Else
+                    OpenRecNum(w) = OpenRecNum(w)
+                    Open_Index(i, w) = 0
                 End If
             End If
         Else
             If site_qa_approval_on(i) > Period_End + 1 Then
-                OpenRecNum = OpenRecNum + 1
-                Open_Index(i) = i
+                OpenRecNum(w) = OpenRecNum(w) + 1
+                Open_Index(i, w) = i
             Else
                 OpenRecNum = OpenRecNum
-                Open_Index(i) = 0
+                Open_Index(i, w) = 0
             End If
         End If
     End If
 End If
 Next i
+Next w
 '-------------------------------------------------------------------------------
 'Fill the list of Opened Records with index numbers of the whole data set
 '-------------------------------------------------------------------------------
-ReDim OpenList(OpenRecNum)
+ReDim OpenList(OpenRecNum(Week_Num))
 OpenList_Pos = 1
 For i = 1 To Record_Num
         If Open_Index(i) <> 0 Then
@@ -460,10 +484,10 @@ Next i
 '---------------------------------------------------------------------------------
 'Calculate Age , Stage and Type of Opened Records
 '---------------------------------------------------------------------------------
-ReDim OpenAge(OpenRecNum)
-ReDim OpenStage(OpenRecNum)
-ReDim OpenRecType(OpenRecNum)
-For i = 1 To OpenRecNum
+ReDim OpenAge(OpenRecNum(Week_Num))
+ReDim OpenStage(OpenRecNum(Week_Num))
+ReDim OpenRecType(OpenRecNum(Week_Num))
+For i = 1 To OpenRecNum(Week_Num)
     OpenAge(i) = Period_End - discovery_date(OpenList(i))
     If OpenAge(i) < 23 Then
         OpenStage(i) = 0
@@ -510,8 +534,8 @@ Next i
 '-------------------------------------------------------------
 'Compute Area Affected/Area Originated
 '-------------------------------------------------------------
-ReDim OpenArea(OpenRecNum)
-For i = 1 To OpenRecNum
+ReDim OpenArea(OpenRecNum(Week_Num))
+For i = 1 To OpenRecNum(Week_Num)
     If Left(areas_affected(OpenList(i)), 8) = "RMT - CQ" Then
         OpenArea(i) = 1
     Else
@@ -555,7 +579,7 @@ Next i
 '-----------------------------------------------------------------------------
 'Count stage and type of records
 '-------------------------------
-For i = 1 To OpenRecNum
+For i = 1 To OpenRecNum(Week_Num)
     Select Case OpenRecType(i)
         Case Is = 1
             Select Case OpenStage(i)
@@ -962,7 +986,7 @@ Next i
 '----------------------------------------------------------------
 'Write Open Record Description into Array
 '----------------------------------------------------------------
-ReDim OpenRec(OpenRecNum, 6)
+ReDim OpenRec(OpenRecNum(Week_Num), 6)
 '--------------------------------------
 'First Dimension
 '---------------
@@ -972,7 +996,7 @@ ReDim OpenRec(OpenRecNum, 6)
 '---------------
 '1(pr_id); 2(short_description); 3(responsible_person); 4(OpenStage); 5(OpenRecType); 6(OpenArea)
 '--------------------------------------
-For i = 1 To OpenRecNum
+For i = 1 To OpenRecNum(Week_Num)
     OpenRec(i, 1) = pr_id(OpenList(i))
     OpenRec(i, 2) = title_short_description(OpenList(i))
     OpenRec(i, 3) = responsible_person(OpenList(i))
@@ -1817,7 +1841,7 @@ ActiveCell.Offset(1, i - 1).Value = Rep_Headers(12 + i)
 Next i
 ActiveCell.Offset(1, 0).Activate
 For j = 1 To 5
-    For i = 1 To OpenRecNum
+    For i = 1 To OpenRecNum(w)
         If OpenRec(i, 5) = j Then
             ActiveCell.Offset(1, 0).Value = OpenRec(i, 1)
             ActiveCell.Offset(1, 1).Value = OpenRec(i, 2)
