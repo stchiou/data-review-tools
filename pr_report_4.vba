@@ -17,8 +17,6 @@ Sub PR_Report()
 '10. PRs by writer
 '11. PRs opened (CQ vs IM)
 '12. Produce weekly report starting from the first week of the year upto the specified date
-
-
 '-------------------------------------------------------------------------------------------------------------------
 'Features:
 '1. Combine output records with corresponding short description
@@ -47,6 +45,8 @@ Dim Record_Num As Long
 Dim FirstWeekDay As Integer
 Dim Month_Begin As Date
 Dim Month_End As Date
+Dim Quarter_Begin As Date
+Dim Quarter_End As Date
 Dim EndDay As Date
 '-------------------------------------------------------
 'Arrays for fields in raw data
@@ -204,6 +204,9 @@ Input_report_type:
             End If 'Report_type=3
         End If  'Report_type=2
     End If  'Report_type=1
+'----------------------------------------------------
+'Parameters for Weekly Report
+'----------------------------------------------------
 Input_week_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Month_Num = InputBox("Input numeric value the Month for the Report" _
@@ -225,6 +228,9 @@ Input_week_parameters:
     Week_Num = WorksheetFunction.WeekNum(Period_End, FirstWeekDay)
     Period_Begin = Period_End - 6
     GoTo Input_data_file:
+'--------------------------------------------------------------
+'Parameters for Monthly Report
+'--------------------------------------------------------------
 Input_month_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Month_Num = InputBox("Input numeric value the Month for the Report" _
@@ -258,13 +264,39 @@ Input_month_parameters:
       Week_End(w) = EndDay - (Week_Num - w) * 7
       Week_Begin(w) = Week_End(w) - 6
     Next w
+    Period_Begin = Month_Begin
+    Period_End = Month_End
     GoTo Input_data_file:
+'-------------------------------------------------------------
+'Parameters for Quarterly Report
+'-------------------------------------------------------------
 Input_quarter_parameters:
     Year_Num = InputBox("Input numeric value of the Year for the Report", "YEAR NUMBER")
     Quarter_Num = InputBox("Input numeric value of the quarter for the report", "QUARTER NUMBER")
-    Period_Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
-    Period_End = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
+    FirstWeekDay = InputBox("Provide the first day of the week" _
+        & vbCr & "1. Monday" _
+        & vbCr & "2. Tuesday" _
+        & vbCr & "3. Wednesday" _
+        & vbCr & "4. Thursday" _
+        & vbCr & "5. Friday" _
+        & vbCr & "6. Saturday" _
+        & vbCr & "7. Sunday", "FIRST DAY OF THE WEEK") + 10
+    Quarter_Begin = DateSerial(Year_Num, (Quarter_Num - 1) * 3 + 1, 1)
+    Quarter_End = DateSerial(Year_Num, Quarter_Num * 3 + 1, 0)
+    Week_Num = WorksheetFunction.WeekNum(Month_End, FirstWeekDay)
+    EndDay = 7 - DatePart("w", Month_End, vbFriday, vbFirstJan1) + Quarter_End
+    ReDim Week_Begin(Week_Num)
+    ReDim Week_End(Week_Num)
+    For w = 0 To Week_Num
+      Week_End(w) = EndDay - (Week_Num - w) * 7
+      Week_Begin(w) = Week_End(w) - 6
+    Next w
+    Period_Begin = Quarter_Begin
+    Period_End = Quarter_End
     GoTo Input_data_file:
+'---------------------------------------------------
+'Parameters for Yearly Report
+'---------------------------------------------------
 Input_year_parameters:
     Year_Num = InputBox("Input numeric value of Year of the Report", "YEAR NUMBER")
     Period_Begin = DateSerial(Year_Num, 1, 1)
