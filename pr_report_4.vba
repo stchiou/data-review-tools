@@ -48,6 +48,7 @@ Dim Month_End As Date
 Dim Quarter_Begin As Date
 Dim Quarter_End As Date
 Dim EndDay As Date
+Dim MaxOpenRecNum As Integer
 '-------------------------------------------------------
 'Arrays for fields in raw data
 '-------------------------------------------------------
@@ -226,7 +227,14 @@ Input_week_parameters:
     Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
     FirstWeekDay = Weekday(Period_End) + 10
     Week_Num = WorksheetFunction.WeekNum(Period_End, FirstWeekDay)
+    EndDay = Period_End
     Period_Begin = Period_End - 6
+    ReDim Week_Begin(Week_Num)
+    ReDim Week_End(Week_Num)
+    For w = 0 To Week_Num
+      Week_End(w) = EndDay - (Week_Num - w) * 7
+      Week_Begin(w) = Week_End(w) - 6
+    Next w
     GoTo Input_data_file:
 '--------------------------------------------------------------
 'Parameters for Monthly Report
@@ -336,6 +344,9 @@ Input_range_parameters:
     Period_Begin = DateSerial(Year_Num, Month_Num, Day_Num)
     Period_End = DateSerial(r_y, r_m, r_d)
     GoTo Input_data_file:
+'-------------------------------------------------
+'Parameters for data file
+'-------------------------------------------------
 Input_data_file:
     File_1 = Application.GetOpenFilename _
         (Title:="Data File", _
@@ -463,56 +474,59 @@ Next i
 'Count Number of Opened Record
 '------------------------------------------------------------------------------
 ReDim OpenRecNum(Week_Num)
+ReDim Open_Index(Week_Num, Record_Num)
 For w = 1 To Week_Num
     OpenRecNum(w) = 0
-    ReDim Open_Index(Record_Num, Week_Num)
     For i = 2 To Record_Num
-    If pr_state(i) = "Cancelled" Then
-        OpenRecNum(w) = OpenRecNum(w)
-        Open_Index(i, w) = 0
-    Else
-        If date_open(i) > Period_End + 1 Then
+        If pr_state(i) = "Cancelled" Then
             OpenRecNum(w) = OpenRecNum(w)
-            Open_Index(i, w) = 0
+            Open_Index(w, i) = 0
         Else
-            If site_qa_approval_on(i) = 0 Then
-                If qa_final_app_on(i) = 0 Then
-                    OpenRecNum(w) = OpenRecNum(w) + 1
-                    Open_Index(i, w) = i
-                Else
-                    If qa_final_app_on(i) > Period_End + 1 Then
-                    OpenRecNum(w) = OpenRecNum(w) + 1
-                    Open_Index(i, w) = i
-                Else
-                    OpenRecNum(w) = OpenRecNum(w)
-                    Open_Index(i, w) = 0
-                End If
-            End If
-        Else
-            If site_qa_approval_on(i) > Period_End + 1 Then
-                OpenRecNum(w) = OpenRecNum(w) + 1
-                Open_Index(i, w) = i
+            If date_open(i) > Week_End(w) + 1 Then
+                OpenRecNum(w) = OpenRecNum(w)
+                Open_Index(w, i) = 0
             Else
-                OpenRecNum = OpenRecNum
-                Open_Index(i, w) = 0
-            End If
+                If site_qa_approval_on(i) = 0 Then
+                    If qa_final_app_on(i) = 0 Then
+                        OpenRecNum(w) = OpenRecNum(w) + 1
+                        Open_Index(w, i) = i
+                    Else
+                        If qa_final_app_on(i) > Week_End(w) + 1 Then
+                            OpenRecNum(w) = OpenRecNum(w) + 1
+                            Open_Index(w, i) = i
+                        Else
+                            OpenRecNum(w) = OpenRecNum(w)
+                            Open_Index(w, i) = 0
+                        End If
+                    End If
+                Else
+                    If site_qa_approval_on(i) > Week_End(w) + 1 Then
+                        OpenRecNum(w) = OpenRecNum(w) + 1
+                        Open_Index(w, i) = i
+                    Else
+                        OpenRecNum(w) = OpenRecNum(w)
+                        Open_Index(w, i) = 0
+                    End If
+                End If
         End If
     End If
-End If
 Next i
 Next w
 '-------------------------------------------------------------------------------
 'Fill the list of Opened Records with index numbers of the whole data set
 '-------------------------------------------------------------------------------
-ReDim OpenList(OpenRecNum(Week_Num))
+
+ReDim OpenList(Week_Num, Record_Num)
+For w = 1 To Week_Num
 OpenList_Pos = 1
-For i = 1 To Record_Num
-        If Open_Index(i) <> 0 Then
-            OpenList(OpenList_Pos) = Open_Index(i)
+    For i = 1 To Record_Num
+        If Open_Index(w, i) <> 0 Then
+            OpenList(w, OpenList_Pos) = Open_Index(w, i)
             OpenList_Pos = OpenList_Pos + 1
         Else
         End If
-Next i
+    Next i
+Next w
 '---------------------------------------------------------------------------------
 'Calculate Age , Stage and Type of Opened Records
 '---------------------------------------------------------------------------------
