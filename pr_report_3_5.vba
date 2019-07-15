@@ -1990,7 +1990,7 @@ ActiveChart.Legend.LegendEntries(4).Delete
 'ActiveChart.ChartStyle = 26
 With ActiveChart
     .HasTitle = True
-    .ChartTitle.Text = "CQ Open Record by Type and Age (Week " & Week_Num & ", " & Right(Period_End, 4) & ")"
+    .ChartTitle.Text = "CQ Opened Record by Type and Age (Week " & Week_Num & ", " & Right(Period_End, 4) & ")"
 End With
 ActiveChart.SetElement (msoElementPrimaryValueGridLinesNone)
 ActiveSheet.Shapes.AddChart.Select
