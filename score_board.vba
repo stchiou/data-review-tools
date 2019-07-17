@@ -20,13 +20,14 @@ Sub reviewer_score()
     Cells(1, 1).Value = "Review Date"
     Cells(1, 2).Value = "Name"
     Cells(1, 3).Value = "Number of Lots"
-    Cells(1, 4).Value = "Number of Assay in each lot"
+    Cells(1, 4).Value = "Number of Potency/Impurity in each lot"
     Cells(1, 5).Value = "Number of Potency in each lot"
     Cells(1, 6).Value = "Number of Impurity in each lot"
-    Cells(1, 7).Value = "Number of ID in each lot"
-    Cells(1, 8).Value = "Possible Scores"
-    Cells(1, 9).Value = "Penalty"
-    Cells(1, 10).Value = "Final Score"
+    Cells(1, 7).Value = "Number of Assay in each lot"
+    Cells(1, 8).Value = "Number of ID in each lot"
+    Cells(1, 9).Value = "Possible Scores"
+    Cells(1, 10).Value = "Penalty"
+    Cells(1, 11).Value = "Final Score"
     Range("B2").Select
     With Selection.Validation
         .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
@@ -61,14 +62,17 @@ Sub Compute()
     Dim entry_date() As Date
     Dim reviewer() As String
     Dim lot() As Integer
-    Dim assay() As Integer
+    Dim pot_imp() As Integer
     Dim potency() As Integer
     Dim impurity() As Integer
+    Dim assay() As Integer
     Dim id() As Integer
     Dim possible_score() As Integer
     Dim penalty() As Long
     Dim score() As Long
     Dim record_num As Long
+    Dim i As Integer
+    Dim j As Integer
 '------------------------------------------------------------------------------
 'variables for specifying report
 '------------------------------------------------------------------------------
@@ -90,7 +94,34 @@ Sub Compute()
     Dim num_review_id() As Integer
     Dim review_score() As Long
     Dim review_penal() As Long
+Worksheets("Data_Entry").Activate
+Cells(1, 1).Activate
+record_num = ActiveSheet.UsedRange.Rows.Count
+    ReDim entry_date(record_num) As Date
+    ReDim reviewer(record_num) As String
+    ReDim lot(record_num) As Integer
+    ReDim pot_imp(record_num) As Integer
+    ReDim potency(record_num) As Integer
+    ReDim impurity(record_num) As Integer
+    ReDim assay(record_num) As Integer
+    ReDim id(record_num) As Integer
+    ReDim possible_score(record_num) As Integer
+    ReDim penalty(record_num) As Long
+    ReDim score(record_num) As Long
+    For i = 2 To record_num
+      Cells(2, 1).Activate
+      entry_date(i) = ActiveCell.Value
+      reviewer(i) = ActiveCell.Offset(0, 1).Value
+      lot(i) = ActiveCell.Offset(0, 2).Value
+      pot_imp(i) = ActiveCell.Offset(0, 3).Value
+      potency(i) = ActiveCell.Offset(0, 4).Value
+      impurity(i) = ActiveCell.Offset(0, 5).Value
+      assay(i) = ActiveCell.Offset(0, 6).Value
+      id(i) = ActiveCell.Offset(0, 7).Value
     
+    Next i
+    
+
 MsgBox ("This is it!!!")
 End Sub
 
