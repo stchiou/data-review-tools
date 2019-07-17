@@ -38,6 +38,21 @@ Sub reviewer_score()
     Dim review_score() As Long
     Dim review_score() As Long
 '-----------------------------------------------------------------------------
+'Prepare for data entry
+'-----------------------------------------------------------------------------
+    Worksheets("Sheet1").Activate
+    Cells(1, 1).Value = "Entry Date"
+    Cells(1, 2).Value = "Name"
+    Cells(1, 3).Value = "Number of Lots"
+    Cells(1, 4).Value = "Assay"
+    Cells(1, 5).Value = "Potency"
+    Cells(1, 6).Value = "Impurity"
+    Cells(1, 7).Value = "ID"
+    Cells(1, 8).Value = "Possible Scores"
+    Cells(1, 9).Value = "Penalty"
+    Cells(1, 10).Value = "Final Score"
+    
+'-----------------------------------------------------------------------------
 'Validation, List
 '   With Selection.Validation
 '        .Delete
