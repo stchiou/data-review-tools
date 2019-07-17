@@ -1,5 +1,60 @@
 Attribute VB_Name = "Module1"
 Sub reviewer_score()
+'-----------------------------------------------------------------------------
+'Prepare for data entry
+'-----------------------------------------------------------------------------
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim btn As Button
+    Set wb = ActiveWorkbook
+    On Error Resume Next
+    Set ws = wb.Sheets("Data_Entry")
+    On Error GoTo 0
+    If Not ws Is Nothing Then
+        MsgBox "The Sheet called " & "Data_Entry" & " already existed in the workbook.", vbExclamation, "Sheet Already Exists!"
+        GoTo Entry_Prompt
+    Else
+        Set ws = wb.Sheets.Add(after:=wb.Sheets(wb.Sheets.Count))
+        ws.name = "Data_Entry"
+    End If
+    Cells(1, 1).Value = "Review Date"
+    Cells(1, 2).Value = "Name"
+    Cells(1, 3).Value = "Number of Lots"
+    Cells(1, 4).Value = "Number of Assay in each lot"
+    Cells(1, 5).Value = "Number of Potency in each lot"
+    Cells(1, 6).Value = "Number of Impurity in each lot"
+    Cells(1, 7).Value = "Number of ID in each lot"
+    Cells(1, 8).Value = "Possible Scores"
+    Cells(1, 9).Value = "Penalty"
+    Cells(1, 10).Value = "Final Score"
+    Range("B2").Select
+    With Selection.Validation
+        .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+        xlBetween, Formula1:="=Names!$A$1:$A$27"
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = ""
+        .ErrorTitle = ""
+        .InputMessage = ""
+        .ErrorMessage = ""
+        .ShowInput = True
+        .ShowError = True
+    End With
+    Selection.AutoFill Destination:=Range("B2:B1048576"), Type:=xlFillDefault
+    Range("B2").End(xlDown).Select
+    Set btn = ActiveSheet.Buttons.Add(Range("N2").Left, 100, 50, 100)
+    ActiveSheet.Buttons.Select
+    With Selection
+    .OnAction = "Compute"
+    .Characters.Text = "Calculate"
+    .Font.Bold = True
+    End With
+Entry_Prompt:
+    Worksheets("Data_Entry").Activate
+    Cells(1, 1).Select
+    MsgBox ("Enter Data in columns A-G. Click the 'Calculate' button to compute values for columns H-J.")
+End Sub
+Sub Compute()
 '--------------------------------------------------------------------------------
 'variables for store input
 '--------------------------------------------------------------------------------
@@ -35,36 +90,7 @@ Sub reviewer_score()
     Dim num_review_id() As Integer
     Dim review_score() As Long
     Dim review_penal() As Long
-    Dim review_score() As Long
-    Dim review_score() As Long
-'-----------------------------------------------------------------------------
-'Prepare for data entry
-'-----------------------------------------------------------------------------
-    Worksheets("Sheet1").Activate
-    Cells(1, 1).Value = "Entry Date"
-    Cells(1, 2).Value = "Name"
-    Cells(1, 3).Value = "Number of Lots"
-    Cells(1, 4).Value = "Assay"
-    Cells(1, 5).Value = "Potency"
-    Cells(1, 6).Value = "Impurity"
-    Cells(1, 7).Value = "ID"
-    Cells(1, 8).Value = "Possible Scores"
-    Cells(1, 9).Value = "Penalty"
-    Cells(1, 10).Value = "Final Score"
     
-'-----------------------------------------------------------------------------
-'Validation, List
-'   With Selection.Validation
-'        .Delete
-'        .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-'        xlBetween, Formula1:="=Sheet3!$A$1:$A$27"
-'        .IgnoreBlank = True
-'        .InCellDropdown = True
-'        .InputTitle = ""
-'        .ErrorTitle = ""
-'        .InputMessage = ""
-'        .ErrorMessage = ""
-'        .ShowInput = True
-'        .ShowError = True
-'    End With
+MsgBox ("This is it!!!")
 End Sub
+
