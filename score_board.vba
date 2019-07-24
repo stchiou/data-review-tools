@@ -9,7 +9,12 @@ Sub reviewer_score()
     Dim wb As Workbook
     Dim ws As Worksheet
     Dim btn As Button
-    week_num = InputBox("Please enter week number (1-52).")
+    If week_num <> 0 Then
+        GoTo CreateNewSheet
+    Else
+        week_num = InputBox("Please enter week number (1-52).")
+    End If
+CreateNewSheet:
     Set wb = ActiveWorkbook
     On Error Resume Next
     Set ws = wb.Sheets("Week_" & week_num)
@@ -46,9 +51,9 @@ Sub reviewer_score()
         xlBetween, formula1:="=Names!$A$1:$A$27"
         .IgnoreBlank = True
         .InCellDropdown = True
-        .InputTitle = ""
+        .InputTitle = "Data Reviewer Name"
         .ErrorTitle = ""
-        .InputMessage = ""
+        .InputMessage = "Select name from the drop-down list."
         .ErrorMessage = ""
         .ShowInput = True
         .ShowError = True
@@ -100,8 +105,8 @@ With Selection.Validation
         .IgnoreBlank = True
         .InCellDropdown = True
         .InputTitle = ""
-        .ErrorTitle = ""
-        .InputMessage = ""
+        .ErrorTitle = "Wrong Date"
+        .InputMessage = "Enter date between " & date1 & " and " & date2 & "."
         .ErrorMessage = "Week " & week_num & " is between " & date1 & " and " & date2 & "."
         .ShowInput = True
         .ShowError = True
@@ -160,10 +165,20 @@ Sub Compute()
     Dim num_review_id() As Integer
     Dim review_score() As Long
     Dim review_penal() As Long
-    
-Worksheets("Week_" & week_num).Activate
-Cells(1, 1).Activate
+    Dim sht As Worksheet
 
+If week_num = 0 Then
+    week_num = InputBox("Which week do you want to calculate?", "Enter Week Number")
+    On Error Resume Next
+        Set sht = Worksheets("Week_" & week_num)
+    On Error GoTo ErrHandler
+ErrHandler:
+    MsgBox ("Specified week does not exist, creating one.")
+    reviewer_score
+Else
+    Worksheets("Week_" & week_num).Activate
+End If
+Cells(1, 1).Activate
 record_num = ActiveSheet.UsedRange.Rows.Count
     ReDim entry_date(record_num) As Date
     ReDim reviewer(record_num) As String
