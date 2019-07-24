@@ -265,10 +265,21 @@ Sub Gen_report()
     Dim week_num As Integer
     Dim year As Integer
     Dim month As Integer
-    Dim report_start_date As Date
-    Dim report_end_date As Date
+    Dim report_start_week As Integer
+    Dim report_end_week As Integer
+    Dim sheetNum As Integer
+    Dim recNum() As Integer
     Dim month_start As Date
     Dim month_end As Date
+    
+    Dim i As Integer
+    Dim j As Integer
+'---------------------------------------------------------
+'Array dimension
+'----------------
+
+'---------------------------------------------------------
+    ReDim summary(3, 27)
     year = InputBox("Enter the year of the report")
     month = InputBox("Enter the month for report: " _
         & vbCr & "1. January" _
@@ -283,11 +294,11 @@ Sub Gen_report()
         & vbCr & "10. October" _
         & vbCr & "11. November" _
         & vbCr & "12. December")
-    
     month_start = year & "/" & month & "/1"
     month_end = WorksheetFunction.EoMonth(month_start, 0)
-    report_start_date = month_start - (Weekday(month_start) - 1)
-    report_end_date = month_end - Weekday(month_end) + 7
+    report_start_week = WorksheetFunction.WeekNum(month_start)
+    report_end_week = WorksheetFunction.WeekNum(month_end)
+    sheetNum = report_end_week - report_start_week + 1
     
     MsgBox ("Processing monthly report.")
 End Sub
