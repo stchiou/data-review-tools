@@ -13,22 +13,7 @@ Sub reviewer_score()
     Dim btn3 As Button
     Dim typelist As String
     Dim lastrow As Long
-    
-'    If week_num <> 0 Then
-'        GoTo CreateNewSheet
-'    Else
-'        yr = InputBox("Please enter the year of the records.")
-'        week_num = InputBox("Please enter week number (1-52).")
-'    End If
-'CreateNewSheet:
-'    Set wb = ActiveWorkbook
-'    On Error Resume Next
-'    Set ws = wb.Sheets("Week_" & week_num & "_" & yr)
-'    On Error GoTo 0
-'    If Not ws Is Nothing Then
-'        MsgBox "The Sheet called " & "Week_" & week_num & "_" & yr & " already existed in this workbook.", vbExclamation, "Sheet Already Exists!"
-'        GoTo entry_prompt
-'    Else
+
 typelist = "Impurity/Potency, Impurity, Potency, Assay, ID"
 yr = InputBox("Please enter the year of the records.")
 week_num = InputBox("Please enter week number (1-52).")
@@ -65,7 +50,7 @@ End With
     Range("B2").Select
     With Selection.Validation
         .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-        xlBetween, formula1:="=Names!$A$1:$A$27"
+        xlBetween, formula1:="=Names!$A$1:$A$30"
         .IgnoreBlank = True
         .InCellDropdown = True
         .InputTitle = "Data Reviewer Name"
@@ -77,8 +62,6 @@ End With
     End With
     Selection.AutoFill Destination:=Range("B2:B1048576"), Type:=xlFillDefault
     Range("B2").End(xlDown).Select
-
-
     Range("C2").Select
     With Selection.Validation
         .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
@@ -104,7 +87,7 @@ With Selection
 End With
 Worksheets("Week_" & wn & "_" & yr).Activate
 Cells(1, 1).Select
-MsgBox ("Enter Data in columns A-L. Click the 'Calculate' button to compute penalty and final score.")
+MsgBox ("Enter Data in columns A-F. Click the 'Calculate' button to compute penalty and final score.")
 Set btn2 = ActiveSheet.Buttons.Add(Range("L5").Left, 30, 120, 25)
 btn2.Select
 With Selection
@@ -116,13 +99,10 @@ MsgBox ("Click Report to generate monthly report.")
 Set btn3 = ActiveSheet.Buttons.Add(Range("L9").Left, 60, 120, 25)
 btn3.Select
 With Selection
-    .OnAction = "UpDate_Record"
-    .Caption = "Update Scores"
+    .OnAction = "reviewer_score"
+    .Caption = "Add New Sheet"
     .Font.Bold = True
 End With
-    
-
-
 Cells(2, 1).Activate
 End Sub
 Sub Compute()
@@ -156,12 +136,13 @@ Else
     week_num = Mid(ShName, 6, 2)
 End If
 Cells(1, 1).Activate
-record_num = ActiveSheet.UsedRange.Rows.Count
+record_num = Cells(1, 1).End(xlDown).Row
     ReDim entry_date(record_num) As Date
     ReDim reviewer(record_num) As String
     ReDim assignment(record_num) As String
     ReDim LotAssigned(record_num) As Integer
     ReDim LotError(record_num) As Integer
+    ReDim ErrorNum(record_num) As Integer
     ReDim penalty(record_num) As Double
     ReDim score(record_num) As Double
     Cells(2, 1).Activate
@@ -171,62 +152,25 @@ record_num = ActiveSheet.UsedRange.Rows.Count
       assignment(i) = ActiveCell.Offset(0, 2).Value
       Select Case assignment(i)
         Case Is = "Impurity/Potency"
+            assignment(i) = 5
         Case Is = "Impurity"
+            assignment(i) = 4
         Case Is = "Potency"
+            assignment(i) = 3
         Case Is = "Assay"
+            assignment(i) = 2
         Case Is = "ID"
-        
+            assignment(i) = 1
       End Select
       LotAssigned(i) = ActiveCell.Offset(0, 3).Value
       LotError(i) = ActiveCell.Offset(0, 4).Value
-      penalty (i)
-'      pot_imp_lot(i) = ActiveCell.Offset(0, 2).Value
-'      pot_imp_err_lot(i) = ActiveCell.Offset(0, 3).Value
-'      pot_imp_err(i) = ActiveCell.Offset(0, 4).Value
-'      imp_lot(i) = ActiveCell.Offset(0, 5).Value
-'      imp_err_lot(i) = ActiveCell.Offset(0, 6).Value
-'      imp_err(i) = ActiveCell.Offset(0, 7).Value
-'      pot_lot(i) = ActiveCell.Offset(0, 8).Value
-'      pot_err_lot(i) = ActiveCell.Offset(0, 9).Value
-'      pot_err(i) = ActiveCell.Offset(0, 10).Value
-'      assay_lot(i) = ActiveCell.Offset(0, 11).Value
-'      assay_err_lot(i) = ActiveCell.Offset(0, 12).Value
-'      assay_err(i) = ActiveCell.Offset(0, 13).Value
-'      id_lot(i) = ActiveCell.Offset(0, 14).Value
-'      id_err_lot(i) = ActiveCell.Offset(0, 15).Value
-      id_err(i) = ActiveCell.Offset(0, 16).Value
-      If pot_imp_lot(i) = 0 Then
-        pot_imp_pen(i) = 0
-      Else
-        pot_imp_pen(i) = pot_imp_err_lot(i) * pot_imp_err(i) / pot_imp_lot(i) * 5
-      End If
-      If imp_lot(i) = 0 Then
-        imp_pen(i) = 0
-      Else
-        imp_pen(i) = imp_err_lot(i) * imp_err(i) / imp_lot(i) * 4
-      End If
-      If pot_lot(i) = 0 Then
-        pot_pen(i) = 0
-      Else
-        pot_pen(i) = pot_err_lot(i) * pot_err(i) / pot_lot(i) * 3
-      End If
-      If assay_lot(i) = 0 Then
-        assay_pen(i) = 0
-      Else
-        assay_pen(i) = assay_err_lot(i) * assay_err(i) / assay_lot(i) * 2
-      End If
-      If id_lot(i) = 0 Then
-        id_pen(i) = 0
-      Else
-        id_pen(i) = id_err_lot(i) * id_err(i) / id_lot(i) * 1
-      End If
-      penalty(i) = pot_imp_pen(i) + imp_pen(i) + pot_pen(i) + assay_pen(i) + id_pen(i)
+      ErrorNum(i) = ActiveCell.Offset(0, 5).Value
+      penalty(i) = (LotError(i) * ErrorNum(i)) / (assignment(i) * LotAssigned(i))
       score(i) = 100 - penalty(i)
-      ActiveCell.Offset(0, 17).Value = penalty(i)
-      ActiveCell.Offset(0, 18).Value = score(i)
+      ActiveCell.Offset(0, 6).Value = penalty(i)
+      ActiveCell.Offset(0, 7).Value = score(i)
       ActiveCell.Offset(1, 0).Activate
     Next i
-
 End Sub
 '--------------------------------------------------------------------------------------
 'Generate Report
@@ -248,7 +192,6 @@ Sub Gen_report()
     Dim i As Integer
     Dim j As Integer
     Dim temp() As Double
-    
 '---------------------------------------------------------
 'Array dimension
 '----------------
@@ -277,7 +220,8 @@ Sub Gen_report()
     ReDim rowNum(report_end_week) As Integer
     ReportRecNum = 0
     For i = report_start_week To report_end_week
-        rowNum(i) = Worksheets("Week_" & i).UsedRange.Rows.Count
+        If i < 10 Then wn = "0" & i
+        rowNum(i) = Worksheets("Week_" & wn & "_" & year).Cells(1, 1).xlDown.Row
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
  
