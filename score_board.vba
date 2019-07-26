@@ -192,6 +192,7 @@ Sub Gen_report()
     Dim i As Integer
     Dim j As Integer
     Dim temp() As Double
+    Dim month_name As String
 '---------------------------------------------------------
 'Array dimension
 '----------------
@@ -218,14 +219,43 @@ Sub Gen_report()
     report_end_week = WorksheetFunction.WeekNum(month_end)
     SheetNum = report_end_week - report_start_week + 1
     ReDim rowNum(report_end_week) As Integer
+    Select Case month
+        Case Is = 1
+            month_name = "January"
+        Case Is = 2
+            month_name = "February"
+        Case Is = 3
+            month_name = "March"
+        Case Is = 4
+            month_name = "April"
+        Case Is = 5
+            month_name = "May"
+        Case Is = 6
+            month_name = "June"
+        Case Is = 7
+            month_name = "July"
+        Case Is = 8
+            month_name = "August"
+        Case Is = 9
+            month_name = "September"
+        Case Is = 10
+            month_name = "October"
+        Case Is = 11
+            month_name = "November"
+        Case Is = 12
+            month_name = "December"
+    End Select
+    MsgBox ("Processing monthly report of " & month_name & " " & year & " with " & ReportRecNum & " records.")
     ReportRecNum = 0
     For i = report_start_week To report_end_week
-        If i < 10 Then wn = "0" & i
-        rowNum(i) = Worksheets("Week_" & wn & "_" & year).Cells(1, 1).xlDown.Row
+        If i < 10 Then
+            wn = "0" & i
+        Else
+            wn = i
+        End If
+        rowNum(i) = Worksheets("Week_" & wn & "_" & year).Cells(1, 1).End(xlDown).Row
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
- 
-    MsgBox ("Processing monthly report.")
 End Sub
 '----------------------------------------------------------------------
 '  Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
