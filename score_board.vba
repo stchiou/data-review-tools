@@ -194,6 +194,7 @@ Sub Gen_report()
     Dim j As Integer
     Dim temp() As Double
     Dim month_name As String
+    Dim Curr_Rec As Integer
 '---------------------------------------------------------
 'Array dimension
 '----------------
@@ -247,7 +248,7 @@ Sub Gen_report()
         Case Is = 12
             month_name = "December"
     End Select
-    MsgBox ("Processing monthly report of " & month_name & " " & year & " with " & ReportRecNum & " records.")
+   
     ReportRecNum = 0
     For i = report_start_week To report_end_week
         If i < 10 Then
@@ -259,10 +260,92 @@ Sub Gen_report()
         rowNum(i) = Worksheets(SheetName(i)).Cells(1, 1).End(xlDown).Row
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
+MsgBox ("Processing monthly report of " & month_name & " " & year & " with " & ReportRecNum & " records.")
+ReDim temp(4, ReportRecNum) As Double
+Curr_Rec = 0
+For i = report_start_week To report_end_week
+    Worksheets(SheetName(i)).Activate
+    For j = 2 To rowNum(i)
+        Curr_Rec = Curr_Rec + j - 1
+        Cells(j, 2).Activate
+        Select Case Cells(j, 2).Value
+            Case Is = "Alam, Nuzhat P"
+                temp(1, Curr_Rec) = 1
+            Case Is = "Barnes, Michelle"
+                temp(1, Curr_Rec) = 2
+            Case Is = "Batts, George III"
+                temp(1, Curr_Rec) = 3
+            Case Is = "Beckwith, Catherine"
+                temp(1, Curr_Rec) = 4
+            Case Is = "Blair, Kenneth John"
+                temp(1, Curr_Rec) = 5
+            Case Is = "Bomboy, Dustin Shaun"
+                temp(1, Curr_Rec) = 6
+            Case Is = "Borrero López, Francheska"
+                temp(1, Curr_Rec) = 7
+            Case Is = "Cintron Barreto, Derickniel"
+                temp(1, Curr_Rec) = 8
+            Case Is = "Clark, Antonio"
+                temp(1, Curr_Rec) = 9
+            Case Is = "Clark, Janneth Lucia"
+                temp(1, Curr_Rec) = 10
+            Case Is = "Dudley, Jocelyn Imi"
+                temp(1, Curr_Rec) = 11
+            Case Is = "Ghahra, Parvaneh"
+                temp(1, Curr_Rec) = 12
+            Case Is = "Gray, Jason L."
+                temp(1, Curr_Rec) = 13
+            Case Is = "HARRISON, MARY"
+                temp(1, Curr_Rec) = 14
+            Case Is = "Lash, Tanya"
+                temp(1, Curr_Rec) = 15
+            Case Is = "Lee, Trecia"
+                temp(1, Curr_Rec) = 16
+            Case Is = "McRae, Tangelo"
+                temp(1, Curr_Rec) = 17
+            Case Is = "McBean, Coray"
+                temp(1, Curr_Rec) = 18
+            Case Is = "Nash, Shalena"
+                temp(1, Curr_Rec) = 19
+            Case Is = "Obdens, Aaron Benjamin"
+                temp(1, Curr_Rec) = 20
+            Case Is = "Polashuk, Michael"
+                temp(1, Curr_Rec) = 21
+            Case Is = "Riley, Lakesha"
+                temp(1, Curr_Rec) = 22
+            Case Is = "Silver, Carla Marie"
+                temp(1, Curr_Rec) = 23
+            Case Is = "Smith, Carlton E"
+                temp(1, Curr_Rec) = 24
+            Case Is = "Springer-Dickson, Sherlene"
+                temp(1, Curr_Rec) = 25
+            Case Is = "Tummala, Lok"
+                temp(1, Curr_Rec) = 26
+            Case Is = "Vines, Vernon"
+                temp(1, Curr_Rec) = 27
+            Case Is = "Wynn, Jason L."
+                temp(1, Curr_Rec) = 28
+            Case Is = "Zimmerman-Ford, Gisela Z"
+                temp(1, Curr_Rec) = 29
+        End Select
+        Select Case ActiveCell.Offset(0, 1).Value
+            Case Is = "Impurity/Potency"
+                temp(2, Curr_Rec) = 5
+            Case Is = "Impurity"
+                temp(2, Curr_Rec) = 4
+            Case Is = "Potency"
+                temp(2, Curr_Rec) = 3
+            Case Is = "Assay"
+                temp(2, Curr_Rec) = 2
+            Case Is = "ID"
+                temp(2, Curr_Rec) = 1
+        End Select
+        temp(3, Curr_Rec) = ActiveCell.Offset(0, 2).Value
+        temp(4, Curr_Rec) = ActiveCell.Offset(0, 6).Value
+    Next j
+Next i
+MsgBox ("Data loaded")
 End Sub
-ReDim temp(4, ReportRecNum) As Integer
-
-
 '----------------------------------------------------------------------
 '  Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
 '    FirstWeekDay = Weekday(Period_End) + 10
