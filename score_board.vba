@@ -184,6 +184,7 @@ Sub Gen_report()
     Dim report_start_week As Integer
     Dim report_end_week As Integer
     Dim SheetNum As Integer
+    Dim SheetName() As String
     Dim rowNum() As Integer
     Dim ReportRecNum As Integer
     Dim summary() As Double
@@ -218,6 +219,7 @@ Sub Gen_report()
     report_start_week = WorksheetFunction.WeekNum(month_start)
     report_end_week = WorksheetFunction.WeekNum(month_end)
     SheetNum = report_end_week - report_start_week + 1
+    ReDim SheetName(report_end_week) As String
     ReDim rowNum(report_end_week) As Integer
     Select Case month
         Case Is = 1
@@ -253,7 +255,8 @@ Sub Gen_report()
         Else
             wn = i
         End If
-        rowNum(i) = Worksheets("Week_" & wn & "_" & year).Cells(1, 1).End(xlDown).Row
+        SheetName(i) = "Week_" & wn & "_" & year
+        rowNum(i) = Worksheets(SheetName(i)).Cells(1, 1).End(xlDown).Row
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
 End Sub
