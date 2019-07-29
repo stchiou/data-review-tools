@@ -195,6 +195,7 @@ Sub Gen_report()
     Dim temp() As Double
     Dim month_name As String
     Dim Curr_Rec As Integer
+    Dim ReportSheet() As Variant
 '---------------------------------------------------------
 'Array dimension
 '----------------
@@ -266,7 +267,7 @@ Curr_Rec = 0
 For i = report_start_week To report_end_week
     Worksheets(SheetName(i)).Activate
     For j = 2 To rowNum(i)
-        Curr_Rec = Curr_Rec + j - 1
+        Curr_Rec = Curr_Rec + 1
         Cells(j, 2).Activate
         Select Case Cells(j, 2).Value
             Case Is = "Alam, Nuzhat P"
@@ -345,6 +346,19 @@ For i = report_start_week To report_end_week
     Next j
 Next i
 MsgBox ("Data loaded")
+With Application
+    .SheetsInNewWorkbook = 29
+    .Workbooks.Add
+    .SheetsInNewWorkbook = 29
+End With
+ReportSheet = Array("Alam", "Barnes", "Batts", "Beckwith", "Blair", "Bomboy", "Borrero_López", "Clintron_Barreto", _
+"Clark_A", "Clack_J", "Dudley", "Ghahra", "Gray", "Harrison", "Lash", "Lee", "McRae", "McBean", "Nash", "Obdens", _
+"Polashuk", "Riley", "Silver", "Smith", "Springer-Dickson", "Tummala", "Vines", "Wynn", "Zimmerman-Ford")
+For i = 0 To 28
+   Sheets("Sheet" & i + 1).name = ReportSheet(i)
+Next i
+ActiveWorkbook.SaveAs Filename:=month_name & year & ".xlsx"
+
 End Sub
 '----------------------------------------------------------------------
 '  Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
