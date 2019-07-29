@@ -260,6 +260,9 @@ Sub Gen_report()
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
 End Sub
+ReDim temp(4, ReportRecNum) As Integer
+
+
 '----------------------------------------------------------------------
 '  Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
 '    FirstWeekDay = Weekday(Period_End) + 10
