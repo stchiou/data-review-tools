@@ -393,7 +393,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(1)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 2
@@ -403,7 +414,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(2)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 3
@@ -413,7 +435,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(3)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 4
@@ -423,7 +456,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(4)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 5
@@ -433,7 +477,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(5)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 6
@@ -443,7 +498,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(6)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 7
@@ -453,7 +519,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(7)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 8
@@ -463,7 +540,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(8)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 9
@@ -473,7 +561,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(9)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 10
@@ -483,7 +582,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(10)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 11
@@ -493,7 +603,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(11)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 12
@@ -503,7 +624,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(12)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 13
@@ -513,7 +645,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(13)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 14
@@ -523,7 +666,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(14)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 15
@@ -533,7 +687,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(15)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 16
@@ -543,7 +708,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(16)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 17
@@ -553,7 +729,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(17)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 18
@@ -563,7 +750,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(18)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 19
@@ -573,7 +771,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(19)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 20
@@ -583,7 +792,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(20)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 21
@@ -593,7 +813,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(21)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 22
@@ -603,7 +834,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(22)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 23
@@ -613,7 +855,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(23)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 24
@@ -623,7 +876,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(24)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 25
@@ -633,7 +897,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(25)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 26
@@ -643,7 +918,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(26)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 27
@@ -653,7 +939,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(27)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 28
@@ -663,7 +960,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(28)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
         Case Is = 29
@@ -673,7 +981,18 @@ For i = 1 To ReportRecNum
             ActiveCell.Value = temp(1, i)
             ActiveCell.NumberFormat = "mm/dd/yyyy"
             ActiveCell.Offset(0, 1).Value = ReviewerName(29)
-            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            Select Case temp(3, i)
+                Case Is = 1
+                    ActiveCell.Offset(0, 2).Value = "ID"
+                Case Is = 2
+                    ActiveCell.Offset(0, 2).Value = "Assay"
+                Case Is = 3
+                    ActiveCell.Offset(0, 2).Value = "Potency"
+                Case Is = 4
+                    ActiveCell.Offset(0, 2).Value = "Impurity"
+                Case Is = 5
+                    ActiveCell.Offset(0, 2).Value = "Impurity/Potency"
+            End Select
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
     End Select
