@@ -214,6 +214,7 @@ Sub Gen_report()
     Dim Curr_Rec As Integer
     Dim ReportSheet() As Variant
     Dim NextRow As Long
+    Dim RecNum As Integer
 '---------------------------------------------------------
 'Array dimension
 '----------------
@@ -383,7 +384,7 @@ For i = 1 To ReviewerNum
    Worksheets(ReviewerName(i)).Cells(1, 4).Value = "Lot"
    Worksheets(ReviewerName(i)).Cells(1, 5).Value = "Score"
 Next i
-ActiveWorkbook.SaveAs Filename:=month_name & year & ".xlsx"
+ActiveWorkbook.SaveAs Filename:="\\hpdrmf01\f_DRIVE\CQ Lab\Data Review Tracking\Test\" & month_name & year & ".xlsx", Password:="Seniors"
 For i = 1 To ReportRecNum
     Select Case temp(2, i)
         Case Is = 1
@@ -996,6 +997,17 @@ For i = 1 To ReportRecNum
             ActiveCell.Offset(0, 3).Value = temp(4, i)
             ActiveCell.Offset(0, 4).Value = temp(5, i)
     End Select
+Next i
+For i = 1 To ReviewerNum
+    Worksheets(ReviewerName(i)).Activate
+    NextRow = Worksheets(ReviewerName(i)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+    Range("A2:A" & NextRow - 1).Sort key1:=Range("A1"), order1:=xlAscending
+    Cells(NextRow, 1).Value = "Total"
+    Cells(NextRow + 1, 1).Value = "Average"
+    Cells(NextRow, 4).Value = WorksheetFunction.Sum(Range("D2:D" & NextRow - 1).Value)
+    Cells(NextRow, 5).Value = WorksheetFunction.Sum(Range("E2:E" & NextRow - 1).Value)
+    Cells(NextRow + 1, 4).Value = WorksheetFunction.Average(Range("D2:D" & NextRow - 1).Value)
+    Cells(NextRow + 1, 5).Value = WorksheetFunction.Average(Range("E2:E" & NextRow - 1).Value)
 Next i
 End Sub
 '----------------------------------------------------------------------
