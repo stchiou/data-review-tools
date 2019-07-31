@@ -2,6 +2,8 @@ Attribute VB_Name = "Data_Reviewer_ScoreBoard"
 Public week_num As Integer
 Public yr As Integer
 Public wn As String
+Public ReviewerName() As String
+Public ReviewerNum As Integer
 Sub reviewer_score()
 '-----------------------------------------------------------------------------
 'Prepare for data entry
@@ -31,8 +33,9 @@ Worksheets.Add(after:=Worksheets(Worksheets.Count)).name = "Week_" & wn & "_" & 
     Cells(1, 4).Value = "Lot Assigned"
     Cells(1, 5).Value = "Lot with Error"
     Cells(1, 6).Value = "Number of Error"
-    Cells(1, 7).Value = "Penalty"
-    Cells(1, 8).Value = "Score"
+    Cells(1, 7).Value = "Additional Error"
+    Cells(1, 8).Value = "Penalty"
+    Cells(1, 9).Value = "Score"
 Range("A2:A1048576").Select
 With Selection.Validation
         .Delete
@@ -47,10 +50,16 @@ With Selection.Validation
         .ShowInput = True
         .ShowError = True
 End With
+    ReviewerNum = Worksheets("Names").Cells(1, 1).End(xlDown).Row
+    ReDim ReviewerName(ReviewerNum) As String
+    For i = 1 To ReviewerNum
+        ReviewerName(i) = Worksheets("Names").Cells(i, 1).Value
+    Next i
+    
     Range("B2").Select
     With Selection.Validation
         .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-        xlBetween, formula1:="=Names!$A$1:$A$30"
+        xlBetween, formula1:="=Names!$A$1:$A$" & ReviewerNum
         .IgnoreBlank = True
         .InCellDropdown = True
         .InputTitle = "Data Reviewer Name"
@@ -115,6 +124,7 @@ Sub Compute()
     Dim LotAssigned() As Integer
     Dim LotError() As Integer
     Dim ErrorNum() As Integer
+    Dim ExtraError() As Integer
     Dim penalty() As Double
     Dim score() As Double
     Dim record_num As Long
@@ -143,6 +153,7 @@ record_num = Cells(1, 1).End(xlDown).Row
     ReDim LotAssigned(record_num) As Integer
     ReDim LotError(record_num) As Integer
     ReDim ErrorNum(record_num) As Integer
+    ReDim ExtraError(record_num) As Integer
     ReDim penalty(record_num) As Double
     ReDim score(record_num) As Double
     Cells(2, 1).Activate
@@ -165,10 +176,16 @@ record_num = Cells(1, 1).End(xlDown).Row
       LotAssigned(i) = ActiveCell.Offset(0, 3).Value
       LotError(i) = ActiveCell.Offset(0, 4).Value
       ErrorNum(i) = ActiveCell.Offset(0, 5).Value
-      penalty(i) = (LotError(i) * ErrorNum(i)) / (assignment(i) * LotAssigned(i))
-      score(i) = 100 - penalty(i)
-      ActiveCell.Offset(0, 6).Value = penalty(i)
-      ActiveCell.Offset(0, 7).Value = score(i)
+      ExtraError(i) = ActiveCell.Offset(0, 6).Value
+      penalty(i) = (LotError(i) * ErrorNum(i)) / (assignment(i)) + (ExtraError(i) / assignment(i))
+      score(i) = (assignment(i) * LotAssigned(i) - penalty(i)) / (assignment(i) * LotAssigned(i)) * 100
+      If score(i) < 0 Then
+        score(i) = 0
+      Else
+        score(i) = score(i)
+      End If
+      ActiveCell.Offset(0, 7).Value = penalty(i)
+      ActiveCell.Offset(0, 8).Value = score(i)
       ActiveCell.Offset(1, 0).Activate
     Next i
 End Sub
@@ -196,12 +213,17 @@ Sub Gen_report()
     Dim month_name As String
     Dim Curr_Rec As Integer
     Dim ReportSheet() As Variant
+    Dim NextRow As Long
 '---------------------------------------------------------
 'Array dimension
 '----------------
 
 '---------------------------------------------------------
-    ReDim summary(26, 2) As Double
+    ReviewerNum = ActiveWorkbook.Worksheets("Names").Cells(1, 1).End(xlDown).Row
+    ReDim ReviewerName(ReviewerNum) As String
+    For i = 1 To ReviewerNum
+        ReviewerName(i) = Worksheets("Names").Cells(i, 1).Value
+    Next i
     year = InputBox("Enter the year of the report")
     month = InputBox("Enter the month for report: " _
         & vbCr & "1. January" _
@@ -249,7 +271,6 @@ Sub Gen_report()
         Case Is = 12
             month_name = "December"
     End Select
-   
     ReportRecNum = 0
     For i = report_start_week To report_end_week
         If i < 10 Then
@@ -262,103 +283,401 @@ Sub Gen_report()
         ReportRecNum = ReportRecNum + rowNum(i) - 1
     Next i
 MsgBox ("Processing monthly report of " & month_name & " " & year & " with " & ReportRecNum & " records.")
-ReDim temp(4, ReportRecNum) As Double
+ReDim temp(5, ReportRecNum) As Double
 Curr_Rec = 0
 For i = report_start_week To report_end_week
     Worksheets(SheetName(i)).Activate
     For j = 2 To rowNum(i)
         Curr_Rec = Curr_Rec + 1
-        Cells(j, 2).Activate
-        Select Case Cells(j, 2).Value
-            Case Is = "Alam, Nuzhat P"
-                temp(1, Curr_Rec) = 1
-            Case Is = "Barnes, Michelle"
-                temp(1, Curr_Rec) = 2
-            Case Is = "Batts, George III"
-                temp(1, Curr_Rec) = 3
-            Case Is = "Beckwith, Catherine"
-                temp(1, Curr_Rec) = 4
-            Case Is = "Blair, Kenneth John"
-                temp(1, Curr_Rec) = 5
-            Case Is = "Bomboy, Dustin Shaun"
-                temp(1, Curr_Rec) = 6
-            Case Is = "Borrero López, Francheska"
-                temp(1, Curr_Rec) = 7
-            Case Is = "Cintron Barreto, Derickniel"
-                temp(1, Curr_Rec) = 8
-            Case Is = "Clark, Antonio"
-                temp(1, Curr_Rec) = 9
-            Case Is = "Clark, Janneth Lucia"
-                temp(1, Curr_Rec) = 10
-            Case Is = "Dudley, Jocelyn Imi"
-                temp(1, Curr_Rec) = 11
-            Case Is = "Ghahra, Parvaneh"
-                temp(1, Curr_Rec) = 12
-            Case Is = "Gray, Jason L."
-                temp(1, Curr_Rec) = 13
-            Case Is = "HARRISON, MARY"
-                temp(1, Curr_Rec) = 14
-            Case Is = "Lash, Tanya"
-                temp(1, Curr_Rec) = 15
-            Case Is = "Lee, Trecia"
-                temp(1, Curr_Rec) = 16
-            Case Is = "McRae, Tangelo"
-                temp(1, Curr_Rec) = 17
-            Case Is = "McBean, Coray"
-                temp(1, Curr_Rec) = 18
-            Case Is = "Nash, Shalena"
-                temp(1, Curr_Rec) = 19
-            Case Is = "Obdens, Aaron Benjamin"
-                temp(1, Curr_Rec) = 20
-            Case Is = "Polashuk, Michael"
-                temp(1, Curr_Rec) = 21
-            Case Is = "Riley, Lakesha"
-                temp(1, Curr_Rec) = 22
-            Case Is = "Silver, Carla Marie"
-                temp(1, Curr_Rec) = 23
-            Case Is = "Smith, Carlton E"
-                temp(1, Curr_Rec) = 24
-            Case Is = "Springer-Dickson, Sherlene"
-                temp(1, Curr_Rec) = 25
-            Case Is = "Tummala, Lok"
-                temp(1, Curr_Rec) = 26
-            Case Is = "Vines, Vernon"
-                temp(1, Curr_Rec) = 27
-            Case Is = "Wynn, Jason L."
-                temp(1, Curr_Rec) = 28
-            Case Is = "Zimmerman-Ford, Gisela Z"
-                temp(1, Curr_Rec) = 29
+        Cells(j, 1).Activate
+            temp(1, Curr_Rec) = ActiveCell.Value
+            ActiveCell.Offset(0, 1).Activate
+        Select Case ActiveCell.Value
+            Case Is = ReviewerName(1)
+                temp(2, Curr_Rec) = 1
+            Case Is = ReviewerName(2)
+                temp(2, Curr_Rec) = 2
+            Case Is = ReviewerName(3)
+                temp(2, Curr_Rec) = 3
+            Case Is = ReviewerName(4)
+                temp(2, Curr_Rec) = 4
+            Case Is = ReviewerName(5)
+                temp(2, Curr_Rec) = 5
+            Case Is = ReviewerName(6)
+                temp(2, Curr_Rec) = 6
+            Case Is = ReviewerName(7)
+                temp(2, Curr_Rec) = 7
+            Case Is = ReviewerName(8)
+                temp(2, Curr_Rec) = 8
+            Case Is = ReviewerName(9)
+                temp(2, Curr_Rec) = 9
+            Case Is = ReviewerName(10)
+                temp(2, Curr_Rec) = 10
+            Case Is = ReviewerName(11)
+                temp(2, Curr_Rec) = 11
+            Case Is = ReviewerName(12)
+                temp(2, Curr_Rec) = 12
+            Case Is = ReviewerName(13)
+                temp(2, Curr_Rec) = 13
+            Case Is = ReviewerName(14)
+                temp(2, Curr_Rec) = 14
+            Case Is = ReviewerName(15)
+                temp(2, Curr_Rec) = 15
+            Case Is = ReviewerName(16)
+                temp(2, Curr_Rec) = 16
+            Case Is = ReviewerName(17)
+                temp(2, Curr_Rec) = 17
+            Case Is = ReviewerName(18)
+                temp(2, Curr_Rec) = 18
+            Case Is = ReviewerName(19)
+                temp(2, Curr_Rec) = 19
+            Case Is = ReviewerName(20)
+                temp(2, Curr_Rec) = 20
+            Case Is = ReviewerName(21)
+                temp(2, Curr_Rec) = 21
+            Case Is = ReviewerName(22)
+                temp(2, Curr_Rec) = 22
+            Case Is = ReviewerName(23)
+                temp(2, Curr_Rec) = 23
+            Case Is = ReviewerName(24)
+                temp(2, Curr_Rec) = 24
+            Case Is = ReviewerName(25)
+                temp(2, Curr_Rec) = 25
+            Case Is = ReviewerName(26)
+                temp(2, Curr_Rec) = 26
+            Case Is = ReviewerName(27)
+                temp(2, Curr_Rec) = 27
+            Case Is = ReviewerName(28)
+                temp(2, Curr_Rec) = 28
+            Case Is = ReviewerName(29)
+                temp(2, Curr_Rec) = 29
         End Select
         Select Case ActiveCell.Offset(0, 1).Value
             Case Is = "Impurity/Potency"
-                temp(2, Curr_Rec) = 5
+                temp(3, Curr_Rec) = 5
             Case Is = "Impurity"
-                temp(2, Curr_Rec) = 4
+                temp(3, Curr_Rec) = 4
             Case Is = "Potency"
-                temp(2, Curr_Rec) = 3
+                temp(3, Curr_Rec) = 3
             Case Is = "Assay"
-                temp(2, Curr_Rec) = 2
+                temp(3, Curr_Rec) = 2
             Case Is = "ID"
-                temp(2, Curr_Rec) = 1
+                temp(3, Curr_Rec) = 1
         End Select
-        temp(3, Curr_Rec) = ActiveCell.Offset(0, 2).Value
-        temp(4, Curr_Rec) = ActiveCell.Offset(0, 6).Value
+        temp(4, Curr_Rec) = ActiveCell.Offset(0, 2).Value
+        temp(5, Curr_Rec) = ActiveCell.Offset(0, 7).Value
+       
     Next j
 Next i
 MsgBox ("Data loaded")
 With Application
-    .SheetsInNewWorkbook = 29
+    .SheetsInNewWorkbook = ReviewerNum
     .Workbooks.Add
-    .SheetsInNewWorkbook = 29
+    .SheetsInNewWorkbook = ReviewerNum
 End With
-ReportSheet = Array("Alam", "Barnes", "Batts", "Beckwith", "Blair", "Bomboy", "Borrero_López", "Clintron_Barreto", _
-"Clark_A", "Clack_J", "Dudley", "Ghahra", "Gray", "Harrison", "Lash", "Lee", "McRae", "McBean", "Nash", "Obdens", _
-"Polashuk", "Riley", "Silver", "Smith", "Springer-Dickson", "Tummala", "Vines", "Wynn", "Zimmerman-Ford")
-For i = 0 To 28
-   Sheets("Sheet" & i + 1).name = ReportSheet(i)
+For i = 1 To ReviewerNum
+   Sheets("Sheet" & i).name = ReviewerName(i)
+   Worksheets(ReviewerName(i)).Cells(1, 1).Value = "Date"
+   Worksheets(ReviewerName(i)).Cells(1, 2).Value = "Name"
+   Worksheets(ReviewerName(i)).Cells(1, 3).Value = "Type"
+   Worksheets(ReviewerName(i)).Cells(1, 4).Value = "Lot"
+   Worksheets(ReviewerName(i)).Cells(1, 5).Value = "Score"
 Next i
 ActiveWorkbook.SaveAs Filename:=month_name & year & ".xlsx"
-
+For i = 1 To ReportRecNum
+    Select Case temp(2, i)
+        Case Is = 1
+            Worksheets(ReviewerName(1)).Activate
+            NextRow = Worksheets(ReviewerName(1)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(1)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(1)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 2
+            Worksheets(ReviewerName(2)).Activate
+            NextRow = Worksheets(ReviewerName(2)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(2)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(2)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 3
+            Worksheets(ReviewerName(3)).Activate
+            NextRow = Worksheets(ReviewerName(3)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(3)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(3)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 4
+            Worksheets(ReviewerName(4)).Activate
+            NextRow = Worksheets(ReviewerName(4)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(4)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(4)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 5
+            Worksheets(ReviewerName(5)).Activate
+            NextRow = Worksheets(ReviewerName(5)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(5)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(5)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 6
+            Worksheets(ReviewerName(6)).Activate
+            NextRow = Worksheets(ReviewerName(6)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(6)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(6)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 7
+            Worksheets(ReviewerName(7)).Activate
+            NextRow = Worksheets(ReviewerName(7)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(7)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(7)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 8
+            Worksheets(ReviewerName(8)).Activate
+            NextRow = Worksheets(ReviewerName(8)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(8)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(8)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 9
+            Worksheets(ReviewerName(9)).Activate
+            NextRow = Worksheets(ReviewerName(9)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(9)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(9)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 10
+            Worksheets(ReviewerName(10)).Activate
+            NextRow = Worksheets(ReviewerName(10)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(10)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(10)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 11
+            Worksheets(ReviewerName(11)).Activate
+            NextRow = Worksheets(ReviewerName(11)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(11)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(11)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 12
+            Worksheets(ReviewerName(12)).Activate
+            NextRow = Worksheets(ReviewerName(12)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(12)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(12)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 13
+            Worksheets(ReviewerName(13)).Activate
+            NextRow = Worksheets(ReviewerName(13)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(13)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(13)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 14
+            Worksheets(ReviewerName(14)).Activate
+            NextRow = Worksheets(ReviewerName(14)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(14)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(14)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 15
+            Worksheets(ReviewerName(15)).Activate
+            NextRow = Worksheets(ReviewerName(15)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(15)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(15)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 16
+            Worksheets(ReviewerName(16)).Activate
+            NextRow = Worksheets(ReviewerName(16)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(16)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(16)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 17
+            Worksheets(ReviewerName(17)).Activate
+            NextRow = Worksheets(ReviewerName(17)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(17)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(17)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 18
+            Worksheets(ReviewerName(18)).Activate
+            NextRow = Worksheets(ReviewerName(18)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(18)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(18)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 19
+            Worksheets(ReviewerName(19)).Activate
+            NextRow = Worksheets(ReviewerName(19)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(19)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(19)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 20
+            Worksheets(ReviewerName(20)).Activate
+            NextRow = Worksheets(ReviewerName(20)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(20)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(20)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 21
+            Worksheets(ReviewerName(21)).Activate
+            NextRow = Worksheets(ReviewerName(21)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(21)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(21)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 22
+            Worksheets(ReviewerName(22)).Activate
+            NextRow = Worksheets(ReviewerName(22)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(22)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(22)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 23
+            Worksheets(ReviewerName(23)).Activate
+            NextRow = Worksheets(ReviewerName(23)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(23)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(23)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 24
+            Worksheets(ReviewerName(24)).Activate
+            NextRow = Worksheets(ReviewerName(24)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(24)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(24)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 25
+            Worksheets(ReviewerName(25)).Activate
+            NextRow = Worksheets(ReviewerName(25)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(25)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(25)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 26
+            Worksheets(ReviewerName(26)).Activate
+            NextRow = Worksheets(ReviewerName(26)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(26)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(26)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 27
+            Worksheets(ReviewerName(27)).Activate
+            NextRow = Worksheets(ReviewerName(27)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(27)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(27)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 28
+            Worksheets(ReviewerName(28)).Activate
+            NextRow = Worksheets(ReviewerName(28)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(28)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(28)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+        Case Is = 29
+            Worksheets(ReviewerName(29)).Activate
+            NextRow = Worksheets(ReviewerName(29)).Range("A:A").Cells.SpecialCells(xlCellTypeConstants).Count + 1
+            Worksheets(ReviewerName(29)).Cells(NextRow, 1).Activate
+            ActiveCell.Value = temp(1, i)
+            ActiveCell.NumberFormat = "mm/dd/yyyy"
+            ActiveCell.Offset(0, 1).Value = ReviewerName(29)
+            ActiveCell.Offset(0, 2).Value = temp(3, i)
+            ActiveCell.Offset(0, 3).Value = temp(4, i)
+            ActiveCell.Offset(0, 4).Value = temp(5, i)
+    End Select
+Next i
 End Sub
 '----------------------------------------------------------------------
 '  Period_End = DateSerial(Year_Num, Month_Num, Day_Num)
